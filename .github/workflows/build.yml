@@ -86,6 +86,8 @@ jobs:
           tag_v=$(git describe --tags $(git rev-list --tags --max-count=1))
           tag=$(echo $tag_v | sed 's/v//')
 
+          echo "TARGET_TAG=${tag}" >> $GITHUB_OUTPUT
+
       - name: Build and push docker image
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -101,10 +103,10 @@ jobs:
         shell: bash
         run: |
 
-          echo "latest tag is ${{ steps.last_tag.outputs.tag }}"
+          echo "latest tag is ${{ steps.last_tag.outputs.TARGET_TAG }}"
 
           docker build \
-          --target 'publish' -t "homebudget-rates-api:${{ steps.last_tag.outputs.tag }}" \
+          --target 'publish' -t "homebudget-rates-api:${{ steps.last_tag.outputs.TARGET_TAG }}" \
           --build-arg PULL_REQUEST_ID='${{ steps.findPr.outputs.pr }}' \
           --build-arg PULL_REQUEST_SOURCE_BRANCH='${{ github.ref }}' \
           --build-arg PULL_REQUEST_TARGET_BRANCH=refs/heads/master \
