@@ -18,7 +18,7 @@ jobs:
 
       - uses: haya14busa/action-update-semver@v1
         with:
-          tag: "v0.0.0"
+          tag: "v0.1"
           github_token: ${{ secrets.github_token }}
           major_version_tag_only: false # (optional, default is "false")
 
