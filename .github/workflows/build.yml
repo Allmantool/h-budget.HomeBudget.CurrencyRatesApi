@@ -96,8 +96,10 @@ jobs:
           tag_v=$(git describe --tags $(git rev-list --tags --max-count=1))
           tag=$(echo $tag_v | sed 's/v//')
 
+          echo ${tag}
+
           docker build \
-          --target 'publish' -t 'homebudget-rates-api:${tag}' \
+          --target 'publish' -t 'homebudget-rates-api:'${tag} \
           --build-arg PULL_REQUEST_ID='${{ steps.findPr.outputs.pr }}' \
           --build-arg PULL_REQUEST_SOURCE_BRANCH='${{ github.ref }}' \
           --build-arg PULL_REQUEST_TARGET_BRANCH=refs/heads/master \
