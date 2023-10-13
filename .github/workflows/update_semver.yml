@@ -18,5 +18,13 @@ jobs:
 
       - uses: haya14busa/action-update-semver@v1
         with:
+          tag: "v0.0.0"
           github_token: ${{ secrets.github_token }}
           major_version_tag_only: false # (optional, default is "false")
+
+      - name: Show generated tag
+        run: |
+            tag_v=$(git describe --tags $(git rev-list --tags --max-count=1))
+            tag=$(echo $tag_v | sed 's/v//')
+
+            echo ${tag}
