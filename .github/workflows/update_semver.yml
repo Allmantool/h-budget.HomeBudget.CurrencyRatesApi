@@ -18,10 +18,11 @@ jobs:
         id: version
         uses: PaulHatch/semantic-version@v5.3.0
         with:
-          change_path: "."
           tag_prefix: "v"
-          version_format: "${major}.${minor}.${patch}-prerelease${increment}"
+          version_format: "${major}.${minor}.${patch}"
           bump_each_commit: true
+          use_branches: true
+          version_from_branch: true
 
       - name: Show generated tag
         run: |
