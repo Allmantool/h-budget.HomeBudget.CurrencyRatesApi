@@ -3,7 +3,18 @@ name: Update Semver
 on:
   push:
     branches:
-      - "master"
+      - master
+      - developed
+      - feature/*
+      - test/*
+      - hotfix/*
+      - fix/*
+      - tech/*
+    tags:
+      - "v*"
+
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   update-semver:
@@ -19,7 +30,7 @@ jobs:
         uses: PaulHatch/semantic-version@v5.3.0
         with:
           tag_prefix: "v"
-          version_format: "${major}.${minor}.${patch}"
+          version_format: "${major}.${minor}.${patch}-build${increment}"
           bump_each_commit: true
           version_from_branch: true
           debug: true
@@ -31,7 +42,7 @@ jobs:
 
       - name: Show generated tag
         run: |
-            tag_v=$(git describe --tags $(git rev-list --tags --max-count=1))
-            tag=$(echo $tag_v | sed 's/v//')
+          tag_v=$(git describe --tags $(git rev-list --tags --max-count=1))
+          tag=$(echo $tag_v | sed 's/v//')
 
-            echo ${tag}
+          echo ${tag}
