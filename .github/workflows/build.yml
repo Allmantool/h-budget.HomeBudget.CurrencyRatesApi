@@ -79,10 +79,10 @@ jobs:
         env:
           PR: ${{ steps.findPr.outputs.pr }}
 
-      - name: Build and analyze docker script
+      - name: Build and push docker image
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
           GITHUB_RUN_ID: ${{ github.run_id }}
           RUN_NUMBER: ${{ github.run_number }}
           RUN_ATTEMPT: ${{ github.run_attempt }}
@@ -93,12 +93,16 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
         shell: bash
         run: |
+          tag_v=$(git describe --tags $(git rev-list --tags --max-count=1))
+          tag=$(echo $tag_v | sed 's/v//')
+
           docker build \
-          --target 'publish' -t 'h-budget-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}' \
+          --target 'publish' -t 'homebudget-rates-api:${tag}' \
           --build-arg PULL_REQUEST_ID='${{ steps.findPr.outputs.pr }}' \
           --build-arg PULL_REQUEST_SOURCE_BRANCH='${{ github.ref }}' \
           --build-arg PULL_REQUEST_TARGET_BRANCH=refs/heads/master \
           --build-arg GITHUB_RUN_ID='${{ github.run_id }}' \
-          --build-arg SONAR_TOKEN='${{ secrets.SONAR_TOKEN }}' \
+          --build-arg SONAR_TOKEN='${{ env.SONAR_TOKEN }}' \
           .
 
+          docker push allmantool/homebudget-rates-api:${tag}
