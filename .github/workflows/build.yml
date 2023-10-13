@@ -88,7 +88,7 @@ jobs:
 
           echo "TARGET_TAG=${tag}" >> $GITHUB_OUTPUT
 
-      - name: Build and push docker image
+      - name: Build docker image
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
@@ -114,4 +114,7 @@ jobs:
           --build-arg SONAR_TOKEN='${{ env.SONAR_TOKEN }}' \
           .
 
-          docker push allmantool/homebudget-rates-api:${tag}
+      - name: Push docker image
+        shell: bash
+        run: |
+            docker push "allmantool/homebudget-rates-api:${{ steps.last_tag.outputs.TARGET_TAG }}"
