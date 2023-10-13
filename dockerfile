@@ -69,7 +69,6 @@ COPY ["HomeBudget.DataAccess/*.csproj", "HomeBudget.DataAccess/"]
 COPY ["HomeBudget.Core/*.csproj", "HomeBudget.Core/"]
 COPY ["HomeBudget.Rates.Api/*.csproj", "HomeBudget.Rates.Api/"]
 COPY ["HomeBudget.DataAccess.Dapper/*.csproj", "HomeBudget.DataAccess.Dapper/"]
-COPY ["docker-compose.dcproj", "."]
 
 COPY . .
 
