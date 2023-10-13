@@ -19,6 +19,7 @@ jobs:
         uses: PaulHatch/semantic-version@v5.3.0
         with:
           change_path: "."
+          tag_prefix: "v"
 
       - name: Show generated tag
         run: |
