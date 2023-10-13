@@ -1,0 +1,136 @@
+version: '3.9'
+
+services:
+  elasticsearch:
+    image: elasticsearch:8.5.3
+    container_name: homebudget-elasticsearch
+    ports:
+      - 9250:9200
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    environment:
+      - xpack.watcher.enabled=false
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    networks:
+     - elastic-network
+
+  homebudget-sql-server:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    container_name: homebudget-sql-server
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: ${SQL_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - ${SQL_VOLUME_PATH}:/var/opt/mssql/data
+    networks:
+      - mssql-network
+
+  flyway:
+    image: flyway/flyway:8.5.2
+    container_name: homebudget-flyway-migration
+    command: -url=jdbc:sqlserver://homebudget-sql-server -schemas=homebudget-schema -mixed=true -baselineOnMigrate=true -user=sa -password=${SQL_PASSWORD} -connectRetries=5 migrate
+    volumes:
+      - ${FLYWAY_SCRIPTS_PATH}:/flyway/sql
+    networks:
+      - mssql-network
+    depends_on:
+      - homebudget-sql-server
+
+  redis_server:
+    image: redis:7.0.7
+    container_name: homebudget-cache
+    ports:
+      - "6379:6379"
+    networks:
+      - redis-network
+    depends_on:
+      - homebudget-sql-server
+
+  sonarCube:
+    image: sonarqube:9.9.1-developer
+    container_name: homebudget-sonar-cube
+    environment:
+#      SONAR_JDBC_URL: jdbc:sqlserver://homebudget-sql-server;databaseName=sonar;integratedSecurity=true
+      SONAR_JDBC_USERNAME: sa
+      SONAR_JDBC_PASSWORD: ${SQL_PASSWORD}
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    networks:
+      - sonar-network
+    depends_on:
+      - homebudget-sql-server
+
+  kibana:
+    image: kibana:8.5.3
+    container_name: homebudget-kibana
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTICSEARCH_URL=http://localhost:9250
+    networks:
+      - elastic-network
+    depends_on:
+      - elasticsearch
+
+  homebudget-rates-api:
+    image: ${DOCKER_REGISTRY-}homebudget-rates-api:v0.0.84
+    container_name: homebudget-rates-api
+    build:
+      context: .
+      dockerfile: dockerfile
+      args:
+        - SONAR_TOKEN=${SONAR_TOKEN}
+        - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+        - GITHUB_RUN_ID=${GITHUB_RUN_ID}
+        - PULL_REQUEST_ID=${PULL_REQUEST_ID}
+        - PULL_REQUEST_SOURCE_BRANCH=${PULL_REQUEST_SOURCE_BRANCH}
+        - PULL_REQUEST_TARGET_BRANCH=${PULL_REQUEST_TARGET_BRANCH}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      # - ASPNETCORE_HTTPS_PORT=5008
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      - "5207:80"
+      - "5208:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - elastic-network
+      - sonar-network
+      - redis-network
+      - mssql-network
+      - rates-api-network
+    depends_on:
+      - homebudget-sql-server
+      - redis_server
+      - sonarCube
+      - elasticsearch
+      - kibana
+
+networks:
+  rates-api-network:
+    driver: bridge
+  elastic-network:
+    driver: bridge
+  sonar-network:
+    driver: bridge
+  redis-network:
+    driver: bridge
+  mssql-network:
+    driver: bridge
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  elasticsearch-data:
