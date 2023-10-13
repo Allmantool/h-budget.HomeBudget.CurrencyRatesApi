@@ -19,10 +19,10 @@ jobs:
         uses: PaulHatch/semantic-version@v5.3.0
         with:
           tag_prefix: "v"
-          version_format: "${major}.${minor}.${patch}"
+          version_format: "$v{major}.${minor}.${patch}"
           bump_each_commit: true
-          use_branches: true
           version_from_branch: true
+          debug: true
 
       - name: Show generated tag
         run: |
