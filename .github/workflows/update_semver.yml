@@ -21,6 +21,7 @@ jobs:
           change_path: "."
           tag_prefix: "v"
           version_format: "${major}.${minor}.${patch}-prerelease${increment}"
+          bump_each_commit: true
 
       - name: Show generated tag
         run: |
