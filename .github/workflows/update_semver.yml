@@ -20,6 +20,7 @@ jobs:
         with:
           change_path: "."
           tag_prefix: "v"
+          version_format: "${major}.${minor}.${patch}-prerelease${increment}"
 
       - name: Show generated tag
         run: |
