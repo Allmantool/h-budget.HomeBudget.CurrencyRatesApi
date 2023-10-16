@@ -10,5 +10,10 @@ namespace HomeBudget.Rates.Api.Middlewares
         {
             return builder.UseMiddleware<NationalBankClientWarmUpMiddleware>(services);
         }
+
+        public static IApplicationBuilder UseCorrelationId(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<CorrelationIdMiddleware>();
+        }
     }
 }
