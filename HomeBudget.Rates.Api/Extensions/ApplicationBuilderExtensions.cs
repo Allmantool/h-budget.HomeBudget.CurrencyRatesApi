@@ -49,6 +49,7 @@ namespace HomeBudget.Rates.Api.Extensions
                 .UseResponseCaching()
                 .UseAuthorization()
                 .UseRouting()
+                .UseCorrelationId()
                 .UseSerilogRequestLogging(options =>
                 {
                     // Customize the message template
