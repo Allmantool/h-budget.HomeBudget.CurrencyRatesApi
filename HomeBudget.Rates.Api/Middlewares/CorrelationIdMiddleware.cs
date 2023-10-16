@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
 
+using HomeBudget.Core.Constants;
+
 namespace HomeBudget.Rates.Api.Middlewares
 {
     public class CorrelationIdMiddleware
     {
         private readonly RequestDelegate _next;
-
-        private const string CorrelationIdHeaderKey = "Correlationid";
 
         public CorrelationIdMiddleware(RequestDelegate next)
         {
@@ -20,11 +20,11 @@ namespace HomeBudget.Rates.Api.Middlewares
         {
             var requestHeaders = context.Request.Headers;
 
-            _ = requestHeaders.TryGetValue(CorrelationIdHeaderKey, out var correlationId);
+            _ = requestHeaders.TryGetValue(HttpHeaderKeys.CorrelationIdHeaderKey, out var correlationId);
 
             var responseHeaders = context.Response.Headers;
 
-            responseHeaders.TryAdd(CorrelationIdHeaderKey, correlationId);
+            responseHeaders.TryAdd(HttpHeaderKeys.CorrelationIdHeaderKey, correlationId);
 
             await _next.Invoke(context);
         }

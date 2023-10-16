@@ -11,6 +11,7 @@ using Serilog.Events;
 using HomeBudget.Rates.Api.Configuration;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Middlewares;
+using HomeBudget.Core.Constants;
 
 namespace HomeBudget.Rates.Api.Extensions
 {
@@ -39,7 +40,8 @@ namespace HomeBudget.Rates.Api.Extensions
                     corsPolicyBuilder
                         .WithOrigins(uiOrigin ?? throw new InvalidOperationException())
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .WithExposedHeaders(HttpHeaderKeys.CorrelationIdHeaderKey);
                 });
             }
 
