@@ -5,7 +5,6 @@
     <RootNamespace>HomeBudget.Rates.Api</RootNamespace>
     <UserSecretsId>643b3ebf-9227-4642-9075-ffa462c6b4d3</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
