@@ -16,7 +16,7 @@ if [ ${PULL_REQUEST_ID} ];
         /d:sonar.coverageReportPaths="/app/testresults/coverage/reports/SonarQube.xml" \
         /d:sonar.cs.opencover.reportsPaths="/app/testresults/coverage/currencyRates.coverage.xml" \
         /d:sonar.pullrequest.provider="github" \
-        /d:sonar.pullrequest.github.repository="Allmantool/h-budget" \
+        /d:sonar.pullrequest.github.repository="Allmantool/h-budget.HomeBudget.CurrencyRatesApi" \
         /d:sonar.pullrequest.github.endpoint="https://api.github.com/"; \
     else \
         if [ ${PULL_REQUEST_SOURCE_BRANCH:11}=="master" ];
