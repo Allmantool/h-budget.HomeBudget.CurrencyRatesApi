@@ -14,7 +14,7 @@ namespace HomeBudget.Rates.Api.Extensions
                      "v1",
                      new OpenApiInfo
                      {
-                         Title = "HomeBudget_Web_API",
+                         Title = "HomeBudget_Rates_Api",
                          Version = "v1"
                      });
 
@@ -26,7 +26,7 @@ namespace HomeBudget.Rates.Api.Extensions
         {
             return app
                 .UseSwagger()
-                .UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "HomeBudget_Web_API v1"));
+                .UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "HomeBudget_Rates_Api v1"));
         }
     }
 }
