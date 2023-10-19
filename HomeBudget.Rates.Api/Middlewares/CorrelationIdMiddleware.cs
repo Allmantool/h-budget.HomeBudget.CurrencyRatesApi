@@ -7,7 +7,7 @@ using HomeBudget.Core.Constants;
 
 namespace HomeBudget.Rates.Api.Middlewares
 {
-    public class CorrelationIdMiddleware
+    internal class CorrelationIdMiddleware
     {
         private readonly RequestDelegate _next;
 
