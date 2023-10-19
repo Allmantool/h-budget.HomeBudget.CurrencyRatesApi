@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Hosting;
 
 namespace HomeBudget.Components.IntegrationTests
 {
-    public class HomeBudgetWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup>
+    public class HomeBudgetRatesApiApplicationFactory<TStartup> : WebApplicationFactory<TStartup>
         where TStartup : class
     {
         protected override IHostBuilder? CreateHostBuilder()

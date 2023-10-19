@@ -1,4 +1,7 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 using FluentAssertions;
 using NUnit.Framework;
@@ -16,7 +19,7 @@ namespace HomeBudget.Components.IntegrationTests
     [TestFixture]
     [Category("Integration")]
     public class CurrencyRatesControllerTests
-        : BaseWebApplicationFactory<HomeBudgetWebApplicationFactory<Rates.Api.Program>, Rates.Api.Program>
+        : BaseWebApplicationFactory<HomeBudgetRatesApiApplicationFactory<Rates.Api.Program>, Rates.Api.Program>
     {
         [SetUp]
         public override void SetUp()

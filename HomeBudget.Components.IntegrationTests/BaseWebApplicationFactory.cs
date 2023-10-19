@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using System;
+using System.Linq;
+
+using Microsoft.AspNetCore.Mvc.Testing;
 using NUnit.Framework;
 using RestSharp;
 
