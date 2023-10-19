@@ -8,7 +8,6 @@ using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
-using ILogger = Serilog.ILogger;
 
 namespace HomeBudget.Rates.Api.Extensions.Logs
 {
@@ -20,29 +19,40 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
             ConfigureHostBuilder host)
         {
             Log.Logger = new LoggerConfiguration()
-                 .Enrich.FromLogContext()
-                 .Enrich.WithMachineName()
-                 .Enrich.WithExceptionDetails()
-                 .Enrich.WithProperty("Environment", environment)
-                 .Enrich.WithSpan()
-                 .WriteTo.Debug()
-                 .WriteTo.Console()
-                 .WriteTo.Elasticsearch(ConfigureElasticSink(configuration, environment))
-                 .ReadFrom.Configuration(configuration)
-                 .CreateLogger();
+                .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .Enrich.WithExceptionDetails()
+                .Enrich.WithProperty("Environment", environment)
+                .Enrich.WithSpan()
+                .WriteTo.Debug()
+                .WriteTo.Console()
+                .AddElasticSearchSupport(configuration, environment)
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
 
             host.UseSerilog(Log.Logger);
 
             return Log.Logger;
         }
 
-        private static ElasticsearchSinkOptions ConfigureElasticSink(IConfiguration configuration, IHostEnvironment environment)
+        private static LoggerConfiguration AddElasticSearchSupport(
+            this LoggerConfiguration loggerConfiguration,
+            IConfiguration configuration,
+            IHostEnvironment environment)
+        {
+            var elasticNodeUrl = (configuration["ElasticConfiguration:Uri"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_URLS")) ?? string.Empty;
+
+            return string.IsNullOrWhiteSpace(elasticNodeUrl)
+                ? loggerConfiguration
+                : loggerConfiguration.WriteTo.Elasticsearch(ConfigureElasticSink(environment, elasticNodeUrl));
+        }
+
+        private static ElasticsearchSinkOptions ConfigureElasticSink(IHostEnvironment environment, string elasticNodeUrl)
         {
             var formattedExecuteAssemblyName = typeof(Program).Assembly.GetName().Name;
             var dateIndexPostfix = DateTime.UtcNow.ToString("MM-yyyy-dd");
-            var nodeUri = new Uri((configuration["ElasticConfiguration:Uri"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_URLS")) ?? string.Empty);
 
-            return new ElasticsearchSinkOptions(nodeUri)
+            return new ElasticsearchSinkOptions(new Uri(elasticNodeUrl))
             {
                 AutoRegisterTemplate = true,
                 TypeName = null,
