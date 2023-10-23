@@ -26,7 +26,7 @@ namespace HomeBudget.Rates.Api.Configuration
                 .Configure<ExternalResourceUrls>(configuration.GetSection(ConfigurationSectionKeys.ExternalResourceUrls))
                 .Configure<PollyRetryOptions>(configuration.GetSection(ConfigurationSectionKeys.PollyRetryOptions))
                 .RegisterCoreIoCDependency()
-                .RegisterCurrencyRatedIoCDependency()
+                .RegisterCurrencyRatesIoCDependency()
                 .RegistryDapperIoCDependencies();
 
             var serviceProvider = services.BuildServiceProvider();

@@ -9,7 +9,7 @@ namespace HomeBudget.Components.CurrencyRates.Configuration
 {
     public static class DependencyRegistrations
     {
-        public static IServiceCollection RegisterCurrencyRatedIoCDependency(
+        public static IServiceCollection RegisterCurrencyRatesIoCDependency(
             this IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
