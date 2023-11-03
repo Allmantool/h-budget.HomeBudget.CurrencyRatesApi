@@ -1,6 +1,4 @@
-﻿using System;
-
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,12 +31,12 @@ namespace HomeBudget.Rates.Api.Extensions
 
                 app.UseCors(corsPolicyBuilder =>
                 {
-                    var uiOrigin = configuration["UiOriginsUrl"];
+                    var allowedUiOrigins = configuration.GetSection("UiOriginsUrl").Get<string[]>();
 
-                    Log.Information("UI origin is '{0}'", uiOrigin);
+                    Log.Information("UI origin is '{0}'", string.Join(" ,", allowedUiOrigins));
 
                     corsPolicyBuilder
-                        .WithOrigins(uiOrigin ?? throw new InvalidOperationException())
+                        .WithOrigins(allowedUiOrigins)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .WithExposedHeaders(HttpHeaderKeys.CorrelationIdHeaderKey);
