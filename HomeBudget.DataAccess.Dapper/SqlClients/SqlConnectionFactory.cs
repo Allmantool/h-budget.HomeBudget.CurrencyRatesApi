@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Data;
-using HomeBudget.Core.Extensions;
+
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using HomeBudget.Core.Extensions;
 using HomeBudget.Core.Models;
 using HomeBudget.DataAccess.Interfaces;
 

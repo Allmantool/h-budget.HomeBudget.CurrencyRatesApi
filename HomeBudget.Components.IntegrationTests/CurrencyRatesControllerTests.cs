@@ -7,33 +7,32 @@ using FluentAssertions;
 using NUnit.Framework;
 using RestSharp;
 
+using HomeBudget.Core.Constants;
 using HomeBudget.Core.Models;
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Rates.Api.Models;
-
+using HomeBudget.Components.IntegrationTests.Constants;
 using CurrencyRate = HomeBudget.Rates.Api.Models.CurrencyRate;
 
 namespace HomeBudget.Components.IntegrationTests
 {
-    [Ignore("Intend to be used only for local testing. Not appropriate infrastructure has been setup")]
+    // [Ignore("Intend to be used only for local testing. Not appropriate infrastructure has been setup")]
+    [Category(TestTypes.Integration)]
     [TestFixture]
-    [Category("Integration")]
-    public class CurrencyRatesControllerTests
-        : BaseWebApplicationFactory<HomeBudgetRatesApiApplicationFactory<Rates.Api.Program>, Rates.Api.Program>
+    public class CurrencyRatesControllerTests : BaseWebApplicationFactory<Rates.Api.Program>
     {
-        [SetUp]
-        public override void SetUp()
+        [OneTimeTearDown]
+        public async Task StopAsync()
         {
-            SetUpHttpClient();
-
-            base.SetUp();
+            await CacheContainer.StopAsync();
+            await DbContainer.StopAsync();
         }
 
         [Test]
         public async Task GetRatesForPeriodAsync_WhenExecuteTheCallToEnquireRatesForPeriodOfTime_ThenIsSuccessStatusCode()
         {
-            var startDay = new DateTime(2022, 10, 25).ToString("yyyy-MM-dd");
-            var endDate = new DateTime(2022, 12, 25).ToString("yyyy-MM-dd");
+            var startDay = new DateTime(2022, 10, 25).ToString(DateFormats.RatesApiRequestFormat);
+            var endDate = new DateTime(2022, 12, 25).ToString(DateFormats.RatesApiRequestFormat);
 
             var getCurrencyRatesForPeriodRequest = new RestRequest($"/currencyRates/period/{startDay}/{endDate}");
 
@@ -46,8 +45,8 @@ namespace HomeBudget.Components.IntegrationTests
         public async Task GetRatesForPeriodAsync_WhenExecuteTheCallToEnquireRatesForPeriodOfTime_ThenReturnsExpectedAmountOfCurrencyGroupsInResponse()
         {
             // "2023-07-30"
-            var startDay = new DateTime(2022, 10, 25).ToString("yyyy-MM-dd");
-            var endDate = new DateTime(2022, 12, 25).ToString("yyyy-MM-dd");
+            var startDay = new DateTime(2022, 10, 25).ToString(DateFormats.RatesApiRequestFormat);
+            var endDate = new DateTime(2022, 12, 25).ToString(DateFormats.RatesApiRequestFormat);
 
             var getCurrencyRatesForPeriodRequest = new RestRequest($"/currencyRates/period/{startDay}/{endDate}");
 
