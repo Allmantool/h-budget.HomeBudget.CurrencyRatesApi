@@ -16,7 +16,6 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
         private bool _disposed;
 
         private IntegrationTestWebApplicationFactory<TEntryPoint> WebFactory { get; }
-
         internal RestClient RestHttpClient { get; private set; }
         protected MsSqlContainer DbContainer { get; private set; }
         protected RedisContainer CacheContainer { get; private set; }
@@ -28,17 +27,25 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
 
             if (TestTypes.Integration.Equals(testCategory, StringComparison.OrdinalIgnoreCase))
             {
-                WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>();
+                WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(SetUpDockerContainers);
 
-                SetUpDockerContainers();
-                SetUpHttpClient();
+                RestHttpClient = new RestClient(
+                    WebFactory.CreateClient(),
+                    new RestClientOptions(new Uri("http://localhost:6064")));
             }
         }
 
         public async Task StartAsync()
         {
-            await DbContainer.StartAsync();
-            await CacheContainer.StartAsync();
+            if (DbContainer != null)
+            {
+                await DbContainer.StartAsync();
+            }
+
+            if (CacheContainer != null)
+            {
+                await CacheContainer.StartAsync();
+            }
         }
 
         public async Task StopAsync()
@@ -58,6 +65,8 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
                 .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
                 .WithName("integration-sql-server")
                 .WithPassword("Strong_password_123!")
+                .WithEnvironment("ACCEPT_EULA", "Y")
+                .WithEnvironment("SA_PASSWORD", "Strong_password_123!")
                 .WithPortBinding(1533, 1433)
                 .Build();
 
@@ -66,13 +75,6 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
                 .WithPortBinding(6479, 6379)
                 .WithName("integration-redis_server")
                 .Build();
-        }
-
-        private void SetUpHttpClient()
-        {
-            var httpClient = WebFactory.CreateClient();
-
-            RestHttpClient = new RestClient(httpClient, new RestClientOptions(new Uri("http://localhost:6064")));
         }
 
         public void Dispose()

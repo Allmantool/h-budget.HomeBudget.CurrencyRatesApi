@@ -71,7 +71,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         }
 
         [Test]
-        public async Task GetTodayRatesAsync_WhenEnquiringAndSaveTodayRates_ThenOkAsStatus()
+        public async Task GetTodayRatesAsync_WhenEnquireAndSaveTodayRates_ThenOkAsStatus()
         {
             var getTodayRatesRequest = new RestRequest("/currencyRates/today");
 
