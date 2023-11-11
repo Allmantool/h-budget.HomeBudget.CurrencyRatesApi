@@ -12,21 +12,23 @@ using HomeBudget.Core.Models;
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Rates.Api.Models;
 using HomeBudget.Components.IntegrationTests.Constants;
+using HomeBudget.Components.IntegrationTests.WebApps;
 using CurrencyRate = HomeBudget.Rates.Api.Models.CurrencyRate;
 
-namespace HomeBudget.Components.IntegrationTests
+namespace HomeBudget.Components.IntegrationTests.Controllers
 {
     // [Ignore("Intend to be used only for local testing. Not appropriate infrastructure has been setup")]
     [Category(TestTypes.Integration)]
     [TestFixture]
-    public class CurrencyRatesControllerTests : BaseWebApplicationFactory<Rates.Api.Program>
+    public class CurrencyRatesControllerTests : IAsyncDisposable
     {
+        private readonly CurrencyRatesTestWebApp _sut = new();
+
+        [OneTimeSetUp]
+        public async Task StartAsync() => await _sut.StartAsync();
+
         [OneTimeTearDown]
-        public async Task StopAsync()
-        {
-            await CacheContainer.StopAsync();
-            await DbContainer.StopAsync();
-        }
+        public async Task StopAsync() => await _sut.StopAsync();
 
         [Test]
         public async Task GetRatesForPeriodAsync_WhenExecuteTheCallToEnquireRatesForPeriodOfTime_ThenIsSuccessStatusCode()
@@ -36,7 +38,7 @@ namespace HomeBudget.Components.IntegrationTests
 
             var getCurrencyRatesForPeriodRequest = new RestRequest($"/currencyRates/period/{startDay}/{endDate}");
 
-            var response = await RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
 
             Assert.IsTrue(response.IsSuccessful);
         }
@@ -50,7 +52,7 @@ namespace HomeBudget.Components.IntegrationTests
 
             var getCurrencyRatesForPeriodRequest = new RestRequest($"/currencyRates/period/{startDay}/{endDate}");
 
-            var response = await RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
             var payload = response.Data;
             var currencyGroupAmount = payload?.Payload.Count;
 
@@ -62,7 +64,7 @@ namespace HomeBudget.Components.IntegrationTests
         {
             var getRatesRequest = new RestRequest("/currencyRates");
 
-            var response = await RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getRatesRequest);
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getRatesRequest);
 
             // TODO: think over what to test
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -73,7 +75,7 @@ namespace HomeBudget.Components.IntegrationTests
         {
             var getTodayRatesRequest = new RestRequest("/currencyRates/today");
 
-            var response = await RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getTodayRatesRequest);
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getTodayRatesRequest);
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
@@ -101,9 +103,17 @@ namespace HomeBudget.Components.IntegrationTests
             var currencySaveRatesRequest = new RestRequest("/currencyRates", Method.Post)
                 .AddJsonBody(requestBody);
 
-            var response = await RestHttpClient!.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_sut != null)
+            {
+                await _sut.DisposeAsync();
+            }
         }
     }
 }

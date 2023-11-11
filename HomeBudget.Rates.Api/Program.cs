@@ -44,7 +44,7 @@ webHost
 // This method gets called by the runtime. Use this method to add services to the container.
 services.AddControllers();
 
-await services.SetUpDiAsync(configuration);
+await services.SetUpDiAsync(configuration, environment);
 services.AddAutoMapper(new List<Assembly>
 {
     typeof(HomeBudget.Rates.Api.Program).Assembly,
