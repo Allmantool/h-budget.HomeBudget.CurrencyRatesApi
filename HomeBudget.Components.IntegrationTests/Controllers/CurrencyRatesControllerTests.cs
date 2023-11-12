@@ -24,9 +24,6 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
     {
         private readonly CurrencyRatesTestWebApp _sut = new();
 
-        [OneTimeSetUp]
-        public async Task StartAsync() => await _sut.StartAsync();
-
         [OneTimeTearDown]
         public async Task StopAsync() => await _sut.StopAsync();
 

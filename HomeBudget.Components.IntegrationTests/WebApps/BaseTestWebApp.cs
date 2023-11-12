@@ -16,7 +16,7 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
         private bool _disposed;
 
         private IntegrationTestWebApplicationFactory<TEntryPoint> WebFactory { get; }
-        internal RestClient RestHttpClient { get; private set; }
+        internal RestClient RestHttpClient { get; }
         protected MsSqlContainer DbContainer { get; private set; }
         protected RedisContainer CacheContainer { get; private set; }
 
@@ -75,6 +75,8 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
                 .WithPortBinding(6479, 6379)
                 .WithName("integration-redis_server")
                 .Build();
+
+            StartAsync().GetAwaiter().GetResult();
         }
 
         public void Dispose()

@@ -21,6 +21,7 @@ namespace HomeBudget.Components.IntegrationTests
         public IntegrationTestWebApplicationFactory(Action webHostInitializationCallback)
         {
             _webHostInitializationCallback = webHostInitializationCallback;
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", HostEnvironments.Integration);
         }
 
         protected override IHostBuilder CreateHostBuilder()
@@ -35,7 +36,10 @@ namespace HomeBudget.Components.IntegrationTests
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", HostEnvironments.Integration);
+            builder.ConfigureTestServices(services =>
+            {
+                _ = services.SetDiForConnectionsAsync().GetAwaiter().GetResult();
+            });
 
             builder.ConfigureAppConfiguration((_, conf) =>
             {
@@ -62,11 +66,6 @@ namespace HomeBudget.Components.IntegrationTests
 
         protected override TestServer CreateServer(IWebHostBuilder builder)
         {
-            builder.ConfigureTestServices(services =>
-            {
-                // _ = services.SetDiForConnectionsAsync().GetAwaiter().GetResult();
-            });
-
             return base.CreateServer(builder);
         }
     }
