@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using EvolveDb;
+using Microsoft.Data.SqlClient;
 using NUnit.Framework;
 using RestSharp;
 using Testcontainers.MsSql;
@@ -27,7 +29,7 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
 
             if (TestTypes.Integration.Equals(testCategory, StringComparison.OrdinalIgnoreCase))
             {
-                WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(SetUpDockerContainers);
+                WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(SetUpAndRunDockerContainers);
 
                 RestHttpClient = new RestClient(
                     WebFactory.CreateClient(),
@@ -54,7 +56,7 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
             await DbContainer.StopAsync();
         }
 
-        private void SetUpDockerContainers()
+        private void SetUpAndRunDockerContainers()
         {
             var configuration = WebFactory?.Configuration;
 
@@ -77,6 +79,22 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
                 .Build();
 
             StartAsync().GetAwaiter().GetResult();
+
+            try
+            {
+                var cnx = new SqlConnection(DbContainer.GetConnectionString());
+                var evolve = new Evolve(cnx)
+                {
+                    Locations = new[] { "db/migrations" },
+                    EnableClusterMode = false
+                };
+
+                evolve.Migrate();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public void Dispose()
