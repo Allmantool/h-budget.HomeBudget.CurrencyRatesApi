@@ -90,8 +90,8 @@ jobs:
           dotnet test HomeBudgetRatesApi.sln \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat='opencover' \
-            /p:CoverletOutput='..\test-results\' \
-            /p:MergeWith='..\test-results\coverage.xml'
+            /p:CoverletOutput='../test-results/' \
+            /p:MergeWith='../test-results/coverage.xml'
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
