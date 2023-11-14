@@ -83,16 +83,6 @@ jobs:
 
           echo "TARGET_TAG=${tag}" >> $GITHUB_OUTPUT
 
-      - name: Run tests (unit / integrations based on test containers)
-        run: |
-          dotnet test HomeBudgetRatesApi.sln \
-          --logger "trx" \
-          --results-directory "testresults/coverage" \
-          --collect:"XPlat Code Coverage" \
-          /p:CollectCoverage=true \
-          /p:CoverletOutputFormat=opencover \
-          /p:CoverletOutput="testresults/coverage/currencyRates.coverage.xml"
-
       - name: Build docker image
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
@@ -107,6 +97,15 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
         shell: bash
         run: |
+          echo "Run tests (unit / integrations based on test containers)"
+
+          dotnet test HomeBudgetRatesApi.sln \
+            --logger "trx" \
+            --results-directory "testresults/coverage" \
+            --collect:"XPlat Code Coverage" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=opencover \
+            /p:CoverletOutput="testresults/coverage/currencyRates.coverage.xml"
 
           echo "latest tag is ${{ steps.last_tag.outputs.TARGET_TAG }}"
 
