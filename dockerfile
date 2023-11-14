@@ -47,7 +47,6 @@ RUN export PATH=$JAVA_HOME/bin:$PATH
 
 RUN dotnet new tool-manifest
 RUN dotnet tool install dotnet-sonarscanner --tool-path /tools --version 5.13.1
-RUN dotnet tool install dotnet-reportgenerator-globaltool --tool-path /tools --version 5.1.26
 RUN dotnet tool install snitch --tool-path /tools --version 1.12.0
 
 RUN dotnet tool restore
@@ -67,7 +66,7 @@ COPY ["HomeBudget.DataAccess/*.csproj", "HomeBudget.DataAccess/"]
 COPY ["HomeBudget.Core/*.csproj", "HomeBudget.Core/"]
 COPY ["HomeBudget.Rates.Api/*.csproj", "HomeBudget.Rates.Api/"]
 COPY ["HomeBudget.DataAccess.Dapper/*.csproj", "HomeBudget.DataAccess.Dapper/"]
-COPY ["testresults/coverage/*", "testresults/coverage/"]
+COPY ["test-results/*", "test-results/"]
 
 COPY . .
 
@@ -83,11 +82,6 @@ LABEL build_version="${BUILD_VERSION}"
 LABEL service=CurrencyRatesService
 
 RUN dotnet dev-certs https --trust
-
-RUN /tools/reportgenerator \
-    -reports:'testresults/coverage/**/coverage.cobertura.xml' \
-    -targetdir:'testresults/coverage/reports' \
-    -reporttypes:'SonarQube'
 
 RUN /tools/dotnet-sonarscanner end /d:sonar.login="${SONAR_TOKEN}"; exit 0;
 
