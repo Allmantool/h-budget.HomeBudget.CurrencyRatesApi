@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -11,6 +13,7 @@ using HomeBudget.Core.Constants;
 using HomeBudget.Core.Extensions;
 using HomeBudget.Core.Models;
 using HomeBudget.DataAccess.Dapper.Extensions;
+using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Rates.Api.Configuration
 {
@@ -18,7 +21,8 @@ namespace HomeBudget.Rates.Api.Configuration
     {
         public static async Task<IServiceCollection> SetUpDiAsync(
             this IServiceCollection services,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IWebHostEnvironment webHostEnvironment)
         {
             services
                 .Configure<DatabaseConnectionOptions>(configuration.GetSection(ConfigurationSectionKeys.DatabaseOptions))
@@ -29,17 +33,29 @@ namespace HomeBudget.Rates.Api.Configuration
                 .RegisterCurrencyRatesIoCDependency()
                 .RegistryDapperIoCDependencies();
 
+            if (!HostEnvironments.Integration.Equals(webHostEnvironment.EnvironmentName, StringComparison.OrdinalIgnoreCase))
+            {
+                await services.SetDiForConnectionsAsync();
+            }
+
+            return services;
+        }
+
+        public static async Task<IServiceCollection> SetDiForConnectionsAsync(this IServiceCollection services)
+        {
             var serviceProvider = services.BuildServiceProvider();
 
-            var databaseOptions = serviceProvider.GetRequiredService<IOptions<DatabaseConnectionOptions>>().Value;
             var configSettingsProvider = serviceProvider.GetRequiredService<IConfigSettingsProvider>();
-            var configSetting = await configSettingsProvider.GetDefaultSettingsAsync();
+
+            var databaseOptions = serviceProvider.GetRequiredService<IOptions<DatabaseConnectionOptions>>().Value;
+
             var redisConnectionMultiplexer = await ConnectionMultiplexer.ConnectAsync(databaseOptions.RedisConnectionString);
+            var configSetting = await configSettingsProvider.GetDefaultSettingsAsync();
 
             return services
-                .AddSingleton(_ => configSetting)
-                .AddSingleton(_ => redisConnectionMultiplexer)
-                .AddScoped(sp => sp.GetRequiredService<ConnectionMultiplexer>().GetDatabase());
+                 .AddSingleton(_ => configSetting)
+                 .AddSingleton(_ => redisConnectionMultiplexer)
+                 .AddScoped(sp => sp.GetRequiredService<ConnectionMultiplexer>().GetDatabase());
         }
     }
 }
