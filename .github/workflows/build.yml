@@ -89,7 +89,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build docker image
+      - name: Run test (unit + integrations based on test containers)
+        shell: bash
+        run: |
+          echo "Run tests (unit / integrations based on test containers)"
+
+          dotnet test HomeBudgetRatesApi.sln \
+            --logger "trx" \
+            --results-directory "testresults/coverage" \
+            --collect:"XPlat Code Coverage" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=opencover \
+            /p:CoverletOutput="testresults/coverage/currencyRates.coverage.xml"
+
+      - name: Build docker image and push to docker hub
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
@@ -103,18 +116,6 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
         shell: bash
         run: |
-          echo "Run tests (unit / integrations based on test containers)"
-
-          dotnet test HomeBudgetRatesApi.sln \
-            --logger "trx" \
-            --results-directory "testresults/coverage" \
-            --collect:"XPlat Code Coverage" \
-            /p:CollectCoverage=true \
-            /p:CoverletOutputFormat=opencover \
-            /p:CoverletOutput="testresults/coverage/currencyRates.coverage.xml"
-
-          echo "latest tag is ${{ steps.last_tag.outputs.TARGET_TAG }}"
-
           docker build \
             --target 'publish' -t "${{ secrets.DOCKERHUB_USERNAME }}/homebudget-rates-api:${{ steps.last_tag.outputs.TARGET_TAG }}" \
             --build-arg PULL_REQUEST_ID='${{ steps.findPr.outputs.pr }}' \
@@ -124,15 +125,3 @@ jobs:
             --build-arg SONAR_TOKEN='${{ env.SONAR_TOKEN }}' \
             --push \
             .
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Push docker image with Buildx
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          tags: "${{ secrets.DOCKERHUB_USERNAME }}/homebudget-rates-api:${{ steps.last_tag.outputs.TARGET_TAG }}"
