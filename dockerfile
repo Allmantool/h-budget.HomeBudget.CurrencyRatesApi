@@ -47,7 +47,7 @@ RUN export PATH=$JAVA_HOME/bin:$PATH
 
 RUN dotnet new tool-manifest
 RUN dotnet tool install dotnet-sonarscanner --tool-path /tools --version 5.13.1
-RUN dotnet tool install dotnet-reportgenerator-globaltool --tool-path /tools --version 5.1.24
+RUN dotnet tool install dotnet-reportgenerator-globaltool --tool-path /tools --version 5.1.26
 RUN dotnet tool install snitch --tool-path /tools --version 1.12.0
 
 RUN dotnet tool restore
@@ -86,8 +86,8 @@ RUN dotnet dev-certs https --trust
 
 RUN /tools/reportgenerator \
     -reports:'testresults/coverage/**/coverage.cobertura.xml' \
-    -targetdir:'/app/testresults/coverage/reports' \
-    -reporttypes:'SonarQube;Cobertura'
+    -targetdir:'testresults/coverage/reports' \
+    -reporttypes:'SonarQube'
 
 RUN /tools/dotnet-sonarscanner end /d:sonar.login="${SONAR_TOKEN}"; exit 0;
 
