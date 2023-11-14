@@ -89,7 +89,7 @@ jobs:
 
           dotnet test HomeBudgetRatesApi.sln \
             /p:CollectCoverage=true \
-            /p:CoverletOutputFormat="opencover,json" \
+            /p:CoverletOutputFormat="json" \
             /p:CoverletOutput="..\test-results\coverage" \
             /p:MergeWith="..\test-results\coverage\coverage.json"
 
