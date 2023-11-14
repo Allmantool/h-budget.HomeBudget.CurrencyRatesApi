@@ -44,7 +44,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0.x'
+          dotnet-version: "7.0.x"
 
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
@@ -83,7 +83,7 @@ jobs:
 
           echo "TARGET_TAG=${tag}" >> $GITHUB_OUTPUT
 
-      - name: Run tests
+      - name: Run tests (unit / integrations based on test containers)
         run: |
           dotnet test HomeBudgetRatesApi.sln
           --logger "trx" \
@@ -91,7 +91,7 @@ jobs:
           --collect:"XPlat Code Coverage" \
           /p:CollectCoverage=true \
           /p:CoverletOutputFormat=opencover \
-          /p:CoverletOutput="testresults/coverage/currencyRates.coverage.xml"    
+          /p:CoverletOutput="testresults/coverage/currencyRates.coverage.xml"
 
       - name: Build docker image
         env:

@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using EvolveDb;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using StackExchange.Redis;
 using Testcontainers.MsSql;
 using Testcontainers.Redis;
+
+using HomeBudget.Components.IntegrationTests.Extensions;
 
 namespace HomeBudget.Components.IntegrationTests
 {
@@ -43,29 +42,18 @@ namespace HomeBudget.Components.IntegrationTests
                 return;
             }
 
-            var redisConfiguration = ConfigurationOptions.Parse(_configuration.GetSection("DatabaseOptions:RedisConnectionString")?.Value);
-
-            var redistTestPort = redisConfiguration.EndPoints.Single();
-
-            var sqlConnectionBuilder = new SqlConnectionStringBuilder
-            {
-                ConnectionString = _configuration.GetSection("DatabaseOptions:ConnectionString")?.Value
-            };
-
-            var sqlDbPort = new Regex("\\d+").Matches(sqlConnectionBuilder.DataSource)[0].Value;
-
             DbContainer = new MsSqlBuilder()
                 .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
                 .WithName("integration-sql-server")
-                .WithPassword(sqlConnectionBuilder.Password)
+                .WithPassword(_configuration.GetTestSqlPassword())
                 .WithEnvironment("ACCEPT_EULA", "Y")
-                .WithEnvironment("SA_PASSWORD", sqlConnectionBuilder.Password)
-                .WithPortBinding(int.Parse(sqlDbPort), 1433)
+                .WithEnvironment("SA_PASSWORD", _configuration.GetTestSqlPassword())
+                .WithPortBinding(_configuration.GetTestSqlConnectionPort().Value, 1433)
                 .Build();
 
             CacheContainer = new RedisBuilder()
                 .WithImage("redis:7.0.7")
-                .WithPortBinding(6479, 6379)
+                .WithPortBinding(_configuration.GetTestRedisPort().Value, 6379)
                 .WithName("integration-redis_server")
                 .Build();
 

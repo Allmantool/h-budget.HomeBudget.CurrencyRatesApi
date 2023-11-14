@@ -5,7 +5,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
+using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
+using HomeBudget.Components.IntegrationTests.MockServices;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Configuration;
 
@@ -27,6 +30,8 @@ namespace HomeBudget.Components.IntegrationTests
             builder.ConfigureTestServices(services =>
             {
                _ = services.SetDiForConnectionsAsync().GetAwaiter().GetResult();
+
+               services.AddScoped<INationalBankRatesProvider, MockNationalBankRatesProvider>();
             });
 
             builder.ConfigureAppConfiguration((_, conf) =>

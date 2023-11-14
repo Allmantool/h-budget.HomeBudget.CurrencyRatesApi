@@ -5,10 +5,10 @@ using System.Net.Http.Headers;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
-using Polly.Extensions.Http;
+using Newtonsoft.Json.Serialization;
 using Polly;
+using Polly.Extensions.Http;
 using Refit;
 
 using HomeBudget.Components.CurrencyRates.Services.Interfaces;
@@ -34,7 +34,7 @@ namespace HomeBudget.Components.CurrencyRates.Configuration
                 .ConfigurePrimaryHttpMessageHandler(
                     () => new HttpClientHandler
                     {
-                        ServerCertificateCustomValidationCallback = (message, cert, chain, sslErrors) => true
+                        ServerCertificateCustomValidationCallback = (_, _, _, _) => true
                     }
                 )
                 .AddPolicyHandler(GetRetryPolicy(serviceProvider))
