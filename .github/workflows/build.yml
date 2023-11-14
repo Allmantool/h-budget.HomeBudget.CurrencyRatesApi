@@ -83,12 +83,6 @@ jobs:
 
           echo "TARGET_TAG=${tag}" >> $GITHUB_OUTPUT
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Run test (unit + integrations based on test containers)
         shell: bash
         run: |
@@ -101,6 +95,12 @@ jobs:
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=opencover \
             /p:CoverletOutput="testresults/coverage/currencyRates.coverage.xml"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image and push to docker hub
         env:
@@ -117,7 +117,7 @@ jobs:
         shell: bash
         run: |
           docker build \
-            --target 'publish' -t "${{ secrets.DOCKERHUB_USERNAME }}/homebudget-rates-api:${{ steps.last_tag.outputs.TARGET_TAG }}" \
+            --target 'final' -t "${{ secrets.DOCKERHUB_USERNAME }}/homebudget-rates-api:${{ steps.last_tag.outputs.TARGET_TAG }}" \
             --build-arg PULL_REQUEST_ID='${{ steps.findPr.outputs.pr }}' \
             --build-arg PULL_REQUEST_SOURCE_BRANCH='${{ github.ref }}' \
             --build-arg PULL_REQUEST_TARGET_BRANCH=refs/heads/master \
