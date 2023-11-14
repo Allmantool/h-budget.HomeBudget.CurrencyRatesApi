@@ -30,11 +30,11 @@ jobs:
         working-directory: .
 
     steps:
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: "17"
+          java-version: "21"
 
       - name: Check out code
         uses: actions/checkout@v3
@@ -116,6 +116,7 @@ jobs:
           --build-arg PULL_REQUEST_TARGET_BRANCH=refs/heads/master \
           --build-arg GITHUB_RUN_ID='${{ github.run_id }}' \
           --build-arg SONAR_TOKEN='${{ env.SONAR_TOKEN }}' \
+          --push "${{ secrets.DOCKERHUB_USERNAME }}/homebudget-rates-api:${{ steps.last_tag.outputs.TARGET_TAG }}" \
           .
 
       - name: Set up QEMU
