@@ -20,14 +20,13 @@ namespace HomeBudget.Components.IntegrationTests
         public IntegrationTestWebApplicationFactory(Action webHostInitializationCallback)
         {
             _webHostInitializationCallback = webHostInitializationCallback;
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", HostEnvironments.Integration);
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureTestServices(services =>
             {
-                _ = services.SetDiForConnectionsAsync().GetAwaiter().GetResult();
+               _ = services.SetDiForConnectionsAsync().GetAwaiter().GetResult();
             });
 
             builder.ConfigureAppConfiguration((_, conf) =>
