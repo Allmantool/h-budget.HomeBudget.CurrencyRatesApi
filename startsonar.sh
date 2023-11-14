@@ -13,7 +13,7 @@ if [ ${PULL_REQUEST_ID} ];
         /d:sonar.pullrequest.branch="${PULL_REQUEST_SOURCE_BRANCH:11}" \
         /d:sonar.pullrequest.base="${PULL_REQUEST_TARGET_BRANCH:11}" \
         /d:sonar.coverage.exclusions="**/Test[s]/**/*" \
-        /d:sonar.coverageReportPaths="/app/testresults/coverage/reports/SonarQube.xml" \
+        /d:sonar.coverageReportPaths="testresults/coverage/reports/SonarQube.xml" \
         /d:sonar.pullrequest.provider="github" \
         /d:sonar.pullrequest.github.repository="Allmantool/h-budget.HomeBudget.CurrencyRatesApi" \
         /d:sonar.pullrequest.github.endpoint="https://api.github.com/"; \
