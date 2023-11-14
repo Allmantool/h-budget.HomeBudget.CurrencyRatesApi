@@ -11,7 +11,7 @@ on:
       - hotfix/*
       - fix/*
       - tech/
-    tags: [ 'v*.*.*' ]
+    tags: ["v*.*.*"]
 
   pull_request:
     types: [opened, synchronize, reopened]
@@ -89,7 +89,7 @@ jobs:
 
           dotnet test HomeBudgetRatesApi.sln \
             /p:CollectCoverage=true \
-            /p:CoverletOutputFormat="opencover" \
+            /p:CoverletOutputFormat=opencover \
             /p:CoverletOutput="..\test-results\" \
             /p:MergeWith="..\test-results\coverage.xml"
 
