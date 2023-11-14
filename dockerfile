@@ -69,6 +69,7 @@ COPY ["HomeBudget.DataAccess/*.csproj", "HomeBudget.DataAccess/"]
 COPY ["HomeBudget.Core/*.csproj", "HomeBudget.Core/"]
 COPY ["HomeBudget.Rates.Api/*.csproj", "HomeBudget.Rates.Api/"]
 COPY ["HomeBudget.DataAccess.Dapper/*.csproj", "HomeBudget.DataAccess.Dapper/"]
+COPY ["testresults/coverage/*", "testresults/coverage/"]
 
 COPY . .
 
@@ -83,18 +84,10 @@ RUN dotnet build HomeBudgetRatesApi.sln --no-restore -c Release -o /app/build
 LABEL build_version="${BUILD_VERSION}"
 LABEL service=CurrencyRatesService
 
-RUN dotnet test HomeBudgetRatesApi.sln \
-    --logger "trx" \
-    --results-directory "/app/testresults/coverage" \
-    --collect:"XPlat Code Coverage" \
-    /p:CollectCoverage=true \
-    /p:CoverletOutputFormat=opencover \
-    /p:CoverletOutput="/app/testresults/coverage/currencyRates.coverage.xml"
-
 RUN dotnet dev-certs https --trust
 
 RUN /tools/reportgenerator \
-    -reports:'/app/testresults/coverage/**/coverage.cobertura.xml' \
+    -reports:'testresults/coverage/**/coverage.cobertura.xml' \
     -targetdir:'/app/testresults/coverage/reports' \
     -reporttypes:'SonarQube;Cobertura'
 
