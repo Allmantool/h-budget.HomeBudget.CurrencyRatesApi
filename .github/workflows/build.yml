@@ -11,8 +11,7 @@ on:
       - hotfix/*
       - fix/*
       - tech/
-    tags:
-      - "v*"
+    tags: [ 'v*.*.*' ]
 
   pull_request:
     types: [opened, synchronize, reopened]
