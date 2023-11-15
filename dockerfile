@@ -72,27 +72,23 @@ COPY ["startsonar.sh", "startsonar.sh"]
 
 COPY ["HomeBudgetRatesApi.sln", "HomeBudgetRatesApi.sln"]
 
-RUN dotnet restore HomeBudgetRatesApi.sln
-
 COPY . .
-
-RUN dos2unix ./startsonar.sh
-RUN chmod +x ./startsonar.sh
-RUN ./startsonar.sh;
-
-RUN dotnet build HomeBudgetRatesApi.sln --no-restore -c Release -o /app/build /maxcpucount:1
 
 LABEL build_version="${BUILD_VERSION}"
 LABEL service=CurrencyRatesService
 
-RUN dotnet dev-certs https --trust
+RUN dos2unix ./startsonar.sh
+RUN chmod +x ./startsonar.sh
 
+RUN ./startsonar.sh;
+RUN dotnet dev-certs https --trust
+RUN dotnet build HomeBudgetRatesApi.sln -c Release -o /app/build /maxcpucount:1
 RUN /tools/dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}";
 
 RUN /tools/snitch
 
 FROM build AS publish
-RUN dotnet publish "HomeBudgetRatesApi.sln" \
+RUN dotnet publish HomeBudgetRatesApi.sln \
     --no-dependencies \
     --no-restore \
     --framework net7.0 \
