@@ -46,7 +46,7 @@ RUN export JAVA_HOME=/usr/lib/jvm/jdk-21.0.1
 RUN export PATH=$JAVA_HOME/bin:$PATH
 
 RUN dotnet new tool-manifest
-RUN dotnet tool install dotnet-sonarscanner --tool-path /tools --version 5.13.1
+RUN dotnet tool install dotnet-sonarscanner --tool-path /tools --version 5.14.0
 RUN dotnet tool install snitch --tool-path /tools --version 1.12.0
 
 RUN dotnet tool restore
@@ -78,7 +78,7 @@ COPY . .
 
 RUN dos2unix ./startsonar.sh
 RUN chmod +x ./startsonar.sh
-RUN ./startsonar.sh; exit 0;
+RUN startsonar.sh; exit 0;
 
 RUN dotnet build HomeBudgetRatesApi.sln --no-restore -c Release -o /app/build
 
