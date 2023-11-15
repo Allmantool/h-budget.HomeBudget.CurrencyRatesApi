@@ -91,6 +91,8 @@ RUN /tools/reportgenerator \
     -targetdir:'test-results/' \
     -reporttypes:'SonarQube;Cobertura';
 
+RUN cat test-results/SonarQube.xml
+
 RUN /tools/dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}";
 
 RUN /tools/snitch
