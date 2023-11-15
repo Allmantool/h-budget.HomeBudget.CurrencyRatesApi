@@ -81,8 +81,10 @@ RUN dos2unix ./startsonar.sh
 RUN chmod +x ./startsonar.sh
 RUN dotnet dev-certs https --trust
 RUN ./startsonar.sh;
-COPY ["test-results/*", "test-results/"]
+
 RUN dotnet build HomeBudgetRatesApi.sln -c Release -o /app/build /maxcpucount:1
+COPY ["test-results/*", "test-results/"]
+
 RUN /tools/dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}";
 
 RUN /tools/snitch
