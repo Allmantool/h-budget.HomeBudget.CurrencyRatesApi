@@ -89,6 +89,7 @@ RUN /tools/snitch
 
 FROM build AS publish
 RUN dotnet publish "HomeBudgetRatesApi.sln" \
+    --no-build \
     --no-dependencies \
     --no-restore \
     --framework net7.0 \
