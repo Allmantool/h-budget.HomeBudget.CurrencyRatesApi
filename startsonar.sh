@@ -13,7 +13,7 @@ if [ ${PULL_REQUEST_ID} ];
         /d:sonar.pullrequest.branch="${PULL_REQUEST_SOURCE_BRANCH:11}" \
         /d:sonar.pullrequest.base="${PULL_REQUEST_TARGET_BRANCH:11}" \
         /d:sonar.coverage.exclusions="**/Test[s]/**/*" \
-        /d:sonar.cs.opencover.reportsPaths="test-results/coverage.opencover.xml" \
+        /d:sonar.cs.opencover.reportsPaths="src/test-results/rates-opencover.xml" \
         /d:sonar.pullrequest.provider="github" \
         /d:sonar.pullrequest.github.repository="Allmantool/h-budget.HomeBudget.CurrencyRatesApi" \
         /d:sonar.pullrequest.github.endpoint="https://api.github.com/"; \
@@ -31,6 +31,6 @@ if [ ${PULL_REQUEST_ID} ];
         /d:sonar.branch.name="master" \
         /d:sonar.token="${SONAR_TOKEN}" \
         /d:sonar.host.url="https://sonarcloud.io" \
-        /d:sonar.cs.opencover.reportsPaths="test-results/coverage.opencover.xml" \
+        /d:sonar.cs.opencover.reportsPaths="src/test-results/rates-opencover.xml \
         /d:sonar.coverage.exclusions="**/Test[s]/**/*"; \
     fi;

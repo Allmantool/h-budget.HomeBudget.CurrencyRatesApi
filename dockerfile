@@ -66,11 +66,15 @@ COPY ["HomeBudget.DataAccess/*.csproj", "HomeBudget.DataAccess/"]
 COPY ["HomeBudget.Core/*.csproj", "HomeBudget.Core/"]
 COPY ["HomeBudget.Rates.Api/*.csproj", "HomeBudget.Rates.Api/"]
 COPY ["HomeBudget.DataAccess.Dapper/*.csproj", "HomeBudget.DataAccess.Dapper/"]
+
 COPY ["test-results/*", "test-results/"]
+COPY ["startsonar.sh", "startsonar.sh"]
+
+COPY ["HomeBudgetRatesApi.sln", "HomeBudgetRatesApi.sln"]
+
+RUN dotnet restore HomeBudgetRatesApi.sln
 
 COPY . .
-
-RUN dotnet restore ./HomeBudgetRatesApi.sln
 
 RUN dos2unix ./startsonar.sh
 RUN chmod +x ./startsonar.sh
