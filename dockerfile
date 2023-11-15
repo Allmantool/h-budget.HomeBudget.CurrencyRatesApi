@@ -78,7 +78,7 @@ COPY . .
 
 RUN dos2unix ./startsonar.sh
 RUN chmod +x ./startsonar.sh
-RUN startsonar.sh; exit 0;
+RUN ./startsonar.sh;
 
 RUN dotnet build HomeBudgetRatesApi.sln --no-restore -c Release -o /app/build
 
@@ -87,7 +87,7 @@ LABEL service=CurrencyRatesService
 
 RUN dotnet dev-certs https --trust
 
-RUN /tools/dotnet-sonarscanner end /d:sonar.login="${SONAR_TOKEN}"; exit 0;
+RUN /tools/dotnet-sonarscanner end /d:sonar.login="${SONAR_TOKEN}";
 
 RUN /tools/snitch
 
