@@ -72,15 +72,11 @@ COPY ["startsonar.sh", "startsonar.sh"]
 
 COPY ["HomeBudgetRatesApi.sln", "HomeBudgetRatesApi.sln"]
 
-RUN dotnet restore HomeBudgetRatesApi.sln
-
-COPY . .
-
 RUN dos2unix ./startsonar.sh
 RUN chmod +x ./startsonar.sh
 RUN ./startsonar.sh;
 
-RUN dotnet build HomeBudgetRatesApi.sln --no-restore -c Release -o /app/build /maxcpucount:1
+RUN dotnet build HomeBudgetRatesApi.sln -c Release -o /app/build /maxcpucount:1
 
 LABEL build_version="${BUILD_VERSION}"
 LABEL service=CurrencyRatesService

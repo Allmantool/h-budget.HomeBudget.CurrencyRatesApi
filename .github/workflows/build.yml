@@ -87,7 +87,7 @@ jobs:
         run: |
           echo "Run tests (unit / integrations based on test containers)"
 
-          dotnet test HomeBudgetRatesApi.sln \
+          dotnet test HomeBudgetRatesApi.sln --no-build \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat='opencover' \
             /p:CoverletOutput='../test-results/rates-coverage.xml' \
