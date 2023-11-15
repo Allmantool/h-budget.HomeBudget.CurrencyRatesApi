@@ -90,7 +90,7 @@ RUN /tools/dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}";
 RUN /tools/snitch
 
 FROM build AS publish
-RUN dotnet publish "HomeBudgetRatesApi.sln" \
+RUN dotnet publish "/app/build/HomeBudgetRatesApi.sln" \
     --no-build \
     --no-dependencies \
     --no-restore \
