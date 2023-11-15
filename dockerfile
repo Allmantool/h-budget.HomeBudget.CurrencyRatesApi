@@ -87,7 +87,7 @@ LABEL service=CurrencyRatesService
 
 RUN dotnet dev-certs https --trust
 
-RUN dotnet dotcover test HomeBudgetRatesApi.sln --dcReportType=HTML --dcOutput="test-results/rates-coverage.html"
+RUN dotnet /tools/dotcover test HomeBudgetRatesApi.sln --dcReportType=HTML --dcOutput="test-results/rates-coverage.html"
 
 RUN /tools/reportgenerator \
     -reports:'test-results/rates-coverage.xml' \
