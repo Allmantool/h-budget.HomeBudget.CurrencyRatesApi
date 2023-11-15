@@ -32,7 +32,7 @@ if [ ${PULL_REQUEST_ID} ];
             /d:sonar.branch.name="master" \
             /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.coverageReportPaths="**/test-results/SonarQube.xml" \
+            /d:sonar.coverageReportPaths=test-results/SonarQube.xml" \
             /d:sonar.cs.opencover.reportsPaths="test-results/rates-coverage.xml" \
             /d:sonar.coverage.exclusions="Test[s]/**/*"; \
     fi;
