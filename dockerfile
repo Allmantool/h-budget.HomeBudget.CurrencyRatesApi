@@ -72,6 +72,8 @@ COPY ["startsonar.sh", "startsonar.sh"]
 
 COPY ["HomeBudgetRatesApi.sln", "HomeBudgetRatesApi.sln"]
 
+COPY . .
+
 RUN dos2unix ./startsonar.sh
 RUN chmod +x ./startsonar.sh
 RUN ./startsonar.sh;
