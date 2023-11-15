@@ -48,7 +48,6 @@ RUN export PATH=$JAVA_HOME/bin:$PATH
 RUN dotnet new tool-manifest
 RUN dotnet tool install dotnet-sonarscanner --tool-path /tools --version 5.14.0
 RUN dotnet tool install snitch --tool-path /tools --version 1.12.0
-RUN dotnet tool install dotnet-reportgenerator-globaltool --tool-path /tools --version 5.2.0
 RUN dotnet tool install JetBrains.dotCover.GlobalTool --tool-path /tool --version 2023.2.3
 
 RUN dotnet tool restore
@@ -87,12 +86,9 @@ LABEL service=CurrencyRatesService
 
 RUN dotnet dev-certs https --trust
 
-RUN dotnet /tools/dotcover test HomeBudgetRatesApi.sln --dcReportType=HTML --dcOutput="test-results/rates-coverage.html"
-
-RUN /tools/reportgenerator \
-    -reports:'test-results/rates-coverage.xml' \
-    -targetdir:'test-results/' \
-    -reporttypes:'dotCover';
+RUN /tools/dotnet-dotcover test HomeBudgetRatesApi.sln \
+    --dcReportType=HTML \
+    --dcOutput="test-results/rates-coverage.html"
 
 RUN cat test-results/SonarQube.xml
 
