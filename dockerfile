@@ -48,6 +48,7 @@ RUN export PATH=$JAVA_HOME/bin:$PATH
 RUN dotnet new tool-manifest
 RUN dotnet tool install dotnet-sonarscanner --tool-path /tools --version 5.14.0
 RUN dotnet tool install snitch --tool-path /tools --version 1.12.0
+RUN dotnet tool install dotnet-reportgenerator-globaltool --tool-path /tools --version 5.2.0
 
 RUN dotnet tool restore
 
@@ -85,13 +86,17 @@ LABEL service=CurrencyRatesService
 
 RUN dotnet dev-certs https --trust
 
+RUN /tools/reportgenerator \
+    -reports:'test-results/rates-coverage.xml' \
+    -targetdir:'test-results/' \
+    -reporttypes:'SonarQube;Cobertura';
+
 RUN /tools/dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}";
 
 RUN /tools/snitch
 
 FROM build AS publish
-RUN dotnet publish "/app/build/HomeBudgetRatesApi.sln" \
-    --no-build \
+RUN dotnet publish HomeBudgetRatesApi.sln \
     --no-dependencies \
     --no-restore \
     --framework net7.0 \
