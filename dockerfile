@@ -80,14 +80,14 @@ RUN dos2unix ./startsonar.sh
 RUN chmod +x ./startsonar.sh
 RUN ./startsonar.sh;
 
-RUN dotnet build HomeBudgetRatesApi.sln --no-restore -c Release -o /app/build
+RUN dotnet build HomeBudgetRatesApi.sln --no-restore -c Release -o /app/build /maxcpucount:1
 
 LABEL build_version="${BUILD_VERSION}"
 LABEL service=CurrencyRatesService
 
 RUN dotnet dev-certs https --trust
 
-RUN /tools/dotnet-sonarscanner end /d:sonar.login="${SONAR_TOKEN}";
+RUN /tools/dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}";
 
 RUN /tools/snitch
 
