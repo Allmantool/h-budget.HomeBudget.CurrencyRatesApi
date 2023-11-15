@@ -46,7 +46,7 @@ RUN export JAVA_HOME=/usr/lib/jvm/jdk-21.0.1
 RUN export PATH=$JAVA_HOME/bin:$PATH
 
 RUN dotnet new tool-manifest
-RUN dotnet tool install dotnet-sonarscanner --tool-path /tools --version 5.13.1
+RUN dotnet tool install dotnet-sonarscanner --tool-path /tools --version 5.14.0
 RUN dotnet tool install snitch --tool-path /tools --version 1.12.0
 
 RUN dotnet tool restore
@@ -66,15 +66,19 @@ COPY ["HomeBudget.DataAccess/*.csproj", "HomeBudget.DataAccess/"]
 COPY ["HomeBudget.Core/*.csproj", "HomeBudget.Core/"]
 COPY ["HomeBudget.Rates.Api/*.csproj", "HomeBudget.Rates.Api/"]
 COPY ["HomeBudget.DataAccess.Dapper/*.csproj", "HomeBudget.DataAccess.Dapper/"]
+
 COPY ["test-results/*", "test-results/"]
+COPY ["startsonar.sh", "startsonar.sh"]
+
+COPY ["HomeBudgetRatesApi.sln", "HomeBudgetRatesApi.sln"]
+
+RUN dotnet restore HomeBudgetRatesApi.sln
 
 COPY . .
 
-RUN dotnet restore ./HomeBudgetRatesApi.sln
-
 RUN dos2unix ./startsonar.sh
 RUN chmod +x ./startsonar.sh
-RUN ./startsonar.sh; exit 0;
+RUN ./startsonar.sh;
 
 RUN dotnet build HomeBudgetRatesApi.sln --no-restore -c Release -o /app/build
 
@@ -83,7 +87,7 @@ LABEL service=CurrencyRatesService
 
 RUN dotnet dev-certs https --trust
 
-RUN /tools/dotnet-sonarscanner end /d:sonar.login="${SONAR_TOKEN}"; exit 0;
+RUN /tools/dotnet-sonarscanner end /d:sonar.login="${SONAR_TOKEN}";
 
 RUN /tools/snitch
 
