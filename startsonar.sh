@@ -16,6 +16,7 @@ if [ ${PULL_REQUEST_ID} ];
             /d:sonar.testExecutionReportPaths="test-results/SonarQube.xml" \
             /d:sonar.coverageReportPaths="test-results/SonarQube.xml" \
             /d:sonar.cs.opencover.reportsPaths="test-results/rates-coverage.xml" \
+            /d:sonar.cs.dotcover.reportsPaths="test-results/rates-coverage.html" \
             /d:sonar.pullrequest.provider="github" \
             /d:sonar.pullrequest.github.repository="Allmantool/h-budget.HomeBudget.CurrencyRatesApi" \
             /d:sonar.pullrequest.github.endpoint="https://api.github.com/"; \
@@ -36,5 +37,6 @@ if [ ${PULL_REQUEST_ID} ];
             /d:sonar.testExecutionReportPaths="test-results/SonarQube.xml" \
             /d:sonar.coverageReportPaths="test-results/SonarQube.xml" \
             /d:sonar.cs.opencover.reportsPaths="test-results/rates-coverage.xml" \
+            /d:sonar.cs.dotcover.reportsPaths="test-results/rates-coverage.html" \
             /d:sonar.coverage.exclusions="Test[s]/**/*"; \
     fi;
