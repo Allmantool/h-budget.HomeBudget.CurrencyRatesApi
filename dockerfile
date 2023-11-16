@@ -52,6 +52,7 @@ COPY ["HomeBudget.Core/*.csproj", "HomeBudget.Core/"]
 COPY ["HomeBudget.Rates.Api/*.csproj", "HomeBudget.Rates.Api/"]
 COPY ["HomeBudget.DataAccess.Dapper/*.csproj", "HomeBudget.DataAccess.Dapper/"]
 COPY ["HomeBudgetRatesApi.sln", "HomeBudgetRatesApi.sln"]
+COPY ["startsonar.sh", "startsonar.sh"]
 
 COPY . .
 
