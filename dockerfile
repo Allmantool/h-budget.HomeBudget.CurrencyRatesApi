@@ -8,17 +8,8 @@ WORKDIR /scr
 
 COPY --from=mcr.microsoft.com/dotnet/sdk:6.0 /usr/share/dotnet/shared /usr/share/dotnet/shared
 
-ARG SONAR_TOKEN
-ARG PULL_REQUEST_ID
-ARG PULL_REQUEST_SOURCE_BRANCH
-ARG PULL_REQUEST_TARGET_BRANCH
-ARG GITHUB_RUN_ID
-
-ENV SONAR_TOKEN=${SONAR_TOKEN}
-ENV PULL_REQUEST_ID=${PULL_REQUEST_ID}
-ENV PULL_REQUEST_SOURCE_BRANCH=${PULL_REQUEST_SOURCE_BRANCH}
-ENV PULL_REQUEST_TARGET_BRANCH=${PULL_REQUEST_TARGET_BRANCH}
-ENV GITHUB_RUN_ID=${GITHUB_RUN_ID}
+ARG BUILD_VERSION
+ENV BUILD_VERSION=${BUILD_VERSION}
 
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && \
@@ -34,7 +25,7 @@ RUN mkdir /usr/lib/jvm && \
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && \   
     apt-get install -f -y --quiet --no-install-recommends \
-    ant dos2unix ca-certificates-java dotnet-sdk-6.0 dotnet-sdk-7.0 && \
+    ant ca-certificates-java dotnet-sdk-6.0 dotnet-sdk-7.0 && \
     apt-get -y autoremove && \
     apt-get clean autoclean
 
@@ -46,18 +37,12 @@ RUN export JAVA_HOME=/usr/lib/jvm/jdk-21.0.1
 RUN export PATH=$JAVA_HOME/bin:$PATH
 
 RUN dotnet new tool-manifest
-RUN dotnet tool install dotnet-sonarscanner --tool-path /tools --version 5.14.0
 RUN dotnet tool install snitch --tool-path /tools --version 1.12.0
 
 RUN dotnet tool restore
 
 RUN echo "##vso[task.prependpath]$HOME/.dotnet/tools"
 RUN export PATH="$PATH:/root/.dotnet/tools"
-
-RUN echo '--->PULL_REQUEST_ID:' ${PULL_REQUEST_ID}
-RUN echo '--->GITHUB_RUN_ID:' ${GITHUB_RUN_ID}
-RUN echo '--->PULL_REQUEST_SOURCE_BRANCH:' ${PULL_REQUEST_SOURCE_BRANCH}
-RUN echo '--->PULL_REQUEST_TARGET_BRANCH:' ${PULL_REQUEST_TARGET_BRANCH}
 
 COPY ["HomeBudget.Components.CurrencyRates.Tests/*.csproj", "HomeBudget.Components.CurrencyRates.Tests/"]
 COPY ["HomeBudget.Components.IntegrationTests/*.csproj", "HomeBudget.Components.IntegrationTests/"]
@@ -66,24 +51,11 @@ COPY ["HomeBudget.DataAccess/*.csproj", "HomeBudget.DataAccess/"]
 COPY ["HomeBudget.Core/*.csproj", "HomeBudget.Core/"]
 COPY ["HomeBudget.Rates.Api/*.csproj", "HomeBudget.Rates.Api/"]
 COPY ["HomeBudget.DataAccess.Dapper/*.csproj", "HomeBudget.DataAccess.Dapper/"]
-
-COPY ["test-results/*", "test-results/"]
-COPY ["startsonar.sh", "startsonar.sh"]
-
 COPY ["HomeBudgetRatesApi.sln", "HomeBudgetRatesApi.sln"]
 
 COPY . .
 
-LABEL build_version="${BUILD_VERSION}"
-LABEL service=CurrencyRatesService
-
-RUN dos2unix ./startsonar.sh
-RUN chmod +x ./startsonar.sh
-
-RUN ./startsonar.sh;
-RUN dotnet dev-certs https --trust
-RUN dotnet build HomeBudgetRatesApi.sln -c Release -o /app/build /maxcpucount:1
-RUN /tools/dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}";
+RUN dotnet build HomeBudgetRatesApi.sln -c Release --no-incremental -o /app/build
 
 RUN /tools/snitch
 
@@ -98,6 +70,8 @@ RUN dotnet publish HomeBudgetRatesApi.sln \
 
 FROM base AS final
 WORKDIR /app
+LABEL build_version="${BUILD_VERSION}"
+LABEL service=CurrencyRatesService
 COPY --from=publish /app/publish .
 
 ENTRYPOINT ["dotnet", "HomeBudget.Rates.Api.dll"]
