@@ -17,7 +17,7 @@ if [ ${PULL_REQUEST_ID} ]; then
         /d:sonar.pullrequest.github.repository="Allmantool/h-budget.HomeBudget.CurrencyRatesApi" \
         /d:sonar.pullrequest.github.endpoint="https://api.github.com/"
 else
-    if [ ${PULL_REQUEST_SOURCE_BRANCH:11}=="master" ]; then
+    if [[ "${PULL_REQUEST_SOURCE_BRANCH}" =~ "master" ]] ;then
         PULL_REQUEST_SOURCE_BRANCH=""
     fi
 
