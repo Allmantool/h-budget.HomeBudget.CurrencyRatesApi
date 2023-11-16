@@ -127,7 +127,7 @@ jobs:
           SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
         shell: bash
         run: |
-          dotnet /tools/dotnet-sonarscanner end /d:sonar.token="${{ env.SONAR_TOKEN }}"
+          dotnet dotnet-sonarscanner end /d:sonar.token="${{ env.SONAR_TOKEN }}"
 
       - name: Build docker image
         env:
