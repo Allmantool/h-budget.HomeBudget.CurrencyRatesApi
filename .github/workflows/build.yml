@@ -127,30 +127,16 @@ jobs:
         env:
           SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
         shell: bash
-        run: |
-          dotnet-sonarscanner end /d:sonar.token="${{ env.SONAR_TOKEN }}"
+        run: dotnet-sonarscanner end /d:sonar.token="${{ env.SONAR_TOKEN }}"
 
       - name: Build docker image
         env:
-          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
-          GITHUB_RUN_ID: ${{ github.run_id }}
-          RUN_NUMBER: ${{ github.run_number }}
-          RUN_ATTEMPT: ${{ github.run_attempt }}
-          PULL_REQUEST_ID: ${{ steps.findPr.outputs.pr }}
-          PULL_REQUEST_SOURCE_BRANCH: ${{ github.ref }}
-          PULL_REQUEST_TARGET_BRANCH: refs/heads/master
-          ACTION: ${{ github.action }}
-          EVENT_NAME: ${{ github.event_name }}
+          BUILD_VERSION: ${{ steps.last_tag.outputs.TARGET_TAG }}
         shell: bash
         run: |
           docker build \
-            --target 'final' -t "${{ secrets.DOCKERHUB_USERNAME }}/homebudget-rates-api:${{ steps.last_tag.outputs.TARGET_TAG }}" \
-            --build-arg PULL_REQUEST_ID='${{ steps.findPr.outputs.pr }}' \
-            --build-arg PULL_REQUEST_SOURCE_BRANCH='${{ github.ref }}' \
-            --build-arg PULL_REQUEST_TARGET_BRANCH=refs/heads/master \
-            --build-arg GITHUB_RUN_ID='${{ github.run_id }}' \
-            --build-arg SONAR_TOKEN='${{ env.SONAR_TOKEN }}' \
+            --target 'final' \
+            -t "${{ secrets.DOCKERHUB_USERNAME }}/homebudget-rates-api:${{ steps.last_tag.outputs.TARGET_TAG }}" \
             .
 
       - name: Login to Docker Hub

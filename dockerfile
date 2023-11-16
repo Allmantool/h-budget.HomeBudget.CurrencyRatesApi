@@ -8,17 +8,8 @@ WORKDIR /scr
 
 COPY --from=mcr.microsoft.com/dotnet/sdk:7.0 /usr/share/dotnet/shared /usr/share/dotnet/shared
 
-ARG SONAR_TOKEN
-ARG PULL_REQUEST_ID
-ARG PULL_REQUEST_SOURCE_BRANCH
-ARG PULL_REQUEST_TARGET_BRANCH
-ARG GITHUB_RUN_ID
-
-ENV SONAR_TOKEN=${SONAR_TOKEN}
-ENV PULL_REQUEST_ID=${PULL_REQUEST_ID}
-ENV PULL_REQUEST_SOURCE_BRANCH=${PULL_REQUEST_SOURCE_BRANCH}
-ENV PULL_REQUEST_TARGET_BRANCH=${PULL_REQUEST_TARGET_BRANCH}
-ENV GITHUB_RUN_ID=${GITHUB_RUN_ID}
+ARG BUILD_VERSION
+ENV BUILD_VERSION=${BUILD_VERSION}
 
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && \
@@ -34,7 +25,7 @@ RUN mkdir /usr/lib/jvm && \
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && \   
     apt-get install -f -y --quiet --no-install-recommends \
-    ant dos2unix ca-certificates-java dotnet-sdk-7.0 dotnet-sdk-8.0 && \
+    ant ca-certificates-java dotnet-sdk-6.0 dotnet-sdk-7.0 && \
     apt-get -y autoremove && \
     apt-get clean autoclean
 
@@ -53,11 +44,6 @@ RUN dotnet tool restore
 RUN echo "##vso[task.prependpath]$HOME/.dotnet/tools"
 RUN export PATH="$PATH:/root/.dotnet/tools"
 
-RUN echo '--->PULL_REQUEST_ID:' ${PULL_REQUEST_ID}
-RUN echo '--->GITHUB_RUN_ID:' ${GITHUB_RUN_ID}
-RUN echo '--->PULL_REQUEST_SOURCE_BRANCH:' ${PULL_REQUEST_SOURCE_BRANCH}
-RUN echo '--->PULL_REQUEST_TARGET_BRANCH:' ${PULL_REQUEST_TARGET_BRANCH}
-
 COPY ["HomeBudget.Components.CurrencyRates.Tests/*.csproj", "HomeBudget.Components.CurrencyRates.Tests/"]
 COPY ["HomeBudget.Components.IntegrationTests/*.csproj", "HomeBudget.Components.IntegrationTests/"]
 COPY ["HomeBudget.Components.CurrencyRates/*.csproj", "HomeBudget.Components.CurrencyRates/"]
@@ -68,9 +54,6 @@ COPY ["HomeBudget.DataAccess.Dapper/*.csproj", "HomeBudget.DataAccess.Dapper/"]
 COPY ["HomeBudgetRatesApi.sln", "HomeBudgetRatesApi.sln"]
 
 COPY . .
-
-LABEL build_version="${BUILD_VERSION}"
-LABEL service=CurrencyRatesService
 
 RUN dotnet build HomeBudgetRatesApi.sln -c Release --no-incremental -o /app/build
 
@@ -87,6 +70,8 @@ RUN dotnet publish HomeBudgetRatesApi.sln \
 
 FROM base AS final
 WORKDIR /app
+LABEL build_version="${BUILD_VERSION}"
+LABEL service=CurrencyRatesService
 COPY --from=publish /app/publish .
 
 ENTRYPOINT ["dotnet", "HomeBudget.Rates.Api.dll"]
