@@ -105,9 +105,7 @@ jobs:
           ACTION: ${{ github.action }}
           EVENT_NAME: ${{ github.event_name }}
         shell: bash
-        run: |
-          dotnet dev-certs https --trust
-          sh ./startsonar.sh
+        run: sh ./startsonar.sh
 
       - name: Build the solution to quality metrics gathering
         shell: bash
