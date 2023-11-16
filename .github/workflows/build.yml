@@ -87,6 +87,12 @@ jobs:
         run: |
           echo "Run tests (unit / integrations based on test containers)"
 
+          dotnet tool install --global JetBrains.dotCover.GlobalTool --version 2023.2.3
+
+          dotnet-dotcover test HomeBudgetRatesApi.sln \
+            --dcReportType=HTML \
+            --dcOutput="test-results/rates-coverage.html"
+
       - name: Build docker image
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
