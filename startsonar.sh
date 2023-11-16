@@ -10,7 +10,7 @@ if [ ${PULL_REQUEST_ID} ];
             /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.pullrequest.key="${PULL_REQUEST_ID}" \
-            /d:sonar.pullrequest.branch="${PULL_REQUEST_SOURCE_BRANCH:11}" \
+            /d:sonar.pullrequest.branch="${PULL_REQUEST_SOURCE_BRANCH}" \
             /d:sonar.pullrequest.base="${PULL_REQUEST_TARGET_BRANCH}" \
             /d:sonar.coverage.exclusions="**/Test[s]/**/*" \
             /d:sonar.cs.dotcover.reportsPaths="test-results/rates-coverage.html" \

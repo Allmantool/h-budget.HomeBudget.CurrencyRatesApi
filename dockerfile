@@ -66,10 +66,7 @@ COPY ["HomeBudget.DataAccess/*.csproj", "HomeBudget.DataAccess/"]
 COPY ["HomeBudget.Core/*.csproj", "HomeBudget.Core/"]
 COPY ["HomeBudget.Rates.Api/*.csproj", "HomeBudget.Rates.Api/"]
 COPY ["HomeBudget.DataAccess.Dapper/*.csproj", "HomeBudget.DataAccess.Dapper/"]
-
-
 COPY ["startsonar.sh", "startsonar.sh"]
-
 COPY ["HomeBudgetRatesApi.sln", "HomeBudgetRatesApi.sln"]
 
 COPY . .
@@ -82,7 +79,7 @@ RUN chmod +x ./startsonar.sh
 RUN dotnet dev-certs https --trust
 RUN ./startsonar.sh;
 
-RUN dotnet build HomeBudgetRatesApi.sln -c Release -o /app/build /maxcpucount:1
+RUN dotnet build HomeBudgetRatesApi.sln -c Release --no-incremental -o /app/build /maxcpucount:1
 COPY ["test-results/*", "test-results/"]
 
 RUN /tools/dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}";
