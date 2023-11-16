@@ -90,7 +90,6 @@ jobs:
 
       - name: Make the scanner script file executable
         run: | 
-          dos2unix ./startsonar.sh
           chmod +x ./startsonar.sh
 
       - name: Start sonnar scanning
