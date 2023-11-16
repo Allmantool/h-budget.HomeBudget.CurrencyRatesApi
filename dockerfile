@@ -48,6 +48,7 @@ RUN export PATH=$JAVA_HOME/bin:$PATH
 RUN dotnet new tool-manifest
 RUN dotnet tool install dotnet-sonarscanner --tool-path /tools --version 5.14.0
 RUN dotnet tool install snitch --tool-path /tools --version 1.12.0
+RUN dotnet tool install JetBrains.dotCover.GlobalTool --tool-path /tools --version 2023.2.3
 
 RUN dotnet tool restore
 
@@ -83,7 +84,9 @@ RUN dotnet dev-certs https --trust
 RUN ./startsonar.sh;
 
 RUN dotnet build HomeBudgetRatesApi.sln -c Release -o /app/build /maxcpucount:1
-COPY ["test-results/*", "test-results/"]
+RUN /tools/dotnet-dotcover test HomeBudgetRatesApi.sln \
+    --dcReportType=HTML \
+    --dcOutput="test-results/rates-coverage.html"
 
 RUN /tools/dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}";
 
