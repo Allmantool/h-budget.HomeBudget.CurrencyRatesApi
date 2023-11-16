@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy AS build
 WORKDIR /scr
 
 COPY --from=mcr.microsoft.com/dotnet/sdk:7.0 /usr/share/dotnet/shared /usr/share/dotnet/shared
@@ -25,7 +25,7 @@ RUN mkdir /usr/lib/jvm && \
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && \   
     apt-get install -f -y --quiet --no-install-recommends \
-    ant ca-certificates-java dotnet-sdk-6.0 dotnet-sdk-7.0 && \
+    ant ca-certificates-java dotnet-sdk-6.0 && \
     apt-get -y autoremove && \
     apt-get clean autoclean
 
@@ -63,7 +63,7 @@ FROM build AS publish
 RUN dotnet publish HomeBudgetRatesApi.sln \
     --no-dependencies \
     --no-restore \
-    --framework net8.0 \
+    --framework net7.0 \
     -c Release \
     -v Diagnostic \
     -o /app/publish
