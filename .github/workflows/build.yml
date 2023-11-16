@@ -120,7 +120,8 @@ jobs:
         run: |
           dotnet-dotcover test HomeBudgetRatesApi.sln \
             --dcReportType=HTML \
-            --dcOutput="test-results/rates-coverage.html"
+            --dcOutput="test-results/rates-coverage.html" \
+            --dcFilters="+:HomeBudget.*;-:type=*.IntegrationTests;-:type=*.Tests"
 
       - name: End sonnar scanning
         env:

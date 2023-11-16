@@ -1,12 +1,12 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy AS build
 WORKDIR /scr
 
-COPY --from=mcr.microsoft.com/dotnet/sdk:6.0 /usr/share/dotnet/shared /usr/share/dotnet/shared
+COPY --from=mcr.microsoft.com/dotnet/sdk:7.0 /usr/share/dotnet/shared /usr/share/dotnet/shared
 
 ARG SONAR_TOKEN
 ARG PULL_REQUEST_ID
@@ -34,7 +34,7 @@ RUN mkdir /usr/lib/jvm && \
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && \   
     apt-get install -f -y --quiet --no-install-recommends \
-    ant dos2unix ca-certificates-java dotnet-sdk-6.0 dotnet-sdk-7.0 && \
+    ant dos2unix ca-certificates-java dotnet-sdk-7.0 dotnet-sdk-8.0 && \
     apt-get -y autoremove && \
     apt-get clean autoclean
 
@@ -72,7 +72,7 @@ COPY . .
 LABEL build_version="${BUILD_VERSION}"
 LABEL service=CurrencyRatesService
 
-RUN dotnet build HomeBudgetRatesApi.sln -c Release --no-incremental -o /app/build /maxcpucount:
+RUN dotnet build HomeBudgetRatesApi.sln -c Release --no-incremental -o /app/build
 
 RUN /tools/snitch
 
@@ -80,7 +80,7 @@ FROM build AS publish
 RUN dotnet publish HomeBudgetRatesApi.sln \
     --no-dependencies \
     --no-restore \
-    --framework net7.0 \
+    --framework net8.0 \
     -c Release \
     -v Diagnostic \
     -o /app/publish
