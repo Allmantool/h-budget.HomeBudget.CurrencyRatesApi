@@ -82,16 +82,53 @@ jobs:
 
           echo "TARGET_TAG=${tag}" >> $GITHUB_OUTPUT
 
-      - name: Run test (unit + integrations based on test containers)
+      - name: Install external tools for quality gate verification
         shell: bash
         run: |
-          echo "Run tests (unit / integrations based on test containers)"
+          dotnet tool install --global JetBrains.dotCover.GlobalTool --tool-path /tools --version 2023.2.3
+          dotnet tool install --global dotnet-sonarscanner --tool-path /tools --version 5.14.0
 
-          dotnet tool install --global JetBrains.dotCover.GlobalTool --version 2023.2.3
+      - name: Make the scanner script file executable
+        run: | 
+          dos2unix ./startsonar.sh
+          chmod +x ./startsonar.sh
 
+      - name: Start sonnar scanning
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          PULL_REQUEST_ID: ${{ steps.findPr.outputs.pr }}
+          PULL_REQUEST_SOURCE_BRANCH: ${{ github.ref }}
+          PULL_REQUEST_TARGET_BRANCH: refs/heads/master
+          ACTION: ${{ github.action }}
+          EVENT_NAME: ${{ github.event_name }}
+        shell: bash
+        run: |
+          dotnet dev-certs https --trust
+          sh ./startsonar.sh
+
+      - name: Build the solution to quality metrics gathering
+        shell: bash
+        run: |
+          dotnet build HomeBudgetRatesApi.sln \
+            --no-incremental
+
+      - name: Run test (unit + integrations based on test containers) for test coverage collecting
+        shell: bash
+        run: |
           dotnet-dotcover test HomeBudgetRatesApi.sln \
             --dcReportType=HTML \
             --dcOutput="test-results/rates-coverage.html"
+
+      - name: End sonnar scanning
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+        shell: bash
+        run: |
+          dotnet /tools/dotnet-sonarscanner end /d:sonar.token="${{ env.SONAR_TOKEN }}"
 
       - name: Build docker image
         env:
