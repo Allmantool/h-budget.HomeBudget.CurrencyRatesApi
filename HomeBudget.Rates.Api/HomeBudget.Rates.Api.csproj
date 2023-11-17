@@ -38,21 +38,21 @@
     <ProjectReference Include="..\HomeBudget.DataAccess.Dapper\HomeBudget.DataAccess.Dapper.csproj" />
   </ItemGroup>
 
-	<ItemGroup>
-		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-			<_Parameter1>$(AssemblyName).Tests</_Parameter1>
-		</AssemblyAttribute>
-      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-          <_Parameter1>HomeBudget.Components.IntegrationTests</_Parameter1>
-      </AssemblyAttribute>
-		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-			<_Parameter1>HomeBudget.Components.CurrencyRates.Tests</_Parameter1>
-		</AssemblyAttribute>
-      <InternalsVisibleTo Include="MinimalApiPlayground.Tests" />
-	</ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Tests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>HomeBudget.Components.IntegrationTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>HomeBudget.Components.CurrencyRates.Tests</_Parameter1>
+    </AssemblyAttribute>
+    <InternalsVisibleTo Include="MinimalApiPlayground.Tests" />
+  </ItemGroup>
 
-	<ItemGroup>
-	  <PackageReference Update="SonarAnalyzer.CSharp" Version="9.12.0.78982" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="SonarAnalyzer.CSharp" Version="9.12.0.78982" />
+  </ItemGroup>
 
 </Project>

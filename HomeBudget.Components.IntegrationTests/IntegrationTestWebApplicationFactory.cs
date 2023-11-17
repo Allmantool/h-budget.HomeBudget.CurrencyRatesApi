@@ -14,16 +14,11 @@ using HomeBudget.Rates.Api.Configuration;
 
 namespace HomeBudget.Components.IntegrationTests
 {
-    public class IntegrationTestWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup>
+    public class IntegrationTestWebApplicationFactory<TStartup>
+        (Action webHostInitializationCallback) : WebApplicationFactory<TStartup>
         where TStartup : class
     {
-        private readonly Action _webHostInitializationCallback;
         internal IConfiguration Configuration { get; private set; }
-
-        public IntegrationTestWebApplicationFactory(Action webHostInitializationCallback)
-        {
-            _webHostInitializationCallback = webHostInitializationCallback;
-        }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -41,7 +36,7 @@ namespace HomeBudget.Components.IntegrationTests
 
                 Configuration = conf.Build();
 
-                _webHostInitializationCallback?.Invoke();
+                webHostInitializationCallback?.Invoke();
             });
 
             base.ConfigureWebHost(builder);
