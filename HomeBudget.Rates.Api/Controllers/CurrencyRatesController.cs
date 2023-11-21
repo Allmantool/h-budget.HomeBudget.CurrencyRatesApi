@@ -7,6 +7,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
+using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Components.CurrencyRates.CQRS.Commands.Models;
 using HomeBudget.Components.CurrencyRates.CQRS.Queries.Models;
 using HomeBudget.Components.CurrencyRates.Models;
@@ -18,27 +19,18 @@ using CurrencyRate = HomeBudget.Components.CurrencyRates.Models.CurrencyRate;
 namespace HomeBudget.Rates.Api.Controllers
 {
     [ApiController]
-    [Route("currencyRates")]
-    public class CurrencyRatesController : ControllerBase
+    [Route(Endpoints.RatesApi, Name = Endpoints.RatesApi)]
+    public class CurrencyRatesController(
+        IMediator mediator,
+        IMapper mapper) : ControllerBase
     {
-        private readonly IMediator _mediator;
-        private readonly IMapper _mapper;
-
-        public CurrencyRatesController(
-            IMediator mediator,
-            IMapper mapper)
-        {
-            _mediator = mediator;
-            _mapper = mapper;
-        }
-
         [HttpPost]
         public async Task<Result<int>> AddRatesAsync([FromBody] CurrencySaveRatesRequest request, CancellationToken token = default)
         {
-            var unifiedCurrencyRates = _mapper
+            var unifiedCurrencyRates = mapper
                 .Map<IReadOnlyCollection<CurrencyRate>>(request.CurrencyRates);
 
-            return await _mediator.Send(new SaveCurrencyRatesCommand(unifiedCurrencyRates), token);
+            return await mediator.Send(new SaveCurrencyRatesCommand(unifiedCurrencyRates), token);
         }
 
         [HttpGet("period/{startDate}/{endDate}")]
@@ -46,7 +38,7 @@ namespace HomeBudget.Rates.Api.Controllers
             DateOnly startDate,
             DateOnly endDate,
             CancellationToken token = default)
-            => await _mediator.Send(
+            => await mediator.Send(
                 new GetCurrencyGroupedRatesForPeriodQuery
                 {
                     StartDate = startDate,
@@ -56,10 +48,10 @@ namespace HomeBudget.Rates.Api.Controllers
 
         [HttpGet]
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetAllRatesAsync(CancellationToken token = default)
-            => await _mediator.Send(new GetAllRatesQuery(), token);
+            => await mediator.Send(new GetAllRatesQuery(), token);
 
         [HttpGet("today")]
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetTodayRatesAsync(CancellationToken token = default)
-            => await _mediator.Send(new GetTodayRatesQuery(), token);
+            => await mediator.Send(new GetTodayRatesQuery(), token);
     }
 }
