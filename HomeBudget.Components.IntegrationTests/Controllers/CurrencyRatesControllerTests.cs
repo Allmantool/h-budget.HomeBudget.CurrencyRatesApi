@@ -7,12 +7,14 @@ using FluentAssertions;
 using NUnit.Framework;
 using RestSharp;
 
-using HomeBudget.Core.Constants;
-using HomeBudget.Core.Models;
+using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Components.CurrencyRates.Models;
-using HomeBudget.Rates.Api.Models;
 using HomeBudget.Components.IntegrationTests.Constants;
 using HomeBudget.Components.IntegrationTests.WebApps;
+using HomeBudget.Core.Constants;
+using HomeBudget.Core.Models;
+using HomeBudget.Rates.Api.Models;
+
 using CurrencyRate = HomeBudget.Rates.Api.Models.CurrencyRate;
 
 namespace HomeBudget.Components.IntegrationTests.Controllers
@@ -33,7 +35,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var startDay = new DateTime(2022, 10, 25).ToString(DateFormats.RatesApiRequestFormat);
             var endDate = new DateTime(2022, 12, 25).ToString(DateFormats.RatesApiRequestFormat);
 
-            var getCurrencyRatesForPeriodRequest = new RestRequest($"/currencyRates/period/{startDay}/{endDate}");
+            var getCurrencyRatesForPeriodRequest = new RestRequest($"/{Endpoints.RatesApi}/period/{startDay}/{endDate}");
 
             var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
 
@@ -47,7 +49,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var startDay = new DateTime(2022, 10, 25).ToString(DateFormats.RatesApiRequestFormat);
             var endDate = new DateTime(2022, 12, 25).ToString(DateFormats.RatesApiRequestFormat);
 
-            var getCurrencyRatesForPeriodRequest = new RestRequest($"/currencyRates/period/{startDay}/{endDate}");
+            var getCurrencyRatesForPeriodRequest = new RestRequest($"/{Endpoints.RatesApi}/period/{startDay}/{endDate}");
 
             var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
             var payload = response.Data;
@@ -59,7 +61,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         [Test]
         public async Task GetAllRatesAsync_WhenTodayCurrencyHasNotBeenSaved_ThenNotFound()
         {
-            var getRatesRequest = new RestRequest("/currencyRates");
+            var getRatesRequest = new RestRequest($"/{Endpoints.RatesApi}");
 
             var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getRatesRequest);
 
@@ -70,7 +72,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         [Test]
         public async Task GetTodayRatesAsync_WhenEnquireAndSaveTodayRates_ThenOkAsStatus()
         {
-            var getTodayRatesRequest = new RestRequest("/currencyRates/today");
+            var getTodayRatesRequest = new RestRequest($"/{Endpoints.RatesApi}/today");
 
             var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getTodayRatesRequest);
 
@@ -97,7 +99,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
                 }
             };
 
-            var currencySaveRatesRequest = new RestRequest("/currencyRates", Method.Post)
+            var currencySaveRatesRequest = new RestRequest($"/{Endpoints.RatesApi}", Method.Post)
                 .AddJsonBody(requestBody);
 
             var response = await _sut.RestHttpClient!.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
