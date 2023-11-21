@@ -42,7 +42,10 @@ webHost
     });
 
 // This method gets called by the runtime. Use this method to add services to the container.
-services.AddControllers();
+services.AddControllers(o =>
+{
+    o.Conventions.Add(new SwaggerControllerDocConvention());
+});
 
 await services.SetUpDiAsync(configuration, environment);
 services.AddAutoMapper(new List<Assembly>

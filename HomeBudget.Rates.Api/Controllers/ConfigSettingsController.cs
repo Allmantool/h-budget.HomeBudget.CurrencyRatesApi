@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +11,7 @@ using HomeBudget.Rates.Api.Constants;
 namespace HomeBudget.Rates.Api.Controllers
 {
     [ApiController]
-    [DisplayName(Endpoints.ConfigurationSettingsApi)]
-    [Route(Endpoints.ConfigurationSettingsApi)]
+    [Route(Endpoints.ConfigurationSettingsApi, Name = Endpoints.ConfigurationSettingsApi)]
     public class ConfigSettingsController(IConfigSettingsServices configSettingsServices) : ControllerBase
     {
         [HttpGet]

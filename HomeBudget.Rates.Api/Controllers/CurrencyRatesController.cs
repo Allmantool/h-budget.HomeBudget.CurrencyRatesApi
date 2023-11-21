@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,8 +19,7 @@ using CurrencyRate = HomeBudget.Components.CurrencyRates.Models.CurrencyRate;
 namespace HomeBudget.Rates.Api.Controllers
 {
     [ApiController]
-    [Route(Endpoints.RatesApi)]
-    [DisplayName(Endpoints.RatesApi)]
+    [Route(Endpoints.RatesApi, Name = Endpoints.RatesApi)]
     public class CurrencyRatesController(
         IMediator mediator,
         IMapper mapper) : ControllerBase
