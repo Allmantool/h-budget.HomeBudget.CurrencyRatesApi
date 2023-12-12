@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using AutoMapper;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 
@@ -130,7 +131,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
 
             var rates = await _sut.GetRatesForPeriodAsync(testStartDate, testEndDate);
 
-            Assert.AreEqual(expectedRatesCount, rates.Payload.SelectMany(i => i.RateValues).Count());
+            expectedRatesCount.Should().Be(rates.Payload.SelectMany(i => i.RateValues).Count());
         }
 
         [Test]
@@ -184,7 +185,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
 
             var currencyRatesGroups = rates.MapToCurrencyRateGrouped(mapper);
 
-            Assert.AreEqual(2, currencyRatesGroups.Count);
+            currencyRatesGroups.Count.Should().Be(2);
         }
 
         private static IMapper GetDefaultMapper()
