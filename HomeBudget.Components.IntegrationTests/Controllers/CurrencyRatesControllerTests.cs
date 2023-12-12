@@ -39,7 +39,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
 
             var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
 
-            Assert.IsTrue(response.IsSuccessful);
+            response.IsSuccessful.Should().BeTrue();
         }
 
         [Test]
@@ -65,8 +65,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
 
             var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getRatesRequest);
 
-            // TODO: think over what to test
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Test]
@@ -76,7 +75,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
 
             var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getTodayRatesRequest);
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Test]
@@ -104,7 +103,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
 
             var response = await _sut.RestHttpClient!.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         public async ValueTask DisposeAsync()

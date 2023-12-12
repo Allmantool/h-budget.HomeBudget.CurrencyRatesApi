@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-
+using FluentAssertions;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
 
@@ -42,7 +42,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests
 
             var validationResult = await _sut.TestValidateAsync(testData);
 
-            Assert.AreNotSame(4, validationResult.Errors.Count);
+            validationResult.Errors.Count.Should().NotBe(4);
         }
     }
 }
