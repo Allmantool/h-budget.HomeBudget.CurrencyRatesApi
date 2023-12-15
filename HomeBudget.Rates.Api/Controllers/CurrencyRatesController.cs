@@ -21,7 +21,7 @@ namespace HomeBudget.Rates.Api.Controllers
     [ApiController]
     [Route(Endpoints.RatesApi, Name = Endpoints.RatesApi)]
     public class CurrencyRatesController(
-        IMediator mediator,
+        ISender mediator,
         IMapper mapper) : ControllerBase
     {
         [HttpPost]
