@@ -7,15 +7,8 @@ using HomeBudget.Core.Constants;
 
 namespace HomeBudget.Rates.Api.Middlewares
 {
-    internal class CorrelationIdMiddleware
+    internal class CorrelationIdMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
-
-        public CorrelationIdMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
         public async Task InvokeAsync(HttpContext context)
         {
             var requestHeaders = context.Request.Headers;
@@ -26,7 +19,7 @@ namespace HomeBudget.Rates.Api.Middlewares
 
             responseHeaders.TryAdd(HttpHeaderKeys.CorrelationIdHeaderKey, correlationId);
 
-            await _next.Invoke(context);
+            await next.Invoke(context);
         }
     }
 }
