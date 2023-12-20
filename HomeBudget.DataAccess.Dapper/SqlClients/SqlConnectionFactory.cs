@@ -11,18 +11,12 @@ using HomeBudget.DataAccess.Interfaces;
 
 namespace HomeBudget.DataAccess.Dapper.SqlClients
 {
-    internal class SqlConnectionFactory : ISqlConnectionFactory
+    internal class SqlConnectionFactory(
+        ILogger<SqlConnectionFactory> logger,
+        IOptions<DatabaseConnectionOptions> options)
+        : ISqlConnectionFactory
     {
-        private readonly ILogger<SqlConnectionFactory> _logger;
-        private readonly DatabaseConnectionOptions _databaseConnectionOptions;
-
-        public SqlConnectionFactory(
-            ILogger<SqlConnectionFactory> logger,
-            IOptions<DatabaseConnectionOptions> options)
-        {
-            _logger = logger;
-            _databaseConnectionOptions = options.Value;
-        }
+        private readonly DatabaseConnectionOptions _databaseConnectionOptions = options.Value;
 
         public IDbConnection Create()
         {
@@ -32,7 +26,7 @@ namespace HomeBudget.DataAccess.Dapper.SqlClients
             }
             catch (Exception ex)
             {
-                _logger.LogWithExecutionMemberName(
+                logger.LogWithExecutionMemberName(
                     $"Failed connect to database with connection string: '{_databaseConnectionOptions.ConnectionString}'. " +
                     $"Error message: '{ex.Message}'",
                     LogLevel.Critical);

@@ -15,23 +15,13 @@ using HomeBudget.Core.Services.Interfaces;
 
 namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
 {
-    internal class GetTodayGroupedRatesForPeriodQueryHandler : IRequestHandler<GetCurrencyGroupedRatesForPeriodQuery, Result<IReadOnlyCollection<CurrencyRateGrouped>>>
+    internal class GetTodayGroupedRatesForPeriodQueryHandler(
+        ILogger<GetTodayGroupedRatesForPeriodQueryHandler> logger,
+        IRedisCacheService redisCacheService,
+        ICurrencyRatesService currencyRatesService)
+        : IRequestHandler<GetCurrencyGroupedRatesForPeriodQuery, Result<IReadOnlyCollection<CurrencyRateGrouped>>>
     {
         private const string CacheKeyPrefix = nameof(GetTodayGroupedRatesForPeriodQueryHandler);
-
-        private readonly ILogger<GetTodayGroupedRatesForPeriodQueryHandler> _logger;
-        private readonly IRedisCacheService _redisCacheService;
-        private readonly ICurrencyRatesService _currencyRatesService;
-
-        public GetTodayGroupedRatesForPeriodQueryHandler(
-            ILogger<GetTodayGroupedRatesForPeriodQueryHandler> logger,
-            IRedisCacheService redisCacheService,
-            ICurrencyRatesService currencyRatesService)
-        {
-            _logger = logger;
-            _redisCacheService = redisCacheService;
-            _currencyRatesService = currencyRatesService;
-        }
 
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> Handle(GetCurrencyGroupedRatesForPeriodQuery request, CancellationToken cancellationToken)
         {
@@ -39,11 +29,11 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
                                 $"|{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}" +
                                 $"|{request.StartDate.ToString(DateFormats.NationalBankExternalApi)}-{request.EndDate.ToString(DateFormats.NationalBankExternalApi)}";
 
-            _logger.LogWithExecutionMemberName($"Method: '{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}' with key: {redisCacheKey}");
+            logger.LogWithExecutionMemberName($"Method: '{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}' with key: {redisCacheKey}");
 
-            return await _redisCacheService.CacheWrappedMethodAsync(
+            return await redisCacheService.CacheWrappedMethodAsync(
                   redisCacheKey,
-                  () => _currencyRatesService.GetRatesForPeriodAsync(request.StartDate, request.EndDate));
+                  () => currencyRatesService.GetRatesForPeriodAsync(request.StartDate, request.EndDate));
         }
     }
 }

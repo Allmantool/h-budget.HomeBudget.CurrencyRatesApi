@@ -7,20 +7,11 @@ using HomeBudget.Components.CurrencyRates.Services.Interfaces;
 
 namespace HomeBudget.Rates.Api.Middlewares
 {
-    internal class NationalBankClientWarmUpMiddleware
+    internal class NationalBankClientWarmUpMiddleware(RequestDelegate next, IServiceCollection services)
     {
-        private readonly RequestDelegate _next;
-        private readonly IServiceCollection _services;
-
-        public NationalBankClientWarmUpMiddleware(RequestDelegate next, IServiceCollection services)
-        {
-            _next = next;
-            _services = services;
-        }
-
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            var httpClient = _services.BuildServiceProvider().GetService<INationalBankApiClient>();
+            var httpClient = services.BuildServiceProvider().GetService<INationalBankApiClient>();
 
             if (httpClient != null)
             {
@@ -28,7 +19,7 @@ namespace HomeBudget.Rates.Api.Middlewares
                 await httpClient.GetTodayRatesAsync();
             }
 
-            await _next(httpContext);
+            await next(httpContext);
         }
     }
 }
