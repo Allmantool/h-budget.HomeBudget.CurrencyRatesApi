@@ -8,26 +8,18 @@ using HomeBudget.DataAccess.Interfaces;
 
 namespace HomeBudget.Components.CurrencyRates.Providers
 {
-    internal class ConfigSettingsProvider : IConfigSettingsProvider
+    internal class ConfigSettingsProvider(
+        IBaseWriteRepository baseWriteRepository,
+        IBaseReadRepository readRepository)
+        : IConfigSettingsProvider
     {
         private const string GeneralConfigSettingsKey = "General";
-
-        private readonly IBaseWriteRepository _baseWriteRepository;
-        private readonly IBaseReadRepository _readRepository;
-
-        public ConfigSettingsProvider(
-            IBaseWriteRepository baseWriteRepository,
-            IBaseReadRepository readRepository)
-        {
-            _baseWriteRepository = baseWriteRepository;
-            _readRepository = readRepository;
-        }
 
         public async Task<ConfigSettings> GetDefaultSettingsAsync()
         {
             const string query = "SELECT [Settings] FROM [ConfigSettings] WITH (NOLOCK) WHERE [Key] = @Key";
 
-            var configAsJson = await _readRepository.SingleAsync<string>(
+            var configAsJson = await readRepository.SingleAsync<string>(
                 query,
                 new
                 {
@@ -45,7 +37,7 @@ namespace HomeBudget.Components.CurrencyRates.Providers
                                     "SET Settings = @Settings" +
                                   "WHERE [Key] = @Key";
 
-            return await _baseWriteRepository.ExecuteAsync(
+            return await baseWriteRepository.ExecuteAsync(
                 query,
                 new SettingsForUpdatePayload
                 {
