@@ -11,25 +11,19 @@ using HomeBudget.Core.Services.Interfaces;
 
 namespace HomeBudget.Core.Services
 {
-    internal class RedisCacheService : BaseService, IRedisCacheService
+    internal class RedisCacheService(IDatabase redisDatabase, IOptions<CacheStoreOptions> cacheOptions)
+        : BaseService, IRedisCacheService
     {
-        private readonly IDatabase _redisDatabase;
-        private readonly CacheStoreOptions _cacheOptions;
-
-        public RedisCacheService(IDatabase redisDatabase, IOptions<CacheStoreOptions> cacheOptions)
-        {
-            _redisDatabase = redisDatabase;
-            _cacheOptions = cacheOptions.Value;
-        }
+        private readonly CacheStoreOptions _cacheOptions = cacheOptions.Value;
 
         public Task<bool> KeyExistsAsync(string cacheKey)
         {
-            return _redisDatabase.KeyExistsAsync(cacheKey);
+            return redisDatabase.KeyExistsAsync(cacheKey);
         }
 
         public async Task<T> GetAsync<T>(string cacheKey)
         {
-            var cacheValue = await _redisDatabase.StringGetAsync(cacheKey);
+            var cacheValue = await redisDatabase.StringGetAsync(cacheKey);
 
             if (cacheValue.IsNullOrEmpty)
             {
@@ -43,7 +37,7 @@ namespace HomeBudget.Core.Services
         {
             return Equals(cacheValue, default(T))
                 ? Task.FromResult(false)
-                : _redisDatabase.StringSetAsync(
+                : redisDatabase.StringSetAsync(
                     cacheKey,
                     JsonSerializer.Serialize(cacheValue),
                     TimeSpan.FromMinutes(_cacheOptions.ExpirationInMinutes));
@@ -71,7 +65,7 @@ namespace HomeBudget.Core.Services
 
         private IServer GetCurrentServer()
         {
-            var servers = _redisDatabase.Multiplexer.GetServers();
+            var servers = redisDatabase.Multiplexer.GetServers();
 
             return servers.FirstOrDefault();
         }

@@ -44,10 +44,8 @@ namespace HomeBudget.Rates.Api.Configuration
         public static async Task<IServiceCollection> SetDiForConnectionsAsync(this IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
-
-            var configSettingsProvider = serviceProvider.GetRequiredService<IConfigSettingsProvider>();
-
             var databaseOptions = serviceProvider.GetRequiredService<IOptions<DatabaseConnectionOptions>>().Value;
+            var configSettingsProvider = serviceProvider.GetRequiredService<IConfigSettingsProvider>();
 
             var redisConnectionMultiplexer = await ConnectionMultiplexer.ConnectAsync(databaseOptions.RedisConnectionString);
             var configSetting = await configSettingsProvider.GetDefaultSettingsAsync();

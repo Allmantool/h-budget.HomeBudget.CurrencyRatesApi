@@ -1,16 +1,9 @@
 ﻿namespace HomeBudget.Core.Models
 {
-    public class Result<T>
+    public class Result<T>(T payload = default, string message = default, bool isSucceeded = default)
     {
-        public Result(T payload = default, string message = default, bool isSucceeded = default)
-        {
-            Payload = payload;
-            IsSucceeded = isSucceeded;
-            Message = message;
-        }
-
-        public T Payload { get; }
-        public bool IsSucceeded { get; }
-        public string Message { get; }
+        public T Payload { get; } = payload;
+        public bool IsSucceeded { get; } = isSucceeded;
+        public string Message { get; } = message;
     }
 }
