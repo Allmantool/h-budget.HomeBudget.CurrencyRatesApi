@@ -27,6 +27,7 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
             return await redisCacheService.CacheWrappedMethodAsync(
                 $"{CacheKeyPrefix}|{nameof(ICurrencyRatesService.GetRatesAsync)}|{DateTime.Today}",
                 currencyRatesService.GetRatesAsync);
+                () => currencyRatesService.GetRatesAsync());
         }
     }
 }
