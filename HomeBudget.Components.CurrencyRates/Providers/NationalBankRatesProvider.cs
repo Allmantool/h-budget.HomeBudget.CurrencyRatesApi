@@ -13,26 +13,18 @@ using HomeBudget.Core.Models;
 
 namespace HomeBudget.Components.CurrencyRates.Providers
 {
-    internal class NationalBankRatesProvider : INationalBankRatesProvider
+    internal class NationalBankRatesProvider(
+        ConfigSettings configSettings,
+        INationalBankApiClient nationalBankApiClient)
+        : INationalBankRatesProvider
     {
-        private readonly ConfigSettings _configSettings;
-        private readonly INationalBankApiClient _nationalBankApiClient;
-
-        public NationalBankRatesProvider(
-            ConfigSettings configSettings,
-            INationalBankApiClient nationalBankApiClient)
-        {
-            _configSettings = configSettings;
-            _nationalBankApiClient = nationalBankApiClient;
-        }
-
         public async Task<IReadOnlyCollection<NationalBankShortCurrencyRate>> GetRatesForPeriodAsync(
             IEnumerable<int> currenciesIds,
             PeriodRange periodRange)
         {
             var yearRatesRequestPayloads = GetYearPeriodRequests(currenciesIds, periodRange);
 
-            var getRatesFromExternalApiTasks = yearRatesRequestPayloads.Select(payload => _nationalBankApiClient
+            var getRatesFromExternalApiTasks = yearRatesRequestPayloads.Select(payload => nationalBankApiClient
                 .GetRatesForPeriodAsync(
                     payload.CurrencyId,
                     payload.Period.StartDate.ToDateTime(TimeOnly.MinValue).ToString(DateFormats.NationalBankExternalApi),
@@ -47,11 +39,11 @@ namespace HomeBudget.Components.CurrencyRates.Providers
 
         public async Task<IReadOnlyCollection<NationalBankCurrencyRate>> GetTodayActiveRatesAsync()
         {
-            var activeCurrencyAbbreviations = _configSettings
+            var activeCurrencyAbbreviations = configSettings
                 .ActiveNationalBankCurrencies
                 .Select(i => i.Abbreviation);
 
-            var todayRatesFromApi = await _nationalBankApiClient.GetTodayRatesAsync();
+            var todayRatesFromApi = await nationalBankApiClient.GetTodayRatesAsync();
 
             return todayRatesFromApi
                 .Where(r => activeCurrencyAbbreviations.Contains(r.Abbreviation, StringComparer.OrdinalIgnoreCase))

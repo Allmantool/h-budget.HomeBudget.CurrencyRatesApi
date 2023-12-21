@@ -12,20 +12,12 @@ using HomeBudget.DataAccess.Interfaces;
 
 namespace HomeBudget.Components.CurrencyRates.Providers
 {
-    public class CurrencyRatesWriteProvider : ICurrencyRatesWriteProvider
+    public class CurrencyRatesWriteProvider(
+        IMapper mapper,
+        IBaseWriteRepository writeRepository)
+        : ICurrencyRatesWriteProvider
     {
         private const int MaxRatePerAnOperation = 300;
-
-        private readonly IMapper _mapper;
-        private readonly IBaseWriteRepository _writeRepository;
-
-        public CurrencyRatesWriteProvider(
-            IMapper mapper,
-            IBaseWriteRepository writeRepository)
-        {
-            _mapper = mapper;
-            _writeRepository = writeRepository;
-        }
 
         public async Task<int> UpsertRatesWithSaveAsync(IReadOnlyCollection<CurrencyRate> rates)
         {
@@ -48,11 +40,11 @@ namespace HomeBudget.Components.CurrencyRates.Providers
                                        "  FROM dbo.[CurrencyRates] " +
                                        " WHERE [CurrencyId] IN @CurrencyIds AND [UpdateDate] IN @UpdateDates;";
 
-            var dbEntities = _mapper.Map<IEnumerable<CurrencyRateEntity>>(rates);
+            var dbEntities = mapper.Map<IEnumerable<CurrencyRateEntity>>(rates);
 
             foreach (var ratesPerAnChunk in dbEntities.Chunk(MaxRatePerAnOperation))
             {
-                await _writeRepository.ExecuteAsync(
+                await writeRepository.ExecuteAsync(
                     deleteQuery,
                     new RatesForDeletePayload
                     {
@@ -60,7 +52,7 @@ namespace HomeBudget.Components.CurrencyRates.Providers
                         UpdateDates = ratesPerAnChunk.Select(r => r.UpdateDate)
                     });
 
-                yield return await _writeRepository.ExecuteAsync(insertQuery, ratesPerAnChunk);
+                yield return await writeRepository.ExecuteAsync(insertQuery, ratesPerAnChunk);
             }
         }
     }
