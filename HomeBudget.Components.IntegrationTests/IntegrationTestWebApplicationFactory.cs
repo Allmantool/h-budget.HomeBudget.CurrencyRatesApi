@@ -9,8 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.IntegrationTests.MockServices;
-using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Configuration;
+using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Components.IntegrationTests
 {
