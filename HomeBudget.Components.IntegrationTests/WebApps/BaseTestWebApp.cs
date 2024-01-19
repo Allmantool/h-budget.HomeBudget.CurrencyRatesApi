@@ -24,20 +24,22 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
             var testProperties = TestContext.CurrentContext.Test.Properties;
             var testCategory = testProperties.Get("Category") as string;
 
-            if (TestTypes.Integration.Equals(testCategory, StringComparison.OrdinalIgnoreCase))
+            if (!TestTypes.Integration.Equals(testCategory, StringComparison.OrdinalIgnoreCase))
             {
-                WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(
-                    () =>
-                    {
-                        TestContainersService = new TestContainersService(WebFactory?.Configuration);
-
-                        StartAsync().GetAwaiter().GetResult();
-                    });
-
-                RestHttpClient = new RestClient(
-                    WebFactory.CreateClient(),
-                    new RestClientOptions(new Uri("http://localhost:6064")));
+                return;
             }
+
+            WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(
+                () =>
+                {
+                    TestContainersService = new TestContainersService(WebFactory?.Configuration);
+
+                    StartAsync().GetAwaiter().GetResult();
+                });
+
+            RestHttpClient = new RestClient(
+                WebFactory.CreateClient(),
+                new RestClientOptions(new Uri("http://localhost:6064")));
         }
 
         public async Task StartAsync()
