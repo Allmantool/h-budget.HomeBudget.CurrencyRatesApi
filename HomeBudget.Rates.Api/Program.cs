@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 
 using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
+using HomeBudget.Core.Constants;
 using HomeBudget.Rates.Api.Configuration;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Extensions;
@@ -59,6 +60,11 @@ services
     .AddValidatorsFromAssemblyContaining<HomeBudget.Rates.Api.Program>()
     .AddResponseCaching()
     .SetupSwaggerGen();
+
+services.AddHeaderPropagation(options =>
+{
+    options.Headers.Add(HttpHeaderKeys.CorrelationIdHeaderKey);
+});
 
 configuration.InitializeLogger(environment, webAppBuilder.Host);
 

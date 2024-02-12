@@ -2,6 +2,6 @@
 {
     public static class HttpHeaderKeys
     {
-        public static readonly string CorrelationIdHeaderKey = "Correlationid";
+        public static readonly string CorrelationIdHeaderKey = "CorrelationId";
     }
 }

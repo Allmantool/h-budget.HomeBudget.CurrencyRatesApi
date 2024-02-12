@@ -6,10 +6,10 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 
+using HomeBudget.Core.Constants;
 using HomeBudget.Rates.Api.Configuration;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Middlewares;
-using HomeBudget.Core.Constants;
 
 namespace HomeBudget.Rates.Api.Extensions
 {
@@ -48,8 +48,9 @@ namespace HomeBudget.Rates.Api.Extensions
                 .UseHttpsRedirection()
                 .UseResponseCaching()
                 .UseAuthorization()
-                .UseRouting()
                 .UseCorrelationId()
+                .UseHeaderPropagation()
+                .UseRouting()
                 .UseSerilogRequestLogging(options =>
                 {
                     // Customize the message template

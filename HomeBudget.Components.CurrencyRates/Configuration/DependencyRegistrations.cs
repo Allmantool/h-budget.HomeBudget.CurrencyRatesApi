@@ -12,8 +12,6 @@ namespace HomeBudget.Components.CurrencyRates.Configuration
         public static IServiceCollection RegisterCurrencyRatesIoCDependency(
             this IServiceCollection services)
         {
-            var serviceProvider = services.BuildServiceProvider();
-
             return services
                 .AddScoped<IConfigSettingsProvider, ConfigSettingsProvider>()
                 .AddScoped<IConfigSettingsServices, ConfigSettingsServices>()
@@ -21,7 +19,6 @@ namespace HomeBudget.Components.CurrencyRates.Configuration
                 .AddScoped<INationalBankRatesProvider, NationalBankRatesProvider>()
                 .AddScoped<ICurrencyRatesReadProvider, CurrencyRatesReadProvider>()
                 .AddScoped<ICurrencyRatesService, CurrencyRatesService>()
-                .RegisterNationalApiHttpClient(serviceProvider)
                 .AddMediatR(configuration =>
                 {
                     configuration.RegisterServicesFromAssembly(typeof(DependencyRegistrations).Assembly);
