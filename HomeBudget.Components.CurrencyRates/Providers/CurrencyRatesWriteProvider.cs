@@ -45,13 +45,16 @@ namespace HomeBudget.Components.CurrencyRates.Providers
             foreach (var ratesPerAnChunk in dbEntities.Chunk(MaxRatePerAnOperation))
             {
                 await writeRepository.ExecuteAsync(
-                    deleteQuery,
-                    new RatesForDeletePayload
-                    {
-                        CurrencyIds = ratesPerAnChunk.Select(r => r.CurrencyId),
-                        UpdateDates = ratesPerAnChunk.Select(r => r.UpdateDate)
-                    });
+                  deleteQuery,
+                  new RatesForDeletePayload
+                  {
+                      CurrencyIds = ratesPerAnChunk.Select(r => r.CurrencyId),
+                      UpdateDates = ratesPerAnChunk.Select(r => r.UpdateDate)
+                  });
+            }
 
+            foreach (var ratesPerAnChunk in dbEntities.Chunk(MaxRatePerAnOperation))
+            {
                 yield return await writeRepository.ExecuteAsync(insertQuery, ratesPerAnChunk);
             }
         }
