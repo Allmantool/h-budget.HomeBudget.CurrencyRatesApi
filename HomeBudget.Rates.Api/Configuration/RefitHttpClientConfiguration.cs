@@ -14,7 +14,7 @@ using Refit;
 using HomeBudget.Components.CurrencyRates.Services.Interfaces;
 using HomeBudget.Core.Models;
 
-namespace HomeBudget.Components.CurrencyRates.Configuration
+namespace HomeBudget.Rates.Api.Configuration
 {
     internal static class RefitHttpClientConfiguration
     {
@@ -38,7 +38,9 @@ namespace HomeBudget.Components.CurrencyRates.Configuration
                     }
                 )
                 .AddPolicyHandler(GetRetryPolicy(serviceProvider))
-                .SetHandlerLifetime(TimeSpan.FromMinutes(15));
+                .AddHttpMessageHandler<HttpLoggingHandler>()
+                .SetHandlerLifetime(TimeSpan.FromMinutes(15))
+                .AddHeaderPropagation();
 
             return services;
         }

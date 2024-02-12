@@ -38,7 +38,18 @@ namespace HomeBudget.Rates.Api.Configuration
                 await services.SetDiForConnectionsAsync();
             }
 
+            services.SetDiForHttpClient();
+
             return services;
+        }
+
+        public static IServiceCollection SetDiForHttpClient(this IServiceCollection services)
+        {
+            var serviceProvider = services.BuildServiceProvider();
+
+            return services
+                .AddSingleton<HttpLoggingHandler>()
+                .RegisterNationalApiHttpClient(serviceProvider);
         }
 
         public static async Task<IServiceCollection> SetDiForConnectionsAsync(this IServiceCollection services)
