@@ -63,7 +63,8 @@ services
 
 services.AddHeaderPropagation(options =>
 {
-    options.Headers.Add(HttpHeaderKeys.CorrelationIdHeaderKey);
+    options.Headers.Add(HttpHeaderKeys.HostService, "HomeBudget-Rates-Api");
+    options.Headers.Add(HttpHeaderKeys.CorrelationId);
 });
 
 configuration.InitializeLogger(environment, webAppBuilder.Host);

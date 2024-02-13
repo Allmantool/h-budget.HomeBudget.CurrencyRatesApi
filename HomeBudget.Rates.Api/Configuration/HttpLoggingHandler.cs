@@ -17,7 +17,7 @@ namespace HomeBudget.Rates.Api.Configuration
             var response = await base.SendAsync(request, cancellationToken);
 
             var correlationHeader = request.Headers
-                .SingleOrDefault(h => h.Key.Contains(HttpHeaderKeys.CorrelationIdHeaderKey, StringComparison.OrdinalIgnoreCase));
+                .SingleOrDefault(h => h.Key.Contains(HttpHeaderKeys.CorrelationId, StringComparison.OrdinalIgnoreCase));
 
             var requestId = Guid.NewGuid();
             var correlationId = correlationHeader.Value.SingleOrDefault();
