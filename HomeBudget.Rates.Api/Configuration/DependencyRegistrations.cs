@@ -48,7 +48,7 @@ namespace HomeBudget.Rates.Api.Configuration
             var serviceProvider = services.BuildServiceProvider();
 
             return services
-                .AddSingleton<HttpLoggingHandler>()
+                .AddScoped<HttpLoggingHandler>()
                 .RegisterNationalApiHttpClient(serviceProvider);
         }
 
