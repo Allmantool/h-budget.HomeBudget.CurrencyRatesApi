@@ -39,7 +39,7 @@ namespace HomeBudget.Rates.Api.Extensions
                         .WithOrigins(allowedUiOrigins)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
-                        .WithExposedHeaders(HttpHeaderKeys.CorrelationIdHeaderKey);
+                        .WithExposedHeaders(HttpHeaderKeys.CorrelationId);
                 });
             }
 

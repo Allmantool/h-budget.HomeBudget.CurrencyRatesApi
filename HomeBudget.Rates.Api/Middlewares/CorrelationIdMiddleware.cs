@@ -14,7 +14,7 @@ namespace HomeBudget.Rates.Api.Middlewares
         {
             var requestHeaders = context.Request.Headers;
 
-            if (requestHeaders.TryGetValue(HttpHeaderKeys.CorrelationIdHeaderKey, out var correlationId))
+            if (requestHeaders.TryGetValue(HttpHeaderKeys.CorrelationId, out var correlationId))
             {
                 logger.LogInformation(
                     "Propagate header 'correlation id' to response: {correlationId}",
@@ -23,7 +23,7 @@ namespace HomeBudget.Rates.Api.Middlewares
 
             var responseHeaders = context.Response.Headers;
 
-            responseHeaders.TryAdd(HttpHeaderKeys.CorrelationIdHeaderKey, correlationId);
+            responseHeaders.TryAdd(HttpHeaderKeys.CorrelationId, correlationId);
 
             await next.Invoke(context);
         }
