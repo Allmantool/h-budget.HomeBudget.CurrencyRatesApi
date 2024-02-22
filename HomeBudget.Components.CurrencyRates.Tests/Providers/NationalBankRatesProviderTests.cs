@@ -9,10 +9,10 @@ using NUnit.Framework;
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Components.CurrencyRates.Models.Api;
 using HomeBudget.Components.CurrencyRates.Providers;
-using HomeBudget.Components.CurrencyRates.Services.Interfaces;
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Extensions;
 using HomeBudget.Core.Models;
+using HomeBudget.Components.CurrencyRates.Clients;
 
 namespace HomeBudget.Components.CurrencyRates.Tests.Providers
 {

@@ -15,8 +15,8 @@ using HomeBudget.Components.CurrencyRates.Models.Api;
 using HomeBudget.Components.CurrencyRates.Providers;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.CurrencyRates.Services;
-using HomeBudget.Components.CurrencyRates.Services.Interfaces;
 using HomeBudget.Core.Constants;
+using HomeBudget.Components.CurrencyRates.Clients;
 
 namespace HomeBudget.Components.CurrencyRates.Tests.Services
 {
