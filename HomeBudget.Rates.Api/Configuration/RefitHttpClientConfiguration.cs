@@ -11,7 +11,7 @@ using Polly;
 using Polly.Extensions.Http;
 using Refit;
 
-using HomeBudget.Components.CurrencyRates.Services.Interfaces;
+using HomeBudget.Components.CurrencyRates.Clients;
 using HomeBudget.Core.Models;
 
 namespace HomeBudget.Rates.Api.Configuration

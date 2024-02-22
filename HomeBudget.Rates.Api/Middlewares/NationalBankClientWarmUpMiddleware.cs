@@ -2,8 +2,7 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-
-using HomeBudget.Components.CurrencyRates.Services.Interfaces;
+using HomeBudget.Components.CurrencyRates.Clients;
 
 namespace HomeBudget.Rates.Api.Middlewares
 {
