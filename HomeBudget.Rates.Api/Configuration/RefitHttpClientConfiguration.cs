@@ -13,6 +13,7 @@ using Refit;
 
 using HomeBudget.Components.CurrencyRates.Clients;
 using HomeBudget.Core.Models;
+using HomeBudget.Rates.Api.Exceptions.Handlers;
 
 namespace HomeBudget.Rates.Api.Configuration
 {

@@ -24,7 +24,7 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
             GetTodayRatesQuery request,
             CancellationToken cancellationToken)
         {
-            return await redisCacheService.CacheWrappedMethodAsync(
+            return await redisCacheService.AddOrGetExistingAsync(
                 $"{CacheKeyPrefix}|{nameof(ICurrencyRatesService.GetTodayRatesAsync)}|{DateTime.Today}",
                 currencyRatesService.GetTodayRatesAsync);
         }
