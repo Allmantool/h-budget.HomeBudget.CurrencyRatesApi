@@ -14,7 +14,7 @@ using HomeBudget.Core.Services.Interfaces;
 namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
 {
     internal class GetAllRatesQueryHandler(
-        IRedisCacheService redisCacheService,
+        ICacheService cacheService,
         ICurrencyRatesService currencyRatesService)
         : IRequestHandler<GetAllRatesQuery, Result<IReadOnlyCollection<CurrencyRateGrouped>>>
     {
@@ -24,7 +24,7 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
             GetAllRatesQuery request,
             CancellationToken cancellationToken)
         {
-            return await redisCacheService.CacheWrappedMethodAsync(
+            return await cacheService.GetOrCreateAsync(
                 $"{CacheKeyPrefix}|{nameof(ICurrencyRatesService.GetRatesAsync)}|{DateTime.Today}",
                 currencyRatesService.GetRatesAsync);
         }

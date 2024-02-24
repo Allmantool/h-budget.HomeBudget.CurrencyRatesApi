@@ -17,7 +17,7 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
 {
     internal class GetTodayGroupedRatesForPeriodQueryHandler(
         ILogger<GetTodayGroupedRatesForPeriodQueryHandler> logger,
-        IRedisCacheService redisCacheService,
+        ICacheService cacheService,
         ICurrencyRatesService currencyRatesService)
         : IRequestHandler<GetCurrencyGroupedRatesForPeriodQuery, Result<IReadOnlyCollection<CurrencyRateGrouped>>>
     {
@@ -25,14 +25,14 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
 
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> Handle(GetCurrencyGroupedRatesForPeriodQuery request, CancellationToken cancellationToken)
         {
-            var redisCacheKey = $"{CacheKeyPrefix}" +
+            var cacheKey = $"{CacheKeyPrefix}" +
                                 $"|{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}" +
                                 $"|{request.StartDate.ToString(DateFormats.NationalBankExternalApi)}-{request.EndDate.ToString(DateFormats.NationalBankExternalApi)}";
 
-            logger.LogWithExecutionMemberName($"Method: '{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}' with key: {redisCacheKey}");
+            logger.LogWithExecutionMemberName($"Method: '{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}' with key: '{cacheKey}'");
 
-            return await redisCacheService.CacheWrappedMethodAsync(
-                  redisCacheKey,
+            return await cacheService.GetOrCreateAsync(
+                  cacheKey,
                   () => currencyRatesService.GetRatesForPeriodAsync(request.StartDate, request.EndDate));
         }
     }

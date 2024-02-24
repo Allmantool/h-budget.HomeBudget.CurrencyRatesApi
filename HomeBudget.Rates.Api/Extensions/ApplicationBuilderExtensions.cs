@@ -46,6 +46,8 @@ namespace HomeBudget.Rates.Api.Extensions
             return app
                 .UseHsts()
                 .UseHttpsRedirection()
+                .UseMiddleware<ExceptionHandlingMiddleware>()
+                .UseExceptionHandler()
                 .UseResponseCaching()
                 .UseAuthorization()
                 .UseCorrelationId()

@@ -12,55 +12,55 @@ using HomeBudget.Core.Services.Interfaces;
 namespace HomeBudget.Core.Services
 {
     internal class RedisCacheService(IDatabase redisDatabase, IOptions<CacheStoreOptions> cacheOptions)
-        : BaseService, IRedisCacheService
+        : BaseService, ICacheService
     {
         private readonly CacheStoreOptions _cacheOptions = cacheOptions.Value;
 
-        public Task<bool> KeyExistsAsync(string cacheKey)
+        public Task FlushAsync() => GetCurrentServer().FlushDatabaseAsync();
+
+        public async Task<Result<T>> GetOrCreateAsync<T>(string key, Func<Task<Result<T>>> callback)
         {
-            return redisDatabase.KeyExistsAsync(cacheKey);
+            if (await DoesKeyExistAsync(key))
+            {
+                return Succeeded(await GetAsync<T>(key));
+            }
+
+            if (callback is null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+
+            var cacheValue = await callback.Invoke();
+            await AddAsync(key, cacheValue.Payload);
+
+            return Succeeded(await GetAsync<T>(key));
         }
 
-        public async Task<T> GetAsync<T>(string cacheKey)
+        private async Task<T> GetAsync<T>(string key)
         {
-            var cacheValue = await redisDatabase.StringGetAsync(cacheKey);
+            var value = await redisDatabase.StringGetAsync(key);
 
-            if (cacheValue.IsNullOrEmpty)
+            if (value.IsNullOrEmpty)
             {
                 return await Task.FromResult<T>(default);
             }
 
-            return JsonSerializer.Deserialize<T>(cacheValue);
+            return JsonSerializer.Deserialize<T>(value);
         }
 
-        public Task<bool> AddAsync<T>(string cacheKey, T cacheValue)
+        private Task<bool> DoesKeyExistAsync(string key)
         {
-            return Equals(cacheValue, default(T))
+            return redisDatabase.KeyExistsAsync(key);
+        }
+
+        private Task<bool> AddAsync<T>(string key, T value)
+        {
+            return Equals(value, default(T))
                 ? Task.FromResult(false)
                 : redisDatabase.StringSetAsync(
-                    cacheKey,
-                    JsonSerializer.Serialize(cacheValue),
+                    key,
+                    JsonSerializer.Serialize(value),
                     TimeSpan.FromMinutes(_cacheOptions.ExpirationInMinutes));
-        }
-
-        public Task FlushDatabaseAsync() => GetCurrentServer().FlushDatabaseAsync();
-
-        public async Task<Result<T>> CacheWrappedMethodAsync<T>(string cacheKey, Func<Task<Result<T>>> wrappedMethod)
-        {
-            if (await KeyExistsAsync(cacheKey))
-            {
-                return Succeeded(await GetAsync<T>(cacheKey));
-            }
-
-            if (wrappedMethod is null)
-            {
-                throw new ArgumentNullException(nameof(wrappedMethod));
-            }
-
-            var cacheValue = await wrappedMethod.Invoke();
-            await AddAsync(cacheKey, cacheValue.Payload);
-
-            return Succeeded(await GetAsync<T>(cacheKey));
         }
 
         private IServer GetCurrentServer()

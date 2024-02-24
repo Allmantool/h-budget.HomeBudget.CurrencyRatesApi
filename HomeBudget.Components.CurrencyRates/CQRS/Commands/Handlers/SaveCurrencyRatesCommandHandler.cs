@@ -12,14 +12,14 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Commands.Handlers
 {
     internal class SaveCurrencyRatesCommandHandler(
         ICurrencyRatesService currencyRatesService,
-        IRedisCacheService redisCacheService)
+        ICacheService cacheService)
         : IRequestHandler<SaveCurrencyRatesCommand, Result<int>>
     {
         public async Task<Result<int>> Handle(SaveCurrencyRatesCommand request, CancellationToken cancellationToken)
         {
             var result = await currencyRatesService.SaveWithRewriteAsync(request);
 
-            await redisCacheService.FlushDatabaseAsync();
+            await cacheService.FlushAsync();
 
             return result;
         }

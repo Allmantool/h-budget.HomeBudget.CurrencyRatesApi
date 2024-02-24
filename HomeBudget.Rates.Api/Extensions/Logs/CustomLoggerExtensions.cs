@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Exceptions;
@@ -15,12 +16,12 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
 {
     internal static class CustomLoggerExtensions
     {
-        public static ILogger InitializeLogger(
+        public static void InitializeLogger(
             this IConfiguration configuration,
             IWebHostEnvironment environment,
-            ConfigureHostBuilder host)
+            WebApplicationBuilder webAppBuilder)
         {
-            Log.Logger = new LoggerConfiguration()
+            var logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithExceptionDetails()
@@ -33,9 +34,10 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
 
-            host.UseSerilog(Log.Logger);
+            webAppBuilder.Logging.ClearProviders();
 
-            return Log.Logger;
+            webAppBuilder.Logging.AddSerilog(logger);
+            webAppBuilder.Host.UseSerilog(logger);
         }
 
         private static LoggerConfiguration AddElasticSearchSupport(

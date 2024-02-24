@@ -14,6 +14,7 @@ using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
 using HomeBudget.Core.Constants;
 using HomeBudget.Rates.Api.Configuration;
 using HomeBudget.Rates.Api.Constants;
+using HomeBudget.Rates.Api.Exceptions.Handlers;
 using HomeBudget.Rates.Api.Extensions;
 using HomeBudget.Rates.Api.Extensions.Logs;
 
@@ -55,6 +56,10 @@ services.AddAutoMapper(new List<Assembly>
     CurrencyRatesComponentMappingProfiles.GetExecutingAssembly(),
 });
 
+services.AddExceptionHandler<BadExternalApiRequestExceptionHandler>();
+services.AddExceptionHandler<GlobalExceptionHandler>();
+services.AddProblemDetails();
+
 services
     .SetUpHealthCheck(configuration, Environment.GetEnvironmentVariable("ASPNETCORE_URLS"))
     .AddValidatorsFromAssemblyContaining<HomeBudget.Rates.Api.Program>()
@@ -67,7 +72,7 @@ services.AddHeaderPropagation(options =>
     options.Headers.Add(HttpHeaderKeys.CorrelationId);
 });
 
-configuration.InitializeLogger(environment, webAppBuilder.Host);
+configuration.InitializeLogger(environment, webAppBuilder);
 
 // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 var webApp = webAppBuilder.Build();

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 using HomeBudget.Core.Constants;
 
-namespace HomeBudget.Rates.Api.Configuration
+namespace HomeBudget.Rates.Api.Exceptions.Handlers
 {
     public class HttpLoggingHandler(ILogger<HttpLoggingHandler> logger) : DelegatingHandler
     {
@@ -30,6 +30,7 @@ namespace HomeBudget.Rates.Api.Configuration
 
             logger.LogInformation(
                 "[RequestId: {requestId}] [CorrelationId: {correlationId}] Response: {response}",
+                requestId,
                 correlationId,
                 response);
 
