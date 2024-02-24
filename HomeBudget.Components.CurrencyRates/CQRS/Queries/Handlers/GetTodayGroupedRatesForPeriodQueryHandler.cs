@@ -17,7 +17,7 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
 {
     internal class GetTodayGroupedRatesForPeriodQueryHandler(
         ILogger<GetTodayGroupedRatesForPeriodQueryHandler> logger,
-        IRedisCacheService redisCacheService,
+        ICacheService cacheService,
         ICurrencyRatesService currencyRatesService)
         : IRequestHandler<GetCurrencyGroupedRatesForPeriodQuery, Result<IReadOnlyCollection<CurrencyRateGrouped>>>
     {
@@ -31,7 +31,7 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
 
             logger.LogWithExecutionMemberName($"Method: '{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}' with key: '{cacheKey}'");
 
-            return await redisCacheService.AddOrGetExistingAsync(
+            return await cacheService.GetOrCreateAsync(
                   cacheKey,
                   () => currencyRatesService.GetRatesForPeriodAsync(request.StartDate, request.EndDate));
         }

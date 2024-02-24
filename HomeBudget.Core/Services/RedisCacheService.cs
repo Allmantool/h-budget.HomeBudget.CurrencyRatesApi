@@ -12,13 +12,13 @@ using HomeBudget.Core.Services.Interfaces;
 namespace HomeBudget.Core.Services
 {
     internal class RedisCacheService(IDatabase redisDatabase, IOptions<CacheStoreOptions> cacheOptions)
-        : BaseService, IRedisCacheService
+        : BaseService, ICacheService
     {
         private readonly CacheStoreOptions _cacheOptions = cacheOptions.Value;
 
-        public Task FlushDatabaseAsync() => GetCurrentServer().FlushDatabaseAsync();
+        public Task FlushAsync() => GetCurrentServer().FlushDatabaseAsync();
 
-        public async Task<Result<T>> AddOrGetExistingAsync<T>(string key, Func<Task<Result<T>>> callback)
+        public async Task<Result<T>> GetOrCreateAsync<T>(string key, Func<Task<Result<T>>> callback)
         {
             if (await DoesKeyExistAsync(key))
             {

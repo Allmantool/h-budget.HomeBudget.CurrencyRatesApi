@@ -9,7 +9,7 @@ namespace HomeBudget.Core.Extensions
         public static IServiceCollection RegisterCoreIoCDependency(this IServiceCollection services)
         {
             return services
-                .AddScoped<IRedisCacheService, RedisCacheService>();
+                .AddScoped<ICacheService, RedisCacheService>();
         }
     }
 }
