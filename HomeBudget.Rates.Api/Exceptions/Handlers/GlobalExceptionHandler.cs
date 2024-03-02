@@ -17,7 +17,7 @@ namespace HomeBudget.Rates.Api.Exceptions.Handlers
             CancellationToken cancellationToken)
         {
             logger.LogError(
-                exception, "Global exception: {Message}", exception.Message);
+                exception, "Global exception: {ErrorMessage}", exception.Message);
 
             var problemDetails = new ProblemDetails
             {

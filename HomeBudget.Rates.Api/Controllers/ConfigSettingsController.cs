@@ -21,7 +21,7 @@ namespace HomeBudget.Rates.Api.Controllers
         }
 
         [HttpGet("/currencies")]
-        public async Task<Result<IReadOnlyCollection<Currency>>> GetAvailableCurrencies()
+        public async Task<Result<IReadOnlyCollection<Currency>>> GetAvailableCurrenciesAsync()
         {
             return await configSettingsServices.GetAvailableCurrenciesAsync();
         }

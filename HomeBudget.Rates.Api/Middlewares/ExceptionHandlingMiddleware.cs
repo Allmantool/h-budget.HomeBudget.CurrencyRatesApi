@@ -21,7 +21,7 @@ namespace HomeBudget.Rates.Api.Middlewares
             }
             catch (BadExternalApiRequestTimeoutException exception)
             {
-                logger.LogError(exception, "External Api request exception: {Message}", exception.Message);
+                logger.LogError(exception, "External Api request exception: {ErrorMessage}", exception.Message);
 
                 var problemDetails = new ProblemDetails
                 {
@@ -37,7 +37,7 @@ namespace HomeBudget.Rates.Api.Middlewares
             catch (Exception exception)
             {
                 logger.LogError(
-                    exception, "Exception occurred: {Message}", exception.Message);
+                    exception, "Exception occurred: {ErrorMessage}", exception.Message);
 
                 var problemDetails = new ProblemDetails
                 {

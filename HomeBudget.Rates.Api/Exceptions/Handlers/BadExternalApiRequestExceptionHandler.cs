@@ -23,7 +23,7 @@ namespace HomeBudget.Rates.Api.Exceptions.Handlers
 
             logger.LogError(
                 badRequestException,
-                "Exception occurred: {Message}",
+                "Exception occurred: {ErrorMessage}",
                 badRequestException.Message);
 
             var problemDetails = new ProblemDetails

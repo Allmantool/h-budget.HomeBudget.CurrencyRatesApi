@@ -9,7 +9,6 @@ using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.CurrencyRates.Services.Interfaces;
 using HomeBudget.Core.Models;
-using HomeBudget.Core.Services;
 
 namespace HomeBudget.Components.CurrencyRates.Services
 {
@@ -18,24 +17,24 @@ namespace HomeBudget.Components.CurrencyRates.Services
         IMapper mapper,
         INationalBankApiClient nationalBankApiClient,
         IConfigSettingsProvider configSettingsProvider)
-        : BaseService, IConfigSettingsServices
+        : IConfigSettingsServices
     {
         public async Task<Result<IReadOnlyCollection<Currency>>> GetAvailableCurrenciesAsync()
         {
             var currencies = await nationalBankApiClient.GetCurrenciesAsync();
             var upToDateCurrencies = currencies.Where(c => c.DateStart <= DateTime.Today && c.DateEnd >= DateTime.Today);
 
-            return Succeeded(mapper.Map<IReadOnlyCollection<Currency>>(upToDateCurrencies));
+            return Result.Succeeded(mapper.Map<IReadOnlyCollection<Currency>>(upToDateCurrencies));
         }
 
         public async Task<Result<int>> SaveSettingsAsync(ConfigSettings settings)
         {
-            return Succeeded(await configSettingsProvider.SaveDefaultSettingsAsync(settings));
+            return Result.Succeeded(await configSettingsProvider.SaveDefaultSettingsAsync(settings));
         }
 
-        public async Task<Result<ConfigSettings>> GetSettingsAsync()
+        public Task<Result<ConfigSettings>> GetSettingsAsync()
         {
-            return Succeeded(await Task.FromResult(configSettings));
+            return Task.FromResult(Result.Succeeded(configSettings));
         }
     }
 }
