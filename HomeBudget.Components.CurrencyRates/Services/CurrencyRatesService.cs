@@ -12,7 +12,6 @@ using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.CurrencyRates.Services.Interfaces;
 using HomeBudget.Core.Extensions;
 using HomeBudget.Core.Models;
-using HomeBudget.Core.Services;
 
 namespace HomeBudget.Components.CurrencyRates.Services
 {
@@ -21,7 +20,7 @@ namespace HomeBudget.Components.CurrencyRates.Services
         ICurrencyRatesReadProvider currencyRatesReadProvider,
         ICurrencyRatesWriteProvider currencyRatesWriteProvider,
         INationalBankRatesProvider nationalBankRatesProvider)
-        : BaseService, ICurrencyRatesService
+        : ICurrencyRatesService
     {
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesAsync()
         {
@@ -29,7 +28,7 @@ namespace HomeBudget.Components.CurrencyRates.Services
 
             var groupedCurrencyRates = rates.MapToCurrencyRateGrouped(mapper);
 
-            return Succeeded(groupedCurrencyRates);
+            return Result.Succeeded(groupedCurrencyRates);
         }
 
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesForPeriodAsync(DateOnly startDate, DateOnly endDate)
@@ -64,7 +63,7 @@ namespace HomeBudget.Components.CurrencyRates.Services
 
             await SaveWithRewriteAsync(new SaveCurrencyRatesCommand(ratesFromApiCall, ratesForPeriodFromDatabase));
 
-            return Succeeded(ratesFromApiCall.MapToCurrencyRateGrouped(mapper));
+            return Result.Succeeded(ratesFromApiCall.MapToCurrencyRateGrouped(mapper));
         }
 
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetTodayRatesAsync()
@@ -77,7 +76,7 @@ namespace HomeBudget.Components.CurrencyRates.Services
 
             await SaveWithRewriteAsync(new SaveCurrencyRatesCommand(ratesFromApiCall, todayRatesFromDatabase));
 
-            return Succeeded(ratesFromApiCall.MapToCurrencyRateGrouped(mapper));
+            return Result.Succeeded(ratesFromApiCall.MapToCurrencyRateGrouped(mapper));
         }
 
         public async Task<Result<int>> SaveWithRewriteAsync(SaveCurrencyRatesCommand saveRatesCommand)
@@ -89,7 +88,7 @@ namespace HomeBudget.Components.CurrencyRates.Services
                 ? await currencyRatesWriteProvider.UpsertRatesWithSaveAsync(ratesFromApiCall)
                 : default;
 
-            return Succeeded(amountOfAffectedRows);
+            return Result.Succeeded(amountOfAffectedRows);
         }
     }
 }

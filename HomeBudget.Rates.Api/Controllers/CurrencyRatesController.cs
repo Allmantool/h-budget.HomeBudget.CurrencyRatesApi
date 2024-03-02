@@ -7,13 +7,12 @@ using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Components.CurrencyRates.CQRS.Commands.Models;
 using HomeBudget.Components.CurrencyRates.CQRS.Queries.Models;
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Core.Models;
+using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Models;
-
 using CurrencyRate = HomeBudget.Components.CurrencyRates.Models.CurrencyRate;
 
 namespace HomeBudget.Rates.Api.Controllers

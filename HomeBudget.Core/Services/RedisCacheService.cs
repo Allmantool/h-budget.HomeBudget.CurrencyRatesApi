@@ -12,7 +12,7 @@ using HomeBudget.Core.Services.Interfaces;
 namespace HomeBudget.Core.Services
 {
     internal class RedisCacheService(IDatabase redisDatabase, IOptions<CacheStoreOptions> cacheOptions)
-        : BaseService, ICacheService
+        : ICacheService
     {
         private readonly CacheStoreOptions _cacheOptions = cacheOptions.Value;
 
@@ -22,7 +22,7 @@ namespace HomeBudget.Core.Services
         {
             if (await DoesKeyExistAsync(key))
             {
-                return Succeeded(await GetAsync<T>(key));
+                return Result.Succeeded(await GetAsync<T>(key));
             }
 
             if (callback is null)
@@ -33,7 +33,7 @@ namespace HomeBudget.Core.Services
             var cacheValue = await callback.Invoke();
             await AddAsync(key, cacheValue.Payload);
 
-            return Succeeded(await GetAsync<T>(key));
+            return Result.Succeeded(await GetAsync<T>(key));
         }
 
         private async Task<T> GetAsync<T>(string key)
