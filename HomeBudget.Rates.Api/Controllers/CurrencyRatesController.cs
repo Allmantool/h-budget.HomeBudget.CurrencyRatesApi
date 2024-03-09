@@ -12,7 +12,8 @@ using HomeBudget.Components.CurrencyRates.CQRS.Queries.Models;
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Core.Models;
 using HomeBudget.Rates.Api.Constants;
-using HomeBudget.Rates.Api.Models;
+using HomeBudget.Rates.Api.Models.Requests;
+
 using CurrencyRate = HomeBudget.Components.CurrencyRates.Models.CurrencyRate;
 
 namespace HomeBudget.Rates.Api.Controllers

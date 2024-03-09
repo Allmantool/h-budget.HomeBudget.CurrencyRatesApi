@@ -10,7 +10,7 @@ namespace HomeBudget.Components.CurrencyRates.Models.Api
         public int CurrencyId { get; set; }
 
         [JsonProperty(PropertyName = "Date")]
-        public DateTime UpdateDate { get; set; }
+        public DateOnly UpdateDate { get; set; }
 
         [JsonProperty(PropertyName = "Cur_OfficialRate")]
         public decimal? OfficialRate { get; set; }
