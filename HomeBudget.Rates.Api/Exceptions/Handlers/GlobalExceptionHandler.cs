@@ -20,14 +20,17 @@ namespace HomeBudget.Rates.Api.Exceptions.Handlers
             CancellationToken cancellationToken)
         {
             logger.LogError(
-                exception, "Global exception: {ErrorMessage}", exception.Message);
+                exception,
+                "Global exception. " +
+                "Message: {ExceptionMessage}." +
+                "Stack: {ErrorStack}",
+                string.Join(',', exception.GetInnerExceptions().Select(ex => ex.Message)),
+                exception.StackTrace);
 
             var problemDetails = new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
-                Title = $"Global exception. Message: {exception.Message}." +
-                        $"Exceptions: {string.Join(',', exception.GetInnerExceptions().SelectMany(ex => ex.Message))}." +
-                        $"Stack: {exception.StackTrace}"
+                Title = $"Global exception. Message: {exception.Message}"
             };
 
             httpContext.Response.StatusCode = problemDetails.Status.Value;
