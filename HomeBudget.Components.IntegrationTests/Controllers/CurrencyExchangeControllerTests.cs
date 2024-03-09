@@ -16,7 +16,7 @@ using HomeBudget.Rates.Api.Models.Requests;
 namespace HomeBudget.Components.IntegrationTests.Controllers
 {
     [Category(TestTypes.Integration)]
-    public class CurrencyExchangeController : IAsyncDisposable
+    public class CurrencyExchangeControllerTests : IAsyncDisposable
     {
         private readonly CurrencyExchangeTestWebApp _sut = new();
 

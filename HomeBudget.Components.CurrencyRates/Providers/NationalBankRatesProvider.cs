@@ -27,8 +27,8 @@ namespace HomeBudget.Components.CurrencyRates.Providers
             var getRatesFromExternalApiTasks = yearRatesRequestPayloads.Select(payload => nationalBankApiClient
                 .GetRatesForPeriodAsync(
                     payload.CurrencyId,
-                    payload.Period.StartDate.ToString(DateFormats.NationalBankExternalApi),
-                    payload.Period.EndDate.ToString(DateFormats.NationalBankExternalApi)));
+                    payload.Period.StartDate.ToString(DateFormats.NationalBankApiRequest),
+                    payload.Period.EndDate.ToString(DateFormats.NationalBankApiRequest)));
 
             var ratesFromExternalApiByChunks = await Task.WhenAll(getRatesFromExternalApiTasks);
 

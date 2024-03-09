@@ -17,13 +17,20 @@ namespace HomeBudget.Rates.Api.Middlewares
             if (requestHeaders.TryGetValue(HttpHeaderKeys.CorrelationId, out var correlationId))
             {
                 logger.LogInformation(
-                    "Propagate header 'correlation id' to response: {correlationId}",
+                    "Propagate header '{headerName}' to response: {correlationId}",
+                    nameof(HttpHeaderKeys.CorrelationId),
                     correlationId);
+
+                var responseHeaders = context.Response.Headers;
+
+                responseHeaders.TryAdd(HttpHeaderKeys.CorrelationId, correlationId);
             }
-
-            var responseHeaders = context.Response.Headers;
-
-            responseHeaders.TryAdd(HttpHeaderKeys.CorrelationId, correlationId);
+            else
+            {
+                logger.LogWarning(
+                    "The '{correlationId}' has not been provided",
+                    nameof(HttpHeaderKeys.CorrelationId));
+            }
 
             await next.Invoke(context);
         }

@@ -27,7 +27,7 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
         {
             var cacheKey = $"{CacheKeyPrefix}" +
                                 $"|{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}" +
-                                $"|{request.StartDate.ToString(DateFormats.NationalBankExternalApi)}-{request.EndDate.ToString(DateFormats.NationalBankExternalApi)}";
+                                $"|{request.StartDate.ToString(DateFormats.NationalBankApiRequest)}-{request.EndDate.ToString(DateFormats.NationalBankApiRequest)}";
 
             logger.LogWithExecutionMemberName($"Method: '{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}' with key: '{cacheKey}'");
 
