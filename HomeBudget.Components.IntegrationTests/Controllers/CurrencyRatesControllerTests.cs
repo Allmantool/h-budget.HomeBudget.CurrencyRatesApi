@@ -13,13 +13,11 @@ using HomeBudget.Components.IntegrationTests.Constants;
 using HomeBudget.Components.IntegrationTests.WebApps;
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Models;
-using HomeBudget.Rates.Api.Models;
-
+using HomeBudget.Rates.Api.Models.Requests;
 using CurrencyRate = HomeBudget.Rates.Api.Models.CurrencyRate;
 
 namespace HomeBudget.Components.IntegrationTests.Controllers
 {
-    // [Ignore("Intend to be used only for local testing. Not appropriate infrastructure has been setup")]
     [Category(TestTypes.Integration)]
     [TestFixture]
     public class CurrencyRatesControllerTests : IAsyncDisposable

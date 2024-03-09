@@ -4,50 +4,54 @@ using System.Threading.Tasks;
 
 using HomeBudget.Components.CurrencyRates.Models.Api;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
+using HomeBudget.Core.Constants;
 using HomeBudget.Core.Models;
 
 namespace HomeBudget.Components.IntegrationTests.MockServices
 {
     internal class MockNationalBankRatesProvider : INationalBankRatesProvider
     {
-        public Task<IReadOnlyCollection<NationalBankShortCurrencyRate>> GetRatesForPeriodAsync(IEnumerable<int> currenciesIds, PeriodRange periodRange)
+        public Task<IReadOnlyCollection<NationalBankShortCurrencyRate>> GetRatesForPeriodAsync(
+            IEnumerable<int> currenciesIds,
+            PeriodRange periodRange)
         {
             IReadOnlyCollection<NationalBankShortCurrencyRate> responsePayload = new List<NationalBankShortCurrencyRate>
             {
                 new()
                 {
-                    CurrencyId = 1,
-                    OfficialRate = 1.11m,
-                    UpdateDate = new DateTime(2023, 11, 14)
+                    CurrencyId = NationalBankCurrencyIds.USD,
+                    OfficialRate = 3.1775m,
+                    UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = 2,
-                    OfficialRate = 2m,
-                    UpdateDate = new DateTime(2023, 11, 14)
+                    CurrencyId = NationalBankCurrencyIds.RUB,
+                    OfficialRate = 3.4991m,
+                    UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = 3,
-                    OfficialRate = 31m,
-                    UpdateDate = new DateTime(2023, 11, 14)
+                    CurrencyId = NationalBankCurrencyIds.PLN,
+                    OfficialRate = 8.1463m,
+                    UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = 4,
-                    OfficialRate = 4m,
-                    UpdateDate = new DateTime(2023, 11, 14)
+                    CurrencyId = NationalBankCurrencyIds.EUR,
+                    OfficialRate = 3.5363m,
+                    UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = 5,
-                    OfficialRate = 5m,
-                    UpdateDate = new DateTime(2023, 11, 14)
-                },                new()
+                    CurrencyId = NationalBankCurrencyIds.UAN,
+                    OfficialRate = 8.4558m,
+                    UpdateDate = periodRange.StartDate
+                },
+                new()
                 {
-                    CurrencyId = 6,
-                    OfficialRate = 6m,
-                    UpdateDate = new DateTime(2023, 11, 14)
+                    CurrencyId = NationalBankCurrencyIds.TRY,
+                    OfficialRate = 1.0789m,
+                    UpdateDate = periodRange.StartDate
                 }
             };
 
@@ -56,55 +60,57 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
 
         public Task<IReadOnlyCollection<NationalBankCurrencyRate>> GetTodayActiveRatesAsync()
         {
+            var today = new DateTime(2023, 11, 14);
+
             IReadOnlyCollection<NationalBankCurrencyRate> responsePayload = new List<NationalBankCurrencyRate>
             {
                 new()
                 {
-                    Abbreviation = "USD",
+                    Abbreviation = nameof(NationalBankCurrencyIds.USD),
                     Scale = 1,
-                    CurrencyId = 1,
-                    OfficialRate = 1.11m,
-                    UpdateDate = new DateTime(2023, 11, 14)
+                    CurrencyId = NationalBankCurrencyIds.USD,
+                    OfficialRate = 3.2085m,
+                    UpdateDate = today
                 },
                 new()
                 {
-                    Abbreviation = "RUB",
-                    Scale = 3,
-                    CurrencyId = 2,
-                    OfficialRate = 2.22m,
-                    UpdateDate = new DateTime(2023, 11, 14)
+                    Abbreviation = nameof(NationalBankCurrencyIds.RUB),
+                    Scale = 100,
+                    CurrencyId = NationalBankCurrencyIds.RUB,
+                    OfficialRate = 3.5519m,
+                    UpdateDate = today
                 },
                 new()
                 {
-                    Abbreviation = "PLN",
-                    Scale = 5,
-                    CurrencyId = 3,
-                    OfficialRate = 3.33m,
-                    UpdateDate = new DateTime(2023, 11, 14)
-                },
-                new()
-                {
-                    Abbreviation = "EUR",
+                    Abbreviation = nameof(NationalBankCurrencyIds.PLN),
                     Scale = 10,
-                    CurrencyId = 4,
-                    OfficialRate = 4.44m,
-                    UpdateDate = new DateTime(2023, 11, 14)
+                    CurrencyId = NationalBankCurrencyIds.PLN,
+                    OfficialRate = 8.0973m,
+                    UpdateDate = today
                 },
                 new()
                 {
-                    Abbreviation = "UAH",
-                    Scale = 15,
-                    CurrencyId = 5,
-                    OfficialRate = 5.55m,
-                    UpdateDate = new DateTime(2023, 11, 14)
+                    Abbreviation = nameof(NationalBankCurrencyIds.EUR),
+                    Scale = 1,
+                    CurrencyId = NationalBankCurrencyIds.EUR,
+                    OfficialRate = 3.4894m,
+                    UpdateDate = today
                 },
                 new()
                 {
-                    Abbreviation = "TRY",
-                    Scale = 20,
-                    CurrencyId = 6,
-                    OfficialRate = 6.66m,
-                    UpdateDate = new DateTime(2023, 11, 14)
+                    Abbreviation = nameof(NationalBankCurrencyIds.UAN),
+                    Scale = 100,
+                    CurrencyId = NationalBankCurrencyIds.UAN,
+                    OfficialRate = 8.3503m,
+                    UpdateDate = today
+                },
+                new()
+                {
+                    Abbreviation = nameof(NationalBankCurrencyIds.TRY),
+                    Scale = 10,
+                    CurrencyId = NationalBankCurrencyIds.TRY,
+                    OfficialRate = 1.0113m,
+                    UpdateDate = today
                 }
             };
 

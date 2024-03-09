@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using AutoMapper;
-using Moq;
+
 using MediatR;
+using Moq;
 using NUnit.Framework;
 
 using HomeBudget.Components.CurrencyRates.CQRS.Queries.Models;
 using HomeBudget.Rates.Api.Controllers;
-using HomeBudget.Rates.Api.Models;
+using HomeBudget.Rates.Api.Models.Requests;
 
 namespace HomeBudget.Components.CurrencyRates.Tests
 {

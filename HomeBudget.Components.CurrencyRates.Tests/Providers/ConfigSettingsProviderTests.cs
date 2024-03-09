@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 
 using HomeBudget.Components.CurrencyRates.Providers;
+using HomeBudget.Core.Constants;
 using HomeBudget.DataAccess.Interfaces;
 
 namespace HomeBudget.Components.CurrencyRates.Tests.Providers
@@ -50,8 +51,8 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Providers
 
             Assert.Multiple(() =>
             {
-                targetCurrency.Abbreviation.Should().BeEquivalentTo("USD");
-                targetCurrency.Id.Should().Be(431);
+                targetCurrency.Abbreviation.Should().BeEquivalentTo(nameof(NationalBankCurrencyIds.USD));
+                targetCurrency.Id.Should().Be(NationalBankCurrencyIds.USD);
                 targetCurrency.Name.Should().Be("US Dollar");
                 targetCurrency.Scale.Should().Be(1);
             });

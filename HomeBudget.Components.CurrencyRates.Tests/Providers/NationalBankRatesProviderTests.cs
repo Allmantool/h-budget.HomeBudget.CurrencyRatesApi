@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 using FluentAssertions;
+
 using Moq;
 using NUnit.Framework;
 
+using HomeBudget.Components.CurrencyRates.Clients;
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Components.CurrencyRates.Models.Api;
 using HomeBudget.Components.CurrencyRates.Providers;
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Extensions;
 using HomeBudget.Core.Models;
-using HomeBudget.Components.CurrencyRates.Clients;
 
 namespace HomeBudget.Components.CurrencyRates.Tests.Providers
 {
     [TestFixture]
     public class NationalBankRatesProviderTests
     {
-        private const int CurrencyTypeAId = 431;
         private const int CurrencyTypeBId = 272;
 
         private PeriodRange _defaultPeriod;
@@ -41,14 +40,14 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Providers
 
             _mockNationalBankApiClient
                 .Setup(cl => cl.GetRatesForPeriodAsync(
-                    CurrencyTypeAId,
+                    NationalBankCurrencyIds.USD,
                     _defaultPeriod.StartDate.ToString(DateFormats.NationalBankExternalApi),
                     _defaultPeriod.StartDate.LastDateOfYear().ToString(DateFormats.NationalBankExternalApi)))
                 .ReturnsAsync(() => new List<NationalBankShortCurrencyRate>
                 {
                     new()
                     {
-                        CurrencyId = CurrencyTypeAId,
+                        CurrencyId = NationalBankCurrencyIds.USD,
                         OfficialRate = 1
                     },
                 });
@@ -93,7 +92,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Providers
             _sut = new NationalBankRatesProvider(configSettings, _mockNationalBankApiClient.Object);
 
             var result = await _sut.GetRatesForPeriodAsync(
-                new[] { CurrencyTypeAId, CurrencyTypeBId },
+                new[] { NationalBankCurrencyIds.USD, CurrencyTypeBId },
                 _defaultPeriod);
 
             result.Count.Should().Be(3);

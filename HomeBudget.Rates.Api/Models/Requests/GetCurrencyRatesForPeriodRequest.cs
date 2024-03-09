@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HomeBudget.Rates.Api.Models
+namespace HomeBudget.Rates.Api.Models.Requests
 {
     public class GetCurrencyRatesForPeriodRequest
     {
