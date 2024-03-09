@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using HomeBudget.Core.Constants;
+using HomeBudget.Core.Extensions;
 
 namespace HomeBudget.Rates.Api.Exceptions.Handlers
 {
@@ -20,19 +21,23 @@ namespace HomeBudget.Rates.Api.Exceptions.Handlers
                 .SingleOrDefault(h => h.Key.Contains(HttpHeaderKeys.CorrelationId, StringComparison.OrdinalIgnoreCase));
 
             var requestId = Guid.NewGuid();
-            var correlationId = correlationHeader.Value.SingleOrDefault();
 
-            logger.LogInformation(
-                "[requestId: {requestId}] [CorrelationId: {correlationId}] Request: {request}",
-                requestId,
-                correlationId,
-                request);
+            if (!correlationHeader.Value.IsNullOrEmpty())
+            {
+                var correlationId = correlationHeader.Value.SingleOrDefault();
 
-            logger.LogInformation(
-                "[RequestId: {requestId}] [CorrelationId: {correlationId}] Response: {response}",
-                requestId,
-                correlationId,
-                response);
+                logger.LogInformation(
+                    "[requestId: {requestId}] [CorrelationId: {correlationId}] Request: {request}",
+                    requestId,
+                    correlationId,
+                    request);
+
+                logger.LogInformation(
+                    "[RequestId: {requestId}] [CorrelationId: {correlationId}] Response: {response}",
+                    requestId,
+                    correlationId,
+                    response);
+            }
 
             return response;
         }

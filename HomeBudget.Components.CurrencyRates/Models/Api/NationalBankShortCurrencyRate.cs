@@ -2,6 +2,8 @@
 
 using Newtonsoft.Json;
 
+using HomeBudget.Components.CurrencyRates.Configuration;
+
 namespace HomeBudget.Components.CurrencyRates.Models.Api
 {
     public class NationalBankShortCurrencyRate
@@ -10,6 +12,7 @@ namespace HomeBudget.Components.CurrencyRates.Models.Api
         public int CurrencyId { get; set; }
 
         [JsonProperty(PropertyName = "Date")]
+        [JsonConverter(typeof(DateOnlyNationalBankApiResponseJsonConverter))]
         public DateOnly UpdateDate { get; set; }
 
         [JsonProperty(PropertyName = "Cur_OfficialRate")]

@@ -73,8 +73,8 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
             _nationalBankApiClientMock
                 .Setup(i => i.GetRatesForPeriodAsync(
                     1,
-                    testStartDate.ToString(DateFormats.NationalBankExternalApi),
-                    testEndDate.ToString(DateFormats.NationalBankExternalApi)))
+                    testStartDate.ToString(DateFormats.NationalBankApiRequest),
+                    testEndDate.ToString(DateFormats.NationalBankApiRequest)))
                 .ReturnsAsync(new List<NationalBankShortCurrencyRate>
                 {
                     new ()
@@ -92,8 +92,8 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
             _nationalBankApiClientMock
                 .Setup(i => i.GetRatesForPeriodAsync(
                     2,
-                    testStartDate.ToString(DateFormats.NationalBankExternalApi),
-                    testEndDate.ToString(DateFormats.NationalBankExternalApi)))
+                    testStartDate.ToString(DateFormats.NationalBankApiRequest),
+                    testEndDate.ToString(DateFormats.NationalBankApiRequest)))
                 .ReturnsAsync(new List<NationalBankShortCurrencyRate>
                 {
                     new ()
