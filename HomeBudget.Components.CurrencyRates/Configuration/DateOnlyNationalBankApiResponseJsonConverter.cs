@@ -18,9 +18,9 @@ namespace HomeBudget.Components.CurrencyRates.Configuration
         {
             var originalValueAsString = reader.Value == null ? string.Empty : reader.Value.ToString();
 
-            if (DateOnly.TryParseExact(originalValueAsString, DateFormats.NationalBankApiResponse, out var valueAsDateOnly))
+            if (DateTime.TryParse(originalValueAsString, out var responseAsDateTime))
             {
-                return valueAsDateOnly;
+                return DateOnly.FromDateTime(responseAsDateTime);
             }
 
             throw new ArgumentException($"Invalid '{nameof(DateFormats.NationalBankApiRequest)}' date format payload. Invalid value: '{originalValueAsString}'");
