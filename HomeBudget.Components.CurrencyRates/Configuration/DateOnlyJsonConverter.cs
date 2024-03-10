@@ -7,7 +7,7 @@ using HomeBudget.Core.Constants;
 
 namespace HomeBudget.Components.CurrencyRates.Configuration
 {
-    internal class DateOnlyNationalBankApiResponseJsonConverter : JsonConverter<DateOnly>
+    internal class DateOnlyJsonConverter : JsonConverter<DateOnly>
     {
         public override DateOnly ReadJson(
             JsonReader reader,

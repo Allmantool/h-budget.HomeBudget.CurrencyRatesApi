@@ -3,21 +3,21 @@ using System.IO;
 
 using FluentAssertions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 using HomeBudget.Components.CurrencyRates.Configuration;
-using Newtonsoft.Json.Linq;
+using HomeBudget.Components.CurrencyRates.Tests.TestSources;
 
 namespace HomeBudget.Components.CurrencyRates.Tests
 {
     [TestFixture]
-    public class DateOnlyNationalBankApiResponseJsonConverterTests
+    public class DateOnlyJsonConverterTests
     {
-        [TestCase("17.03.2024 00:00:00", "17.03.2024")]
-        [TestCase("14/09/2024 00:00:00", "14.09.2024")]
-        public void ReadJson_WithNationBankApiResponseDateTimeFormat_ReturnsExpectedDateOnly(string apiDateTimeResponse, string expectedDayOnlyAsString)
+        [TestCaseSource(typeof(DateOnlyJsonConverterTestCases), nameof(DateOnlyJsonConverterTestCases.WithNationalBankApi))]
+        public void ReadJson_WithNationBankApiResponseDateTimeFormat_ReturnsExpectedDateOnly(string apiDateTimeResponse, DateOnly expectedDayOnly)
         {
-            var sut = new DateOnlyNationalBankApiResponseJsonConverter();
+            var sut = new DateOnlyJsonConverter();
 
             var payload = JObject.FromObject(new { dateValue = apiDateTimeResponse });
 
@@ -37,7 +37,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests
                 true,
                 new JsonSerializer());
 
-            result.ToString().Should().Be(expectedDayOnlyAsString);
+            result.Should().Be(expectedDayOnly);
         }
     }
 }
