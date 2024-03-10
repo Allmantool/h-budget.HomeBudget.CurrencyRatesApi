@@ -18,12 +18,20 @@ namespace HomeBudget.Components.CurrencyRates.Configuration
         {
             var originalValueAsString = reader.Value == null ? string.Empty : reader.Value.ToString();
 
-            if (DateTime.TryParse(originalValueAsString, out var responseAsDateTime))
+            if (DateTime.TryParse(
+                    originalValueAsString,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var responseAsDateTime))
             {
                 return DateOnly.FromDateTime(responseAsDateTime);
             }
 
-            if (DateOnly.TryParse(originalValueAsString, out var valueAsDateOnly))
+            if (DateOnly.TryParse(
+                    originalValueAsString,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var valueAsDateOnly))
             {
                 return valueAsDateOnly;
             }
