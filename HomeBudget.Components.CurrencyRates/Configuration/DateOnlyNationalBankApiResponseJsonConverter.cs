@@ -25,7 +25,7 @@ namespace HomeBudget.Components.CurrencyRates.Configuration
 
             if (DateOnly.TryParse(originalValueAsString, out var valueAsDateOnly))
             {
-                return valueAsDateOnly;
+                return DateOnly.FromDateTime(responseAsDateTime);
             }
 
             if (DateOnly.TryParseExact(
