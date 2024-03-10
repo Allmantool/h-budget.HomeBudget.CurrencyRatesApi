@@ -12,7 +12,7 @@ namespace HomeBudget.Components.CurrencyRates.Models.Api
         public int CurrencyId { get; set; }
 
         [JsonProperty(PropertyName = "Date")]
-        [JsonConverter(typeof(DateOnlyNationalBankApiResponseJsonConverter))]
+        [JsonConverter(typeof(DateOnlyJsonConverter))]
         public DateOnly UpdateDate { get; set; }
 
         [JsonProperty(PropertyName = "Cur_OfficialRate")]
