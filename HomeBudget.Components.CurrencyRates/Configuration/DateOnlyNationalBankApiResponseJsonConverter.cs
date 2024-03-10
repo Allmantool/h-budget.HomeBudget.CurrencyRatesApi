@@ -23,6 +23,31 @@ namespace HomeBudget.Components.CurrencyRates.Configuration
                 return DateOnly.FromDateTime(responseAsDateTime);
             }
 
+            if (DateOnly.TryParse(originalValueAsString, out var valueAsDateOnly))
+            {
+                return valueAsDateOnly;
+            }
+
+            if (DateOnly.TryParseExact(
+                    originalValueAsString,
+                    DateFormats.NationalBankApiResponseWithDot,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var responseWithDotAsDateOnly))
+            {
+                return responseWithDotAsDateOnly;
+            }
+
+            if (DateOnly.TryParseExact(
+                    originalValueAsString,
+                    DateFormats.NationalBankApiResponseWithSlash,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var responseWithSlashAsDateOnly))
+            {
+                return responseWithSlashAsDateOnly;
+            }
+
             throw new ArgumentException($"Invalid '{nameof(DateFormats.NationalBankApiRequest)}' date format payload. Invalid value: '{originalValueAsString}'");
         }
 
