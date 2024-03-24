@@ -22,7 +22,7 @@ namespace HomeBudget.Core.Services
         {
             if (await DoesKeyExistAsync(key))
             {
-                return Result.Succeeded(await GetAsync<T>(key));
+                return Result<T>.Succeeded(await GetAsync<T>(key));
             }
 
             if (callback is null)
@@ -33,7 +33,7 @@ namespace HomeBudget.Core.Services
             var cacheValue = await callback.Invoke();
             await AddAsync(key, cacheValue.Payload);
 
-            return Result.Succeeded(await GetAsync<T>(key));
+            return Result<T>.Succeeded(await GetAsync<T>(key));
         }
 
         private async Task<T> GetAsync<T>(string key)

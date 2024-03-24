@@ -39,12 +39,12 @@ namespace HomeBudget.Rates.Api.Controllers
             {
                 var exchangeMultiplier = Math.Round(originRateValueResult.Payload / targetRateValueResult.Payload, 5);
 
-                return Result.Succeeded(request.Amount * exchangeMultiplier);
+                return Result<decimal>.Succeeded(request.Amount * exchangeMultiplier);
             }
 
-            return Result.Failure<decimal>(string.Join(',', [
-                originRateValueResult.ErrorMessage,
-                targetRateValueResult.ErrorMessage,
+            return Result<decimal>.Failure(string.Join(',', [
+                originRateValueResult.StatusMessage,
+                targetRateValueResult.StatusMessage,
                 "Original rate value can not be equal to 0"]));
         }
     }
