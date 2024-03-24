@@ -14,24 +14,24 @@ namespace HomeBudget.Components.CurrencyRates.Extensions
         {
             if (currencyId == 0)
             {
-                return Result.Succeeded(1m);
+                return Result<decimal>.Succeeded(1m);
             }
 
             var originCurrencyForPeriod = rateGrouped.SingleOrDefault(x => x.CurrencyId == currencyId);
 
             if (originCurrencyForPeriod == null)
             {
-                return Result.Failure<decimal>($"'{nameof(CurrencyRateGrouped)}' is null or has more then single value");
+                return Result<decimal>.Failure($"'{nameof(CurrencyRateGrouped)}' is null or has more then single value");
             }
 
             var rateValue = originCurrencyForPeriod.RateValues.SingleOrDefault();
 
             if (rateValue == null)
             {
-                return Result.Failure<decimal>($"'{nameof(CurrencyRateGrouped.RateValues)}' is null or has more then single value");
+                return Result<decimal>.Failure($"'{nameof(CurrencyRateGrouped.RateValues)}' is null or has more then single value");
             }
 
-            return Result.Succeeded(rateValue.RatePerUnit);
+            return Result<decimal>.Succeeded(rateValue.RatePerUnit);
         }
     }
 }

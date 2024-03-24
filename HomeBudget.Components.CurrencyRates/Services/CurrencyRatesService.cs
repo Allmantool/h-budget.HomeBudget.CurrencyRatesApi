@@ -28,10 +28,12 @@ namespace HomeBudget.Components.CurrencyRates.Services
 
             var groupedCurrencyRates = rates.MapToCurrencyRateGrouped(mapper);
 
-            return Result.Succeeded(groupedCurrencyRates);
+            return Result<IReadOnlyCollection<CurrencyRateGrouped>>.Succeeded(groupedCurrencyRates);
         }
 
-        public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesForPeriodAsync(DateOnly startDate, DateOnly endDate)
+        public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesForPeriodAsync(
+            DateOnly startDate,
+            DateOnly endDate)
         {
             var todayRatesResponse = await GetTodayRatesAsync();
 
@@ -63,7 +65,7 @@ namespace HomeBudget.Components.CurrencyRates.Services
 
             await SaveWithRewriteAsync(new SaveCurrencyRatesCommand(ratesFromApiCall, ratesForPeriodFromDatabase));
 
-            return Result.Succeeded(ratesFromApiCall.MapToCurrencyRateGrouped(mapper));
+            return Result<IReadOnlyCollection<CurrencyRateGrouped>>.Succeeded(ratesFromApiCall.MapToCurrencyRateGrouped(mapper));
         }
 
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetTodayRatesAsync()
@@ -76,7 +78,7 @@ namespace HomeBudget.Components.CurrencyRates.Services
 
             await SaveWithRewriteAsync(new SaveCurrencyRatesCommand(ratesFromApiCall, todayRatesFromDatabase));
 
-            return Result.Succeeded(ratesFromApiCall.MapToCurrencyRateGrouped(mapper));
+            return Result<IReadOnlyCollection<CurrencyRateGrouped>>.Succeeded(ratesFromApiCall.MapToCurrencyRateGrouped(mapper));
         }
 
         public async Task<Result<int>> SaveWithRewriteAsync(SaveCurrencyRatesCommand saveRatesCommand)
@@ -88,7 +90,7 @@ namespace HomeBudget.Components.CurrencyRates.Services
                 ? await currencyRatesWriteProvider.UpsertRatesWithSaveAsync(ratesFromApiCall)
                 : default;
 
-            return Result.Succeeded(amountOfAffectedRows);
+            return Result<int>.Succeeded(amountOfAffectedRows);
         }
     }
 }

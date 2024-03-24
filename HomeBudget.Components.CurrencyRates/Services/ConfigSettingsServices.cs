@@ -24,17 +24,17 @@ namespace HomeBudget.Components.CurrencyRates.Services
             var currencies = await nationalBankApiClient.GetCurrenciesAsync();
             var upToDateCurrencies = currencies.Where(c => c.DateStart <= DateTime.Today && c.DateEnd >= DateTime.Today);
 
-            return Result.Succeeded(mapper.Map<IReadOnlyCollection<Currency>>(upToDateCurrencies));
+            return Result<IReadOnlyCollection<Currency>>.Succeeded(mapper.Map<IReadOnlyCollection<Currency>>(upToDateCurrencies));
         }
 
         public async Task<Result<int>> SaveSettingsAsync(ConfigSettings settings)
         {
-            return Result.Succeeded(await configSettingsProvider.SaveDefaultSettingsAsync(settings));
+            return Result<int>.Succeeded(await configSettingsProvider.SaveDefaultSettingsAsync(settings));
         }
 
         public Task<Result<ConfigSettings>> GetSettingsAsync()
         {
-            return Task.FromResult(Result.Succeeded(configSettings));
+            return Task.FromResult(Result<ConfigSettings>.Succeeded(configSettings));
         }
     }
 }

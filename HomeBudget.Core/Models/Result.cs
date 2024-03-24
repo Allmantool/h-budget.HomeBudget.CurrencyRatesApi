@@ -2,17 +2,14 @@
 {
     public class Result<T>(
         T payload,
-        string errorMessage,
+        string statusMessage,
         bool isSucceeded)
     {
         public T Payload { get; private set; } = payload;
         public bool IsSucceeded { get; private set; } = isSucceeded;
-        public string ErrorMessage { get; private set; } = errorMessage;
-    }
+        public string StatusMessage { get; private set; } = statusMessage;
 
-    public static class Result
-    {
-        public static Result<T> Succeeded<T>(T payload) => new(payload, null, true);
-        public static Result<T> Failure<T>(string errorMessage = default) => new(default, errorMessage, false);
+        public static Result<T> Succeeded(T payload) => new(payload, null, true);
+        public static Result<T> Failure(string errorMessage = default) => new(default, errorMessage, false);
     }
 }
