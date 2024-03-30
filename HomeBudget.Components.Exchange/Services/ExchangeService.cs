@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,14 +39,13 @@ namespace HomeBudget.Components.Exchange.Services
                 return Result<decimal>.Succeeded(exchangeMultiplier);
             }
 
-            return Result<decimal>.Failure(
-                string.Join(
-                    ',',
-                    [
-                        originRateValueResult.StatusMessage,
-                        targetRateValueResult.StatusMessage,
-                        "Original rate value can not be equal to 0"
-                    ]));
+            var failedMessages = new[]
+            {
+                originRateValueResult.StatusMessage,
+                targetRateValueResult.StatusMessage
+            };
+
+            return Result<decimal>.Failure(string.Join(',', failedMessages.Where(m => !string.IsNullOrWhiteSpace(m))));
         }
     }
 }

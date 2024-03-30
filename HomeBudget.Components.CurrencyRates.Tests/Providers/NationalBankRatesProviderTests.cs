@@ -40,14 +40,14 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Providers
 
             _mockNationalBankApiClient
                 .Setup(cl => cl.GetRatesForPeriodAsync(
-                    NationalBankCurrencyIds.USD,
+                    NationalBankCurrencyIds.Usd,
                     _defaultPeriod.StartDate.ToString(DateFormats.NationalBankApiRequest),
                     _defaultPeriod.StartDate.LastDateOfYear().ToString(DateFormats.NationalBankApiRequest)))
                 .ReturnsAsync(() => new List<NationalBankShortCurrencyRate>
                 {
                     new()
                     {
-                        CurrencyId = NationalBankCurrencyIds.USD,
+                        CurrencyId = NationalBankCurrencyIds.Usd,
                         OfficialRate = 1
                     },
                 });
@@ -92,7 +92,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Providers
             _sut = new NationalBankRatesProvider(configSettings, _mockNationalBankApiClient.Object);
 
             var result = await _sut.GetRatesForPeriodAsync(
-                new[] { NationalBankCurrencyIds.USD, CurrencyTypeBId },
+                new[] { NationalBankCurrencyIds.Usd, CurrencyTypeBId },
                 _defaultPeriod);
 
             result.Count.Should().Be(3);

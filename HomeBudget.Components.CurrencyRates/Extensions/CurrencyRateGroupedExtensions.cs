@@ -2,6 +2,8 @@
 using System.Linq;
 
 using HomeBudget.Components.CurrencyRates.Models;
+using HomeBudget.Core.Constants;
+using HomeBudget.Core.Extensions;
 using HomeBudget.Core.Models;
 
 namespace HomeBudget.Components.CurrencyRates.Extensions
@@ -12,26 +14,29 @@ namespace HomeBudget.Components.CurrencyRates.Extensions
             this IEnumerable<CurrencyRateGrouped> rateGrouped,
             int currencyId)
         {
-            if (currencyId == 0)
+            if (currencyId == NationalBankCurrencyIds.Blr)
             {
                 return Result<decimal>.Succeeded(1m);
             }
 
-            var originCurrencyForPeriod = rateGrouped.SingleOrDefault(x => x.CurrencyId == currencyId);
+            var originCurrencyForPeriod = rateGrouped.Where(x => x.CurrencyId == currencyId).ToArray();
 
-            if (originCurrencyForPeriod == null)
+            if (originCurrencyForPeriod.IsNullOrEmpty() || originCurrencyForPeriod.Length > 1)
             {
-                return Result<decimal>.Failure($"'{nameof(CurrencyRateGrouped)}' is null or has more then single value");
+                return Result<decimal>.Failure($"'{nameof(CurrencyRateGrouped)}' hasn't been found or has more then one entry for target currency id '{currencyId}'");
             }
 
-            var rateValue = originCurrencyForPeriod.RateValues.SingleOrDefault();
+            var currencyGroup = originCurrencyForPeriod.Single();
+            var rateValues = currencyGroup.RateValues.ToArray();
 
-            if (rateValue == null)
+            if (rateValues.IsNullOrEmpty() || rateValues.Length > 1)
             {
-                return Result<decimal>.Failure($"'{nameof(CurrencyRateGrouped.RateValues)}' is null or has more then single value");
+                return Result<decimal>.Failure($"'{nameof(CurrencyRateGrouped.RateValues)}' hasn't been found or has more then one entry with currency group '{currencyGroup.Abbreviation}'");
             }
 
-            return Result<decimal>.Succeeded(rateValue.RatePerUnit);
+            var rate = rateValues.Single();
+
+            return Result<decimal>.Succeeded(rate.RatePerUnit);
         }
     }
 }

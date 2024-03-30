@@ -19,37 +19,37 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
             {
                 new()
                 {
-                    CurrencyId = NationalBankCurrencyIds.USD,
+                    CurrencyId = NationalBankCurrencyIds.Usd,
                     OfficialRate = 3.1775m,
                     UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = NationalBankCurrencyIds.RUB,
+                    CurrencyId = NationalBankCurrencyIds.Rub,
                     OfficialRate = 3.4991m,
                     UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = NationalBankCurrencyIds.PLN,
+                    CurrencyId = NationalBankCurrencyIds.Pln,
                     OfficialRate = 8.1463m,
                     UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = NationalBankCurrencyIds.EUR,
+                    CurrencyId = NationalBankCurrencyIds.Eur,
                     OfficialRate = 3.5363m,
                     UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = NationalBankCurrencyIds.UAN,
+                    CurrencyId = NationalBankCurrencyIds.Uan,
                     OfficialRate = 8.4558m,
                     UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = NationalBankCurrencyIds.TRY,
+                    CurrencyId = NationalBankCurrencyIds.Try,
                     OfficialRate = 1.0789m,
                     UpdateDate = periodRange.StartDate
                 }
@@ -66,49 +66,49 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
             {
                 new()
                 {
-                    Abbreviation = nameof(NationalBankCurrencyIds.USD),
+                    Abbreviation = nameof(NationalBankCurrencyIds.Usd),
                     Scale = 1,
-                    CurrencyId = NationalBankCurrencyIds.USD,
+                    CurrencyId = NationalBankCurrencyIds.Usd,
                     OfficialRate = 3.2085m,
                     UpdateDate = today
                 },
                 new()
                 {
-                    Abbreviation = nameof(NationalBankCurrencyIds.RUB),
+                    Abbreviation = nameof(NationalBankCurrencyIds.Rub),
                     Scale = 100,
-                    CurrencyId = NationalBankCurrencyIds.RUB,
+                    CurrencyId = NationalBankCurrencyIds.Rub,
                     OfficialRate = 3.5519m,
                     UpdateDate = today
                 },
                 new()
                 {
-                    Abbreviation = nameof(NationalBankCurrencyIds.PLN),
+                    Abbreviation = nameof(NationalBankCurrencyIds.Pln),
                     Scale = 10,
-                    CurrencyId = NationalBankCurrencyIds.PLN,
+                    CurrencyId = NationalBankCurrencyIds.Pln,
                     OfficialRate = 8.0973m,
                     UpdateDate = today
                 },
                 new()
                 {
-                    Abbreviation = nameof(NationalBankCurrencyIds.EUR),
+                    Abbreviation = nameof(NationalBankCurrencyIds.Eur),
                     Scale = 1,
-                    CurrencyId = NationalBankCurrencyIds.EUR,
+                    CurrencyId = NationalBankCurrencyIds.Eur,
                     OfficialRate = 3.4894m,
                     UpdateDate = today
                 },
                 new()
                 {
-                    Abbreviation = nameof(NationalBankCurrencyIds.UAN),
+                    Abbreviation = nameof(NationalBankCurrencyIds.Uan),
                     Scale = 100,
-                    CurrencyId = NationalBankCurrencyIds.UAN,
+                    CurrencyId = NationalBankCurrencyIds.Uan,
                     OfficialRate = 8.3503m,
                     UpdateDate = today
                 },
                 new()
                 {
-                    Abbreviation = nameof(NationalBankCurrencyIds.TRY),
+                    Abbreviation = nameof(NationalBankCurrencyIds.Try),
                     Scale = 10,
-                    CurrencyId = NationalBankCurrencyIds.TRY,
+                    CurrencyId = NationalBankCurrencyIds.Try,
                     OfficialRate = 1.0113m,
                     UpdateDate = today
                 }
