@@ -2,7 +2,7 @@
 
 namespace HomeBudget.Rates.Api.Models.Requests
 {
-    public class CurrencySaveRatesRequest
+    public record CurrencySaveRatesRequest
     {
         public IReadOnlyCollection<CurrencyRate> CurrencyRates { get; set; }
     }

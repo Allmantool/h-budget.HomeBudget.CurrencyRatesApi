@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using AutoMapper;
+
 using HomeBudget.Components.CurrencyRates.Models;
 
 namespace HomeBudget.Components.CurrencyRates.MapperProfileConfigurations

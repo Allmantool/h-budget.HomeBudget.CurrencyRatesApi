@@ -11,12 +11,14 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 
 using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
+using HomeBudget.Components.Exchange.MapperProfileConfigurations;
 using HomeBudget.Core.Constants;
 using HomeBudget.Rates.Api.Configuration;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Exceptions.Handlers;
 using HomeBudget.Rates.Api.Extensions;
 using HomeBudget.Rates.Api.Extensions.Logs;
+using HomeBudget.Rates.Api.MapperProfileConfigurations;
 
 var webAppBuilder = WebApplication.CreateBuilder(args);
 
@@ -52,8 +54,9 @@ services.AddControllers(o =>
 await services.SetUpDiAsync(configuration, environment);
 services.AddAutoMapper(new List<Assembly>
 {
-    typeof(HomeBudget.Rates.Api.Program).Assembly,
-    CurrencyRatesComponentMappingProfiles.GetExecutingAssembly(),
+    ApiRatesMappingProfiles.GetExecutingAssembly(),
+    CurrencyRatesMappingProfiles.GetExecutingAssembly(),
+    ExchangeMappingProfiles.GetExecutingAssembly(),
 });
 
 services.AddExceptionHandler<BadExternalApiRequestExceptionHandler>();

@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
-using NUnit.Framework;
 
 using HomeBudget.Rates.Api.MapperProfileConfigurations;
 
-namespace HomeBudget.Components.CurrencyRates.Tests
+namespace HomeBudget.Rates.Api.Tests.Mappers
 {
     [TestFixture]
-    public class CurrencyRatesComponentMappingProfilesTests
+    public class ApiRatesMappingProfilesTests
     {
-        private readonly MapperConfiguration _mapperConfiguration = new (x => x.AddMaps(ApiCallMappingProfiles.GetExecutingAssembly()));
+        private readonly MapperConfiguration _mapperConfiguration = new(x => x.AddMaps(ApiRatesMappingProfiles.GetExecutingAssembly()));
 
         [SetUp]
         public void Setup()

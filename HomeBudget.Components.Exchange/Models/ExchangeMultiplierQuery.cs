@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace HomeBudget.Rates.Api.Models.Requests
+namespace HomeBudget.Components.Exchange.Models
 {
-    public record CurrencyExchangeRequest
+    public class ExchangeMultiplierQuery
     {
         public int OriginCurrencyId { get; set; }
         public int TargetCurrencyId { get; set; }
         public DateOnly OperationDate { get; set; }
-        public decimal Amount { get; set; }
     }
 }
