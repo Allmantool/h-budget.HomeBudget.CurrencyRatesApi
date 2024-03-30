@@ -27,7 +27,7 @@ namespace HomeBudget.Rates.Api.Controllers
                 : Result<decimal>.Failure(exchangeMultiplierResult.StatusMessage);
         }
 
-        [HttpPost("/multiplier")]
+        [HttpPost("multiplier")]
         public async Task<Result<decimal>> GetExchangeMultiplierAsync(
             [FromBody] CurrencyExchangeMultiplierRequest request,
             CancellationToken token = default) => await exchangeService
