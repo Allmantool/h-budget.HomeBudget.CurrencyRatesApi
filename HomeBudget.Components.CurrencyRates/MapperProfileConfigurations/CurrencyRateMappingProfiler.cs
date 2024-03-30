@@ -34,11 +34,17 @@ namespace HomeBudget.Components.CurrencyRates.MapperProfileConfigurations
 
             CreateMap<NationalBankShortCurrencyRate, CurrencyRate>()
                 .ForMember(
-                    dest => dest.OfficialRate,
-                    opt => opt.MapFrom(src => src.OfficialRate))
+                    dest => dest.Name,
+                    opt => opt.Ignore())
                 .ForMember(
-                    dest => dest.UpdateDate,
-                    opt => opt.MapFrom(src => src.UpdateDate));
+                    dest => dest.Abbreviation,
+                    opt => opt.Ignore())
+                .ForMember(
+                    dest => dest.RatePerUnit,
+                    opt => opt.Ignore())
+                .ForMember(
+                    dest => dest.Scale,
+                    opt => opt.Ignore());
         }
     }
 }

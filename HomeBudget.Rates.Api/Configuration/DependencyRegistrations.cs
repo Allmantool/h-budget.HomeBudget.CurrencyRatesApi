@@ -9,6 +9,7 @@ using StackExchange.Redis;
 
 using HomeBudget.Components.CurrencyRates.Configuration;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
+using HomeBudget.Components.Exchange.Configuration;
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Extensions;
 using HomeBudget.Core.Models;
@@ -32,6 +33,7 @@ namespace HomeBudget.Rates.Api.Configuration
                 .Configure<PollyRetryOptions>(configuration.GetSection(ConfigurationSectionKeys.PollyRetryOptions))
                 .RegisterCoreIoCDependency()
                 .RegisterCurrencyRatesIoCDependency()
+                .RegisterExchangeIoCDependency()
                 .RegistryDapperIoCDependencies();
 
             if (!HostEnvironments.Integration.Equals(webHostEnvironment.EnvironmentName, StringComparison.OrdinalIgnoreCase))
