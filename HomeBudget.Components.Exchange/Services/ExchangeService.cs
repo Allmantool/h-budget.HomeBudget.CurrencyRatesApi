@@ -15,7 +15,9 @@ namespace HomeBudget.Components.Exchange.Services
 {
     internal class ExchangeService(ISender mediator) : IExchangeService
     {
-        public async Task<Result<decimal>> GetCurrencyConversionMultiplierAsync(ExchangeMultiplierQuery query, CancellationToken token)
+        public async Task<Result<decimal>> GetCurrencyConversionMultiplierAsync(
+            ExchangeMultiplierQuery query,
+            CancellationToken token)
         {
             var currenciesForPeriodResult = await mediator.Send(
                  new GetCurrencyGroupedRatesForPeriodQuery
@@ -27,8 +29,8 @@ namespace HomeBudget.Components.Exchange.Services
 
             var currenciesForPeriod = currenciesForPeriodResult.Payload;
 
-            var originRateValueResult = currenciesForPeriod.GetSingleRateValue(query.OriginCurrencyId);
-            var targetRateValueResult = currenciesForPeriod.GetSingleRateValue(query.TargetCurrencyId);
+            var originRateValueResult = currenciesForPeriod.GetSingleRateValue(query.OriginCurrency);
+            var targetRateValueResult = currenciesForPeriod.GetSingleRateValue(query.TargetCurrency);
 
             if (originRateValueResult.IsSucceeded
                 && targetRateValueResult.IsSucceeded

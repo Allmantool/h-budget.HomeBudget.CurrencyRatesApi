@@ -6,28 +6,28 @@ namespace HomeBudget.Components.IntegrationTests.TestSources
     {
         public static object[] WithUsdCases =>
         [
-            new object[] { NationalBankCurrencyIds.Blr, NationalBankCurrencyIds.Usd, 314.71m },
-            new object[] { NationalBankCurrencyIds.Usd, NationalBankCurrencyIds.Blr, 3177.5m },
-            new object[] { NationalBankCurrencyIds.Usd, NationalBankCurrencyIds.Rub, 90809.07m },
-            new object[] { NationalBankCurrencyIds.Rub, NationalBankCurrencyIds.Usd, 11.01m },
-            new object[] { NationalBankCurrencyIds.Usd, NationalBankCurrencyIds.Eur, 898.54m },
-            new object[] { NationalBankCurrencyIds.Eur, NationalBankCurrencyIds.Usd, 1112.92m },
+            new object[] { CurrencyCodes.Blr, CurrencyCodes.Usd, 314.71m },
+            new object[] { CurrencyCodes.Usd, CurrencyCodes.Blr, 3177.5m },
+            new object[] { CurrencyCodes.Usd, CurrencyCodes.Rub, 90809.07m },
+            new object[] { CurrencyCodes.Rub, CurrencyCodes.Usd, 11.01m },
+            new object[] { CurrencyCodes.Usd, CurrencyCodes.Eur, 898.54m },
+            new object[] { CurrencyCodes.Eur, CurrencyCodes.Usd, 1112.92m },
         ];
 
         public static object[] WithBlrCases =>
         [
-            new object[] { NationalBankCurrencyIds.Blr, NationalBankCurrencyIds.Usd, 314.71m },
-            new object[] { NationalBankCurrencyIds.Usd, NationalBankCurrencyIds.Blr, 3177.5m },
-            new object[] { NationalBankCurrencyIds.Blr, NationalBankCurrencyIds.Rub, 28578.78m },
-            new object[] { NationalBankCurrencyIds.Rub, NationalBankCurrencyIds.Blr, 34.99m },
-            new object[] { NationalBankCurrencyIds.Blr, NationalBankCurrencyIds.Eur, 282.78m },
-            new object[] { NationalBankCurrencyIds.Eur, NationalBankCurrencyIds.Blr, 3536.3m },
-            new object[] { NationalBankCurrencyIds.Blr, NationalBankCurrencyIds.Pln, 1227.55m },
-            new object[] { NationalBankCurrencyIds.Pln, NationalBankCurrencyIds.Blr, 814.63m },
-            new object[] { NationalBankCurrencyIds.Blr, NationalBankCurrencyIds.Try, 9268.7m },
-            new object[] { NationalBankCurrencyIds.Try, NationalBankCurrencyIds.Blr, 107.89m },
-            new object[] { NationalBankCurrencyIds.Blr, NationalBankCurrencyIds.Uan, 11826.2m },
-            new object[] { NationalBankCurrencyIds.Uan, NationalBankCurrencyIds.Blr, 84.56m },
+            new object[] { CurrencyCodes.Blr, CurrencyCodes.Usd, 314.71m },
+            new object[] { CurrencyCodes.Usd, CurrencyCodes.Blr, 3177.5m },
+            new object[] { CurrencyCodes.Blr, CurrencyCodes.Rub, 28578.78m },
+            new object[] { CurrencyCodes.Rub, CurrencyCodes.Blr, 34.99m },
+            new object[] { CurrencyCodes.Blr, CurrencyCodes.Eur, 282.78m },
+            new object[] { CurrencyCodes.Eur, CurrencyCodes.Blr, 3536.3m },
+            new object[] { CurrencyCodes.Blr, CurrencyCodes.Pln, 1227.55m },
+            new object[] { CurrencyCodes.Pln, CurrencyCodes.Blr, 814.63m },
+            new object[] { CurrencyCodes.Blr, CurrencyCodes.Try, 9268.7m },
+            new object[] { CurrencyCodes.Try, CurrencyCodes.Blr, 107.89m },
+            new object[] { CurrencyCodes.Blr, CurrencyCodes.Uan, 11826.2m },
+            new object[] { CurrencyCodes.Uan, CurrencyCodes.Blr, 84.56m },
         ];
     }
 }

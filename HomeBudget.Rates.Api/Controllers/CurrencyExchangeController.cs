@@ -17,7 +17,9 @@ namespace HomeBudget.Rates.Api.Controllers
     public class CurrencyExchangeController(IMapper mapper, IExchangeService exchangeService) : ControllerBase
     {
         [HttpPost]
-        public async Task<Result<decimal>> GetExchangeAsync([FromBody] CurrencyExchangeRequest request, CancellationToken token = default)
+        public async Task<Result<decimal>> GetExchangeAsync(
+            [FromBody] CurrencyExchangeRequest request,
+            CancellationToken token = default)
         {
             var exchangeMultiplierResult = await exchangeService
                 .GetCurrencyConversionMultiplierAsync(mapper.Map<ExchangeMultiplierQuery>(request), token);
