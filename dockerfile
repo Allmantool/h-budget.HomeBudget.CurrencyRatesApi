@@ -46,12 +46,17 @@ RUN export PATH="$PATH:/root/.dotnet/tools"
 
 COPY ["HomeBudget.Components.CurrencyRates.Tests/*.csproj", "HomeBudget.Components.CurrencyRates.Tests/"]
 COPY ["HomeBudget.Components.IntegrationTests/*.csproj", "HomeBudget.Components.IntegrationTests/"]
+COPY ["HomeBudget.Rates.Api.Tests/*.csproj", "HomeBudget.Rates.Api.Tests/"]
+
 COPY ["HomeBudget.Components.CurrencyRates/*.csproj", "HomeBudget.Components.CurrencyRates/"]
+COPY ["HomeBudget.Components.Exchange/*.csproj", "HomeBudget.Components.Exchange/"]
 COPY ["HomeBudget.DataAccess/*.csproj", "HomeBudget.DataAccess/"]
 COPY ["HomeBudget.Core/*.csproj", "HomeBudget.Core/"]
 COPY ["HomeBudget.Rates.Api/*.csproj", "HomeBudget.Rates.Api/"]
 COPY ["HomeBudget.DataAccess.Dapper/*.csproj", "HomeBudget.DataAccess.Dapper/"]
+
 COPY ["HomeBudgetRatesApi.sln", "HomeBudgetRatesApi.sln"]
+
 COPY ["startsonar.sh", "startsonar.sh"]
 
 COPY . .
