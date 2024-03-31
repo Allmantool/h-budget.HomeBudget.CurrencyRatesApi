@@ -23,14 +23,14 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithBlrCases))]
         public async Task GetExchangeAsync_WhenFromBlrToUsd_ThenExpectedExchangeOutput(
-            int originCurrency,
-            int targetCurrency,
+            string originCurrency,
+            string targetCurrency,
             decimal exchangeResult)
         {
             var requestBody = new CurrencyExchangeRequest
             {
-                TargetCurrencyId = targetCurrency,
-                OriginCurrencyId = originCurrency,
+                TargetCurrency = targetCurrency,
+                OriginCurrency = originCurrency,
                 Amount = 1000,
                 OperationDate = new DateOnly(2024, 1, 15)
             };

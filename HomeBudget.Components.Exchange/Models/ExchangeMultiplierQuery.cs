@@ -4,8 +4,8 @@ namespace HomeBudget.Components.Exchange.Models
 {
     public class ExchangeMultiplierQuery
     {
-        public int OriginCurrencyId { get; set; }
-        public int TargetCurrencyId { get; set; }
+        public string OriginCurrency { get; set; }
+        public string TargetCurrency { get; set; }
         public DateOnly OperationDate { get; set; }
     }
 }

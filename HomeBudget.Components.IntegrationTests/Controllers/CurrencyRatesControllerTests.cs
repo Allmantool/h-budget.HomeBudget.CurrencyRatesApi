@@ -86,7 +86,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
                     new()
                     {
                         Scale = 1,
-                        Abbreviation = "USD",
+                        Abbreviation = CurrencyCodes.Usd,
                         CurrencyId = 431,
                         Name = "Доллар США",
                         OfficialRate = 2.7286m,

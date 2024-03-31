@@ -14,14 +14,14 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Extensions
     public class CurrencyRateGroupedExtensionsTests
     {
         [TestCaseSource(typeof(CurrencyRateGroupedExtensionsTestsCases), nameof(CurrencyRateGroupedExtensionsTestsCases.WithCurrencyGroups))]
-        public void GetSingleRateValue_WithCurrencyId_ThenExpectedRate(int currencyId, decimal expectedRate)
+        public void GetSingleRateValue_WithCurrencyId_ThenExpectedRate(string currency, decimal expectedRate)
         {
             var currencyGroups = new List<CurrencyRateGrouped>
             {
                 new()
                 {
                     Name = "A",
-                    CurrencyId = NationalBankCurrencyIds.Usd,
+                    CurrencyId = NationalBankCurrencies.Usd,
                     RateValues = new List<CurrencyRateValue>
                     {
                          new()
@@ -32,7 +32,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Extensions
                 }
             };
 
-            var result = currencyGroups.GetSingleRateValue(currencyId);
+            var result = currencyGroups.GetSingleRateValue(currency);
 
             result.Payload.Should().Be(expectedRate);
         }

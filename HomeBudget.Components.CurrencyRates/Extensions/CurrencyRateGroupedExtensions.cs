@@ -12,9 +12,16 @@ namespace HomeBudget.Components.CurrencyRates.Extensions
     {
         public static Result<decimal> GetSingleRateValue(
             this IEnumerable<CurrencyRateGrouped> rateGrouped,
-            int currencyId)
+            string currency)
         {
-            if (currencyId == NationalBankCurrencyIds.Blr)
+            var currencyId = NationalBankCurrencies.GetIdByAbbreviation(currency);
+
+            if (currencyId == null)
+            {
+                return Result<decimal>.Failure("No valid 'currency' has been provided");
+            }
+
+            if (currencyId == NationalBankCurrencies.Blr)
             {
                 return Result<decimal>.Succeeded(1m);
             }
