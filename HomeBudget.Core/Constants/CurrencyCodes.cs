@@ -2,7 +2,7 @@
 {
     public static class CurrencyCodes
     {
-        public static readonly string Blr = "BLR";
+        public static readonly string Blr = "BYN";
         public static readonly string Usd = "USD";
         public static readonly string Rub = "RUB";
         public static readonly string Pln = "PLN";

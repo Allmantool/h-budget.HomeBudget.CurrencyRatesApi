@@ -49,6 +49,29 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             });
         }
 
+        [Test]
+        public async Task GetExchangeMultiplierAsync_WhenFromBlrToUsdInFuture_ThenReturnMostUpToDateCurrency()
+        {
+            const string requestBodyAsJson = "{" +
+                 "\"originCurrency\": \"BYN\"," +
+                 "\"targetCurrency\": \"USD\"," +
+                 "\"operationDate\": \"3024-04-28\"" +
+                 "}";
+
+            var currencyExchangeRequest = new RestRequest($"/{Endpoints.CurrencyExchangeApi}/multiplier", Method.Post)
+                .AddJsonBody(requestBodyAsJson);
+
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
+            var payload = response.Data;
+
+            Assert.Multiple(() =>
+            {
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                payload.IsSucceeded.Should().BeTrue();
+                payload.Payload.Should().Be(0.31471M);
+            });
+        }
+
         public async ValueTask DisposeAsync()
         {
             if (_sut != null)
