@@ -1,35 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Linq;
 
 namespace HomeBudget.Core.Constants
 {
-    public static class NationalBankCurrencies
+    public class NationalBankCurrencies(int id, string name)
+        : Enumeration(id, name)
     {
-        public static readonly int Blr = -1;
+        public static readonly NationalBankCurrencies Blr = new(-1, CurrencyCodes.Blr);
+        public static readonly NationalBankCurrencies Usd = new(431, CurrencyCodes.Usd);
+        public static readonly NationalBankCurrencies Uan = new(449, CurrencyCodes.Uan);
+        public static readonly NationalBankCurrencies Eur = new(451, CurrencyCodes.Eur);
+        public static readonly NationalBankCurrencies Pln = new(452, CurrencyCodes.Pln);
+        public static readonly NationalBankCurrencies Rub = new(456, CurrencyCodes.Rub);
+        public static readonly NationalBankCurrencies Try = new(460, CurrencyCodes.Try);
 
-        public static readonly int Usd = 431;
-
-        public static readonly int Rub = 456;
-
-        public static readonly int Pln = 452;
-
-        public static readonly int Eur = 451;
-
-        public static readonly int Uan = 449;
-
-        public static readonly int Try = 460;
-
-        private static readonly Dictionary<string, int> CurrencyHandbook = new(StringComparer.OrdinalIgnoreCase)
-        {
-            { CurrencyCodes.Blr, Blr },
-            { CurrencyCodes.Usd, Usd },
-            { CurrencyCodes.Rub, Rub },
-            { CurrencyCodes.Pln, Pln },
-            { CurrencyCodes.Eur, Eur },
-            { CurrencyCodes.Uan, Uan },
-            { CurrencyCodes.Try, Try },
-        };
-
-        public static int? GetIdByAbbreviation(string abbreviation) => CurrencyHandbook.GetValueOrDefault(abbreviation);
+        public static int? GetIdByAbbreviation(string abbreviation)
+            => GetAll<NationalBankCurrencies>().FirstOrDefault(i => string.Equals(abbreviation, i.Name))?.Id;
     }
 }
