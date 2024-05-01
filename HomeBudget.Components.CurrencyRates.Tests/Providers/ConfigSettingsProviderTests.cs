@@ -52,7 +52,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Providers
             Assert.Multiple(() =>
             {
                 targetCurrency.Abbreviation.Should().BeEquivalentTo(nameof(NationalBankCurrencies.Usd));
-                targetCurrency.Id.Should().Be(NationalBankCurrencies.Usd);
+                targetCurrency.Id.Should().Be(NationalBankCurrencies.Usd.Id);
                 targetCurrency.Name.Should().Be("US Dollar");
                 targetCurrency.Scale.Should().Be(1);
             });

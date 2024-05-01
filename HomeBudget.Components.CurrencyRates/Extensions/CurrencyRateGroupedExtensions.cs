@@ -21,7 +21,7 @@ namespace HomeBudget.Components.CurrencyRates.Extensions
                 return Result<decimal>.Failure("No valid 'currency' has been provided");
             }
 
-            if (currencyId == NationalBankCurrencies.Blr)
+            if (currencyId == NationalBankCurrencies.Blr.Id)
             {
                 return Result<decimal>.Succeeded(1m);
             }

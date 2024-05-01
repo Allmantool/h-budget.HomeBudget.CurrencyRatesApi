@@ -19,37 +19,37 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
             {
                 new()
                 {
-                    CurrencyId = NationalBankCurrencies.Usd,
+                    CurrencyId = NationalBankCurrencies.Usd.Id,
                     OfficialRate = 3.1775m,
                     UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = NationalBankCurrencies.Rub,
+                    CurrencyId = NationalBankCurrencies.Rub.Id,
                     OfficialRate = 3.4991m,
                     UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = NationalBankCurrencies.Pln,
+                    CurrencyId = NationalBankCurrencies.Pln.Id,
                     OfficialRate = 8.1463m,
                     UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = NationalBankCurrencies.Eur,
+                    CurrencyId = NationalBankCurrencies.Eur.Id,
                     OfficialRate = 3.5363m,
                     UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = NationalBankCurrencies.Uan,
+                    CurrencyId = NationalBankCurrencies.Uan.Id,
                     OfficialRate = 8.4558m,
                     UpdateDate = periodRange.StartDate
                 },
                 new()
                 {
-                    CurrencyId = NationalBankCurrencies.Try,
+                    CurrencyId = NationalBankCurrencies.Try.Id,
                     OfficialRate = 1.0789m,
                     UpdateDate = periodRange.StartDate
                 }
@@ -68,7 +68,7 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
                 {
                     Abbreviation = nameof(NationalBankCurrencies.Usd),
                     Scale = 1,
-                    CurrencyId = NationalBankCurrencies.Usd,
+                    CurrencyId = NationalBankCurrencies.Usd.Id,
                     OfficialRate = 3.2085m,
                     UpdateDate = today
                 },
@@ -76,7 +76,7 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
                 {
                     Abbreviation = nameof(NationalBankCurrencies.Rub),
                     Scale = 100,
-                    CurrencyId = NationalBankCurrencies.Rub,
+                    CurrencyId = NationalBankCurrencies.Rub.Id,
                     OfficialRate = 3.5519m,
                     UpdateDate = today
                 },
@@ -84,7 +84,7 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
                 {
                     Abbreviation = nameof(NationalBankCurrencies.Pln),
                     Scale = 10,
-                    CurrencyId = NationalBankCurrencies.Pln,
+                    CurrencyId = NationalBankCurrencies.Pln.Id,
                     OfficialRate = 8.0973m,
                     UpdateDate = today
                 },
@@ -92,7 +92,7 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
                 {
                     Abbreviation = nameof(NationalBankCurrencies.Eur),
                     Scale = 1,
-                    CurrencyId = NationalBankCurrencies.Eur,
+                    CurrencyId = NationalBankCurrencies.Eur.Id,
                     OfficialRate = 3.4894m,
                     UpdateDate = today
                 },
@@ -100,7 +100,7 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
                 {
                     Abbreviation = nameof(NationalBankCurrencies.Uan),
                     Scale = 100,
-                    CurrencyId = NationalBankCurrencies.Uan,
+                    CurrencyId = NationalBankCurrencies.Uan.Id,
                     OfficialRate = 8.3503m,
                     UpdateDate = today
                 },
@@ -108,7 +108,7 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
                 {
                     Abbreviation = nameof(NationalBankCurrencies.Try),
                     Scale = 10,
-                    CurrencyId = NationalBankCurrencies.Try,
+                    CurrencyId = NationalBankCurrencies.Try.Id,
                     OfficialRate = 1.0113m,
                     UpdateDate = today
                 }

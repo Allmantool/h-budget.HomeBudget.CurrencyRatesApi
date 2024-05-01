@@ -21,7 +21,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Extensions
                 new()
                 {
                     Name = "A",
-                    CurrencyId = NationalBankCurrencies.Usd,
+                    CurrencyId = NationalBankCurrencies.Usd.Id,
                     RateValues = new List<CurrencyRateValue>
                     {
                          new()
