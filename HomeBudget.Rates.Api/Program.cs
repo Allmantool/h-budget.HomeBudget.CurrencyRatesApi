@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 using Serilog;
 
 using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
@@ -75,10 +77,23 @@ services.AddHeaderPropagation(options =>
     options.Headers.Add(HttpHeaderKeys.CorrelationId);
 });
 
+// Add relevant services for OTel to function
+services
+    .AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(serviceName: environment.ApplicationName))
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation() // ASP.NET Core related
+        .AddRuntimeInstrumentation() // .NET Runtime metrics like - GC, Memory Pressure, Heap Leaks etc
+        .AddPrometheusExporter() // Prometheus Exporter
+    );
+
 configuration.InitializeLogger(environment, webAppBuilder);
 
 // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 var webApp = webAppBuilder.Build();
+
+// Map the /metrics endpoint
+webApp.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 webApp.SetUpBaseApplication(services, environment, configuration);
 
