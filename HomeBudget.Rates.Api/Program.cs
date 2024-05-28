@@ -82,9 +82,18 @@ services
     .AddOpenTelemetry()
     .ConfigureResource(resource => resource.AddService(serviceName: environment.ApplicationName))
     .WithMetrics(metrics => metrics
-        .AddAspNetCoreInstrumentation() // ASP.NET Core related
-        .AddRuntimeInstrumentation() // .NET Runtime metrics like - GC, Memory Pressure, Heap Leaks etc
-        .AddPrometheusExporter() // Prometheus Exporter
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddRuntimeInstrumentation()
+        .AddMeter("Microsoft.AspNetCore.Hosting")
+        .AddMeter("Microsoft.AspNetCore.Routing")
+        .AddMeter("Microsoft.AspNetCore.Diagnostics")
+        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+        .AddMeter("Microsoft.AspNetCore.Http.Connections")
+        .AddMeter("Microsoft.Extensions.Diagnostics.HealthChecks")
+        .SetMaxMetricStreams(OpenTelemetryOptions.MaxMetricStreams)
+        .SetMaxMetricPointsPerMetricStream(OpenTelemetryOptions.MaxMetricPointsPerMetricStream)
+        .AddPrometheusExporter()
     );
 
 configuration.InitializeLogger(environment, webAppBuilder);
