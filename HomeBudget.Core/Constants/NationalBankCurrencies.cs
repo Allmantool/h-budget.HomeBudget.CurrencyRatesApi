@@ -3,7 +3,7 @@
 namespace HomeBudget.Core.Constants
 {
     public class NationalBankCurrencies(int id, string name)
-        : Enumeration(id, name)
+        : BaseEnumeration(id, name)
     {
         public static readonly NationalBankCurrencies Blr = new(-1, CurrencyCodes.Blr);
         public static readonly NationalBankCurrencies Usd = new(431, CurrencyCodes.Usd);
