@@ -23,7 +23,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
 
-    <PackageReference Include="RestSharp" Version="110.2.0" />
+    <PackageReference Include="RestSharp" Version="111.2.0" />
     <PackageReference Include="Testcontainers.Redis" Version="3.8.0" />
     <PackageReference Include="Testcontainers.MsSql" Version="3.8.0" />
     <PackageReference Include="Testcontainers" Version="3.8.0" />
