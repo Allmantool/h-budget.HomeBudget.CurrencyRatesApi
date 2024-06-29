@@ -1,6 +1,6 @@
-﻿namespace HomeBudget.Core.Models
+﻿namespace HomeBudget.Core.Options
 {
-    public class PollyRetryOptions
+    public record PollyRetryOptions
     {
         public int RetryCount { get; set; }
         public int SleepDurationInSeconds { get; set; }

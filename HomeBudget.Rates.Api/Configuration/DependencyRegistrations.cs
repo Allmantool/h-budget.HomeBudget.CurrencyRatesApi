@@ -16,6 +16,7 @@ using HomeBudget.Core.Models;
 using HomeBudget.DataAccess.Dapper.Extensions;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Exceptions.Handlers;
+using HomeBudget.Core.Options;
 
 namespace HomeBudget.Rates.Api.Configuration
 {

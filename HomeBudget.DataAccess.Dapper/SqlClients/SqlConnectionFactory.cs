@@ -6,8 +6,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using HomeBudget.Core.Extensions;
-using HomeBudget.Core.Models;
 using HomeBudget.DataAccess.Interfaces;
+using HomeBudget.Core.Options;
 
 namespace HomeBudget.DataAccess.Dapper.SqlClients
 {
