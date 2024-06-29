@@ -8,6 +8,7 @@ using StackExchange.Redis;
 
 using HomeBudget.Core.Models;
 using HomeBudget.Core.Services.Interfaces;
+using HomeBudget.Core.Options;
 
 namespace HomeBudget.Core.Services
 {

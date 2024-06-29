@@ -2,7 +2,7 @@
 
 namespace HomeBudget.Core.Models
 {
-    public class ExternalResourceUrls
+    public record ExternalResourceUrls
     {
         public Uri NationalBankUrl { get; set; }
     }

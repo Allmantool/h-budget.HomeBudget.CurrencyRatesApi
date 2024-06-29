@@ -2,7 +2,7 @@
 
 namespace HomeBudget.Core.Models
 {
-    public class PeriodRange
+    public record PeriodRange
     {
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
