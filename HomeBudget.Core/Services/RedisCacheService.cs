@@ -7,8 +7,8 @@ using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 using HomeBudget.Core.Models;
-using HomeBudget.Core.Services.Interfaces;
 using HomeBudget.Core.Options;
+using HomeBudget.Core.Services.Interfaces;
 
 namespace HomeBudget.Core.Services
 {
