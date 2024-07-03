@@ -1,5 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Channels;
 
+using Elastic.Apm.SerilogEnricher;
+using Elastic.Channels;
+using Elastic.Ingest.Elasticsearch;
+using Elastic.Ingest.Elasticsearch.DataStreams;
+using Elastic.Serilog.Sinks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -7,8 +14,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Enrichers.Span;
+using Serilog.Events;
 using Serilog.Exceptions;
-using Serilog.Sinks.Elasticsearch;
 
 using HomeBudget.Rates.Api.Constants;
 
@@ -22,6 +29,7 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
             WebApplicationBuilder webAppBuilder)
         {
             var logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithExceptionDetails()
@@ -49,23 +57,30 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
 
             return string.IsNullOrWhiteSpace(elasticNodeUrl)
                 ? loggerConfiguration
-                : loggerConfiguration.WriteTo.Elasticsearch(ConfigureElasticSink(environment, elasticNodeUrl));
+                : loggerConfiguration
+                    .Enrich.WithElasticApmCorrelationInfo()
+                    .WriteTo.Elasticsearch(
+                        new List<Uri>
+                        {
+                            new(elasticNodeUrl)
+                        },
+                        opt => opt.ConfigureElasticSink(environment));
         }
 
-        private static ElasticsearchSinkOptions ConfigureElasticSink(IHostEnvironment environment, string elasticNodeUrl)
+        private static void ConfigureElasticSink(this ElasticsearchSinkOptions options, IHostEnvironment environment)
         {
             var formattedExecuteAssemblyName = typeof(Program).Assembly.GetName().Name;
             var dateIndexPostfix = DateTime.UtcNow.ToString("MM-yyyy-dd");
 
-            return new ElasticsearchSinkOptions(new Uri(elasticNodeUrl))
+            options.DataStream = new DataStreamName($"{formattedExecuteAssemblyName}-{environment.EnvironmentName}-{dateIndexPostfix}".Replace(".", "-").ToLower());
+            options.BootstrapMethod = BootstrapMethod.Failure;
+            options.MinimumLevel = LogEventLevel.Debug;
+            options.ConfigureChannel = channelOpts =>
             {
-                AutoRegisterTemplate = true,
-                TypeName = null,
-                AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
-                BatchAction = ElasticOpType.Create,
-                NumberOfReplicas = 1,
-                NumberOfShards = 2,
-                IndexFormat = $"{formattedExecuteAssemblyName}-{environment.EnvironmentName}-{dateIndexPostfix}".Replace(".", "-").ToLower()
+                channelOpts.BufferOptions = new BufferOptions
+                {
+                    BoundedChannelFullMode = BoundedChannelFullMode.DropNewest,
+                };
             };
         }
     }
