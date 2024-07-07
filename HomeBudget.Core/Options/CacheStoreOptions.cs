@@ -2,6 +2,6 @@
 {
     public record CacheStoreOptions
     {
-        public int ExpirationInMinutes { get; set; }
+        public int ExpirationInMinutes { get; init; }
     }
 }
