@@ -117,6 +117,8 @@ jobs:
             --no-incremental
 
       - name: Run test (unit + integrations based on test containers) for test coverage collecting
+        env:
+            DOTNET_HOST_FACTORY_RESOLVER_DEFAULT_TIMEOUT_IN_SECONDS: 600
         shell: bash
         run: |
           dotnet-dotcover test HomeBudgetRatesApi.sln \

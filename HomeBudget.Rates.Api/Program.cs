@@ -21,8 +21,6 @@ using HomeBudget.Rates.Api.Exceptions.Handlers;
 using HomeBudget.Rates.Api.Extensions;
 using HomeBudget.Rates.Api.Extensions.Logs;
 using HomeBudget.Rates.Api.MapperProfileConfigurations;
-using Google.Protobuf.WellKnownTypes;
-using HomeBudget.Rates.Api.Middlewares;
 
 var webAppBuilder = WebApplication.CreateBuilder(args);
 
