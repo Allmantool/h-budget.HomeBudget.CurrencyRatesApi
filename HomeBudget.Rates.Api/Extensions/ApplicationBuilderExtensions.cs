@@ -28,20 +28,20 @@ namespace HomeBudget.Rates.Api.Extensions
             if (env.IsDevelopment() || env.IsEnvironment(HostEnvironments.Docker))
             {
                 app.UseDeveloperExceptionPage();
-
-                app.UseCors(corsPolicyBuilder =>
-                {
-                    var allowedUiOrigins = configuration.GetSection("UiOriginsUrl").Get<string[]>();
-
-                    Log.Information("UI origin is '{0}'", string.Join(" ,", allowedUiOrigins));
-
-                    corsPolicyBuilder
-                        .WithOrigins(allowedUiOrigins)
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .WithExposedHeaders(HttpHeaderKeys.CorrelationId);
-                });
             }
+
+            app.UseCors(corsPolicyBuilder =>
+            {
+                var allowedUiOrigins = configuration.GetSection("UiOriginsUrl").Get<string[]>();
+
+                Log.Information("UI origin is '{0}'", string.Join(" ,", allowedUiOrigins));
+
+                corsPolicyBuilder
+                    .WithOrigins(allowedUiOrigins)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithExposedHeaders(HttpHeaderKeys.CorrelationId);
+            });
 
             return app
                 .UseHsts()

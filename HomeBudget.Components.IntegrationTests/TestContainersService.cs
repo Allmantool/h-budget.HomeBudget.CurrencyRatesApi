@@ -35,20 +35,30 @@ namespace HomeBudget.Components.IntegrationTests
                 return;
             }
 
-            DbContainer = new MsSqlBuilder()
-                .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-                .WithName("integration-sql-server")
-                .WithPassword(configuration.GetTestSqlPassword())
-                .WithEnvironment("ACCEPT_EULA", "Y")
-                .WithEnvironment("SA_PASSWORD", configuration.GetTestSqlPassword())
-                .WithPortBinding(configuration.GetTestSqlConnectionPort().Value, 1433)
-                .Build();
+            var sqlConnectionPort = configuration.GetTestSqlConnectionPort();
 
-            CacheContainer = new RedisBuilder()
-                .WithImage("redis:7.0.7")
-                .WithPortBinding(configuration.GetTestRedisPort().Value, 6379)
-                .WithName("integration-redis_server")
-                .Build();
+            if (sqlConnectionPort.HasValue)
+            {
+                DbContainer = new MsSqlBuilder()
+                    .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+                    .WithName("integration-sql-server")
+                    .WithPassword(configuration.GetTestSqlPassword())
+                    .WithEnvironment("ACCEPT_EULA", "Y")
+                    .WithEnvironment("SA_PASSWORD", configuration.GetTestSqlPassword())
+                    .WithPortBinding(sqlConnectionPort.Value, 1433)
+                    .Build();
+            }
+
+            var redistPort = configuration.GetTestRedisPort();
+
+            if (redistPort.HasValue)
+            {
+                CacheContainer = new RedisBuilder()
+                    .WithImage("redis:7.0.7")
+                    .WithPortBinding(redistPort.Value, 6379)
+                    .WithName("integration-redis_server")
+                    .Build();
+            }
 
             if (DbContainer != null)
             {
