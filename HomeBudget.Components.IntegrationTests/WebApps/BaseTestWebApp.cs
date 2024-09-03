@@ -30,15 +30,17 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
             }
 
             WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(
-                () =>
+                async () =>
                 {
                     TestContainersService = new TestContainersService(WebFactory?.Configuration);
 
-                    StartAsync().GetAwaiter().GetResult();
+                    await StartAsync();
                 });
 
+            var httpClient = WebFactory.CreateClient();
+
             RestHttpClient = new RestClient(
-                WebFactory.CreateClient(),
+                httpClient,
                 new RestClientOptions(new Uri("http://localhost:6064")));
         }
 

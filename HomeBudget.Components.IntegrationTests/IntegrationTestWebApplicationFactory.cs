@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -15,7 +15,7 @@ using HomeBudget.Rates.Api.Constants;
 namespace HomeBudget.Components.IntegrationTests
 {
     public class IntegrationTestWebApplicationFactory<TStartup>
-        (Action webHostInitializationCallback) : WebApplicationFactory<TStartup>
+        (Func<Task> webHostInitializationCallback) : WebApplicationFactory<TStartup>
         where TStartup : class
     {
         internal IConfiguration Configuration { get; private set; }
@@ -36,7 +36,9 @@ namespace HomeBudget.Components.IntegrationTests
 
                 Configuration = conf.Build();
 
-                webHostInitializationCallback?.Invoke();
+                var hostInitializationTask = webHostInitializationCallback?.Invoke();
+
+                hostInitializationTask?.GetAwaiter().GetResult();
             });
 
             base.ConfigureWebHost(builder);
