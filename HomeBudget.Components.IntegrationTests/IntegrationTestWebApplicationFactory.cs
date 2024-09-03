@@ -41,7 +41,7 @@ namespace HomeBudget.Components.IntegrationTests
 
                 var hostInitializationTask = webHostInitializationCallback?.Invoke();
 
-                hostInitializationTask?.GetAwaiter().GetResult();
+                hostInitializationTask?.ConfigureAwait(false).GetAwaiter().GetResult();
             });
 
             base.ConfigureWebHost(builder);
