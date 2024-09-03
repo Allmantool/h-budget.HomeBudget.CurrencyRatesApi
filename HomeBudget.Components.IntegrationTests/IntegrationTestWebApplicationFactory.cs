@@ -44,7 +44,7 @@ namespace HomeBudget.Components.IntegrationTests
                 hostInitializationTask?.ConfigureAwait(false).GetAwaiter().GetResult();
             });
 
-            base.ConfigureWebHost(builder);
+            builder.UseEnvironment(HostEnvironments.Integration);
         }
     }
 }

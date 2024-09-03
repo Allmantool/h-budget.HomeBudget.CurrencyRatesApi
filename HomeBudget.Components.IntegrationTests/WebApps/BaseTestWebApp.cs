@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.Mvc.Testing;
 using RestSharp;
+
 using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Components.IntegrationTests.WebApps
@@ -26,7 +28,10 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
                     await StartAsync();
                 });
 
-            var httpClient = WebFactory.CreateClient();
+            var httpClient = WebFactory.CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = false
+            });
 
             RestHttpClient = new RestClient(
                 httpClient,
