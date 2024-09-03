@@ -27,6 +27,8 @@ namespace HomeBudget.Components.IntegrationTests
                _ = services.SetDiForConnectionsAsync().GetAwaiter().GetResult();
 
                services.AddScoped<INationalBankRatesProvider, MockNationalBankRatesProvider>();
+
+               services.AddHttpClient("test-default").SetHandlerLifetime(TimeSpan.FromMinutes(10));
             });
 
             builder.ConfigureAppConfiguration((_, conf) =>
