@@ -124,7 +124,7 @@ jobs:
           dotnet-dotcover test HomeBudgetRatesApi.sln \
             --dcReportType=HTML \
             --dcOutput="test-results/rates-coverage.html" \
-            --filter "Category!=Integration""
+            --filter "Category!=Integration"
 
       - name: Run test (integrations based on test containers) for test coverage collecting
         continue-on-error: true
