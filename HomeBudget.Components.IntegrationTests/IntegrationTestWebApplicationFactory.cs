@@ -20,6 +20,11 @@ namespace HomeBudget.Components.IntegrationTests
     {
         internal IConfiguration Configuration { get; private set; }
 
+        protected override IWebHostBuilder CreateWebHostBuilder()
+        {
+            return base.CreateWebHostBuilder();
+        }
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureTestServices(services =>
