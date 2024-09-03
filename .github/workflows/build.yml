@@ -88,8 +88,8 @@ jobs:
       - name: Install external tools for quality gate verification
         shell: bash
         run: |
-          dotnet tool install --global JetBrains.dotCover.GlobalTool --version 2023.2.3
-          dotnet tool install --global dotnet-sonarscanner --version 5.14.0
+          dotnet tool install --global JetBrains.dotCover.GlobalTool --version 2023.2.5
+          dotnet tool install --global dotnet-sonarscanner --version 8.0.2
 
       - name: Make the scanner script file executable
         run: |
@@ -118,7 +118,7 @@ jobs:
 
       - name: Run test (unit + integrations based on test containers) for test coverage collecting
         env:
-            DOTNET_HOST_FACTORY_RESOLVER_DEFAULT_TIMEOUT_IN_SECONDS: 600
+          DOTNET_HOST_FACTORY_RESOLVER_DEFAULT_TIMEOUT_IN_SECONDS: 600
         shell: bash
         run: |
           dotnet-dotcover test HomeBudgetRatesApi.sln \
