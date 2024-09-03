@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using NUnit.Framework;
 using RestSharp;
-
-using HomeBudget.Components.IntegrationTests.Constants;
 using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Components.IntegrationTests.WebApps
@@ -20,14 +17,6 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
         protected BaseTestWebApp()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", HostEnvironments.Integration);
-
-            var testProperties = TestContext.CurrentContext.Test.Properties;
-            var testCategory = testProperties.Get("Category") as string;
-
-            if (!TestTypes.Integration.Equals(testCategory, StringComparison.OrdinalIgnoreCase))
-            {
-                return;
-            }
 
             WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(
                 async () =>
