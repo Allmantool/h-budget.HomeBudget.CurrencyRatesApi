@@ -118,8 +118,7 @@ jobs:
           dotnet build HomeBudgetRatesApi.sln \
             --no-incremental
 
-      - name: Run test (unit + integrations based on test containers) for test coverage collecting
-        continue-on-error: true
+      - name: Run test (unit) for test coverage collecting
         shell: bash
         run: |
           dotnet-dotcover test HomeBudgetRatesApi.sln \
@@ -127,7 +126,17 @@ jobs:
             --dcOutput="test-results/rates-coverage.html" \
             --dcFilters="+:HomeBudget.*;-:type=*.IntegrationTests;-:type=*.Tests"
 
+      - name: Run test (integrations based on test containers) for test coverage collecting
+        continue-on-error: true
+        shell: bash
+        run: |
+          dotnet-dotcover test HomeBudgetRatesApi.sln \
+            --dcReportType=HTML \
+            --dcOutput="test-results/rates-coverage-integrations.html" \
+            --dcFilters="+:HomeBudget.*;-:type=*.IntegrationTests;
+
       - name: End sonnar scanning
+        continue-on-error: true
         env:
           SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
         shell: bash
