@@ -25,7 +25,7 @@ namespace HomeBudget.Components.IntegrationTests
         {
             builder.ConfigureTestServices(services =>
             {
-               _ = services.SetDiForConnectionsAsync().GetAwaiter().GetResult();
+               _ = services.SetDiForConnectionsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
                services.AddScoped<INationalBankRatesProvider, MockNationalBankRatesProvider>();
 
