@@ -123,17 +123,7 @@ jobs:
         run: |
           dotnet-dotcover test HomeBudgetRatesApi.sln \
             --dcReportType=HTML \
-            --dcOutput="test-results/rates-coverage.html" \
-            --filter "Category!=Integration"
-
-      - name: Run test (integrations based on test containers) for test coverage collecting
-        continue-on-error: true
-        shell: bash
-        run: |
-          dotnet-dotcover test HomeBudgetRatesApi.sln \
-            --dcReportType=HTML \
-            --dcOutput="test-results/rates-coverage-integrations.html" \
-            --filter "Category=Integration"
+            --dcOutput="test-results/rates-coverage.html"
 
       - name: End sonnar scanning
         continue-on-error: true
