@@ -30,12 +30,11 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
 
             var httpClient = WebFactory.CreateClient(new WebApplicationFactoryClientOptions
             {
-                AllowAutoRedirect = false
+                AllowAutoRedirect = false,
+                BaseAddress = new Uri("http://localhost:7064")
             });
 
-            RestHttpClient = new RestClient(
-                httpClient,
-                new RestClientOptions(new Uri("http://localhost:6064")));
+            RestHttpClient = new RestClient(httpClient);
         }
 
         public async Task StartAsync()
