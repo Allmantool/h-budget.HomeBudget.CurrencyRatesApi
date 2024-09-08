@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -15,7 +16,7 @@ using HomeBudget.Rates.Api.Constants;
 namespace HomeBudget.Components.IntegrationTests
 {
     public class IntegrationTestWebApplicationFactory<TStartup>
-        (Action webHostInitializationCallback) : WebApplicationFactory<TStartup>
+        (Func<Task> webHostInitializationCallback) : WebApplicationFactory<TStartup>
         where TStartup : class
     {
         internal IConfiguration Configuration { get; private set; }
@@ -24,9 +25,11 @@ namespace HomeBudget.Components.IntegrationTests
         {
             builder.ConfigureTestServices(services =>
             {
-               _ = services.SetDiForConnectionsAsync().GetAwaiter().GetResult();
+               _ = services.SetDiForConnectionsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
                services.AddScoped<INationalBankRatesProvider, MockNationalBankRatesProvider>();
+
+               services.AddHttpClient("test-default").SetHandlerLifetime(TimeSpan.FromMinutes(10));
             });
 
             builder.ConfigureAppConfiguration((_, conf) =>
@@ -36,10 +39,12 @@ namespace HomeBudget.Components.IntegrationTests
 
                 Configuration = conf.Build();
 
-                webHostInitializationCallback?.Invoke();
+                var hostInitializationTask = webHostInitializationCallback?.Invoke();
+
+                hostInitializationTask?.ConfigureAwait(false).GetAwaiter().GetResult();
             });
 
-            base.ConfigureWebHost(builder);
+            builder.UseEnvironment(HostEnvironments.Integration);
         }
     }
 }

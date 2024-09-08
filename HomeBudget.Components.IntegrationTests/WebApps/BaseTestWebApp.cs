@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using NUnit.Framework;
+using Microsoft.AspNetCore.Mvc.Testing;
 using RestSharp;
 
-using HomeBudget.Components.IntegrationTests.Constants;
 using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Components.IntegrationTests.WebApps
@@ -21,25 +20,21 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", HostEnvironments.Integration);
 
-            var testProperties = TestContext.CurrentContext.Test.Properties;
-            var testCategory = testProperties.Get("Category") as string;
-
-            if (!TestTypes.Integration.Equals(testCategory, StringComparison.OrdinalIgnoreCase))
-            {
-                return;
-            }
-
             WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(
-                () =>
+                async () =>
                 {
                     TestContainersService = new TestContainersService(WebFactory?.Configuration);
 
-                    StartAsync().GetAwaiter().GetResult();
+                    await StartAsync();
                 });
 
-            RestHttpClient = new RestClient(
-                WebFactory.CreateClient(),
-                new RestClientOptions(new Uri("http://localhost:6064")));
+            var httpClient = WebFactory.CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = false,
+                BaseAddress = new Uri("http://localhost:7064")
+            });
+
+            RestHttpClient = new RestClient(httpClient);
         }
 
         public async Task StartAsync()

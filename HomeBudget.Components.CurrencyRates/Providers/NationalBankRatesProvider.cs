@@ -18,6 +18,7 @@ namespace HomeBudget.Components.CurrencyRates.Providers
         INationalBankApiClient nationalBankApiClient)
         : INationalBankRatesProvider
     {
+        // TODO: Re-write with queue + SignalR
         public async Task<IReadOnlyCollection<NationalBankShortCurrencyRate>> GetRatesForPeriodAsync(
             IEnumerable<int> currenciesIds,
             PeriodRange periodRange)
@@ -56,15 +57,17 @@ namespace HomeBudget.Components.CurrencyRates.Providers
         {
             var ratesForYearPeriods = new List<PeriodRange>(period.GetFullYearsDateRangesForPeriod())
             {
-                new()
+                period with
                 {
-                    StartDate = period.StartDate,
-                    EndDate = period.IsWithinTheSameYear() ? period.EndDate : period.StartDate.LastDateOfYear(),
+                    EndDate = period.IsWithinTheSameYear()
+                        ? period.EndDate
+                        : period.StartDate.LastDateOfYear()
                 },
-                new()
+                period with
                 {
-                    StartDate = period.IsWithinTheSameYear() ? period.StartDate : period.EndDate.FirstDateOfYear(),
-                    EndDate = period.EndDate,
+                    StartDate = period.IsWithinTheSameYear()
+                        ? period.StartDate
+                        : period.EndDate.FirstDateOfYear()
                 }
             }.DistinctBy(i => new { i.StartDate, i.EndDate });
 
