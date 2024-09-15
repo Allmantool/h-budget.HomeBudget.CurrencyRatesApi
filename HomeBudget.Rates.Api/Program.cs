@@ -72,6 +72,8 @@ services
     .AddResponseCaching()
     .SetupSwaggerGen();
 
+services.AddSignalR();
+
 services.AddHeaderPropagation(options =>
 {
     options.Headers.Add(HttpHeaderKeys.HostService, HostServiceOptions.Name);

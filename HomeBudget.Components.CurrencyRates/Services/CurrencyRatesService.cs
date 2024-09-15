@@ -65,7 +65,10 @@ namespace HomeBudget.Components.CurrencyRates.Services
 
             await SaveWithRewriteAsync(new SaveCurrencyRatesCommand(ratesFromApiCall, ratesForPeriodFromDatabase));
 
-            return Result<IReadOnlyCollection<CurrencyRateGrouped>>.Succeeded(ratesFromApiCall.MapToCurrencyRateGrouped(mapper));
+            var currencyGroups = ratesFromApiCall.MapToCurrencyRateGrouped(mapper);
+
+            // TODO: SignalR
+            return Result<IReadOnlyCollection<CurrencyRateGrouped>>.Succeeded(currencyGroups);
         }
 
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetTodayRatesAsync()
