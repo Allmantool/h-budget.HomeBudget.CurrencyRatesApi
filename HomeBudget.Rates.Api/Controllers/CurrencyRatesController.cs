@@ -33,6 +33,21 @@ namespace HomeBudget.Rates.Api.Controllers
             return await mediator.Send(new SaveCurrencyRatesCommand(unifiedCurrencyRates), token);
         }
 
+        [HttpPost("period/{startDate}/{endDate}")]
+        public ActionResult RequestRatesForPeriod(
+            [FromBody] CurrencyForPeriodRequest request,
+            CancellationToken token = default)
+        {
+            var command = new RequestRatesForPeriodCommand (
+                request.StartDate,
+                request.EndDate
+            );
+
+            mediator.Send(command, token);
+
+            return Accepted(command.Id);
+        }
+
         [HttpGet("period/{startDate}/{endDate}")]
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesForPeriodAsync(
             DateOnly startDate,

@@ -71,6 +71,7 @@ namespace HomeBudget.Rates.Api.Extensions
                 .SetUpHealthCheckEndpoints()
                 .UseEndpoints(endpoints =>
                 {
+                    // endpoints.MapHub<CurrencyRatesHub>("/currency-rates-hub");
                     endpoints.MapControllers();
                 })
                 .UseNationalBankClientWarmUpMiddleware(services);

@@ -21,13 +21,10 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
         ICurrencyRatesService currencyRatesService)
         : IRequestHandler<GetCurrencyGroupedRatesForPeriodQuery, Result<IReadOnlyCollection<CurrencyRateGrouped>>>
     {
-        private const string CacheKeyPrefix = nameof(GetTodayGroupedRatesForPeriodQueryHandler);
-
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> Handle(GetCurrencyGroupedRatesForPeriodQuery request, CancellationToken cancellationToken)
         {
-            var cacheKey = $"{CacheKeyPrefix}" +
-                                $"|{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}" +
-                                $"|{request.StartDate.ToString(DateFormats.NationalBankApiRequest)}-{request.EndDate.ToString(DateFormats.NationalBankApiRequest)}";
+            var cacheKey = $"{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}" +
+                           $"|{request.StartDate.ToString(DateFormats.NationalBankApiRequest)}-{request.EndDate.ToString(DateFormats.NationalBankApiRequest)}";
 
             logger.LogWithExecutionMemberName($"Method: '{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}' with key: '{cacheKey}'");
 

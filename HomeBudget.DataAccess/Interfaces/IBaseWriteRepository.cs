@@ -10,5 +10,7 @@ namespace HomeBudget.DataAccess.Interfaces
 
         Task<int> ExecuteAsync<T>(string sqlQuery, T[] parameters, IDbTransaction dbTransaction = null)
             where T : IDbEntity;
+
+        Task<int> ExecuteAsync(string sqlQuery, DataTable dt, string mapToDbType, IDbTransaction dbTransaction = null);
     }
 }

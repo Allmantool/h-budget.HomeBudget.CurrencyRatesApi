@@ -18,7 +18,6 @@ namespace HomeBudget.Components.CurrencyRates.Providers
         INationalBankApiClient nationalBankApiClient)
         : INationalBankRatesProvider
     {
-        // TODO: Re-write with queue + SignalR
         public async Task<IReadOnlyCollection<NationalBankShortCurrencyRate>> GetRatesForPeriodAsync(
             IEnumerable<int> currenciesIds,
             PeriodRange periodRange)
