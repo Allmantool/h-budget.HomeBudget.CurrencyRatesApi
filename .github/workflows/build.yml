@@ -48,7 +48,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "9.0.x"
 
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
@@ -91,7 +91,7 @@ jobs:
         shell: bash
         run: |
           dotnet tool install --global JetBrains.dotCover.GlobalTool --version 2023.2.5
-          dotnet tool install --global dotnet-sonarscanner --version 8.0.2
+          dotnet tool install --global dotnet-sonarscanner --version 9.0.2
 
       - name: Make the scanner script file executable
         run: |
