@@ -61,7 +61,7 @@ COPY ["startsonar.sh", "startsonar.sh"]
 
 COPY . .
 
-RUN dotnet build HomeBudgetRatesApi.sln -c Release --no-incremental --framework:net8.0 -maxcpucount:1 -o /app/build
+RUN dotnet build HomeBudgetRatesApi.sln -c Release --no-incremental --framework:net9.0 -maxcpucount:1 -o /app/build
 
 RUN /tools/snitch
 
@@ -69,7 +69,7 @@ FROM build AS publish
 RUN dotnet publish HomeBudgetRatesApi.sln \
     --no-dependencies \
     --no-restore \
-    --framework net8.0 \
+    --framework net9.0 \
     -c Release \
     -v Diagnostic \
     -o /app/publish

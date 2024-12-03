@@ -91,7 +91,7 @@ jobs:
         shell: bash
         run: |
           dotnet tool install --global JetBrains.dotCover.GlobalTool --version 2023.2.5
-          dotnet tool install --global dotnet-sonarscanner --version 8.0.2
+          dotnet tool install --global dotnet-sonarscanner --version 9.0.2
 
       - name: Make the scanner script file executable
         run: |
