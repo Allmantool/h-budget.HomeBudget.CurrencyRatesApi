@@ -25,7 +25,7 @@
     </PackageReference>
     <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="Testcontainers.Redis" Version="4.0.0" />
-    <PackageReference Include="Testcontainers.MsSql" Version="4.0.0" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.1.0" />
     <PackageReference Include="Testcontainers" Version="4.0.0" />
   </ItemGroup>
 
