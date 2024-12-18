@@ -9,11 +9,11 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
-    <PackageReference Include="StackExchange.Redis" Version="2.8.22" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.24" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="SonarAnalyzer.CSharp" Version="10.3.0.106239" />
+    <PackageReference Update="SonarAnalyzer.CSharp" Version="10.4.0.108396" />
   </ItemGroup>
 
 </Project>
