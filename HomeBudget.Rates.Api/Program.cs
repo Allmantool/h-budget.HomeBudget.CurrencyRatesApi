@@ -95,11 +95,12 @@ services
         .AddMeter("Microsoft.AspNetCore.Http.Connections")
         .AddMeter("Microsoft.Extensions.Diagnostics.HealthChecks")
         .SetMaxMetricStreams(OpenTelemetryOptions.MaxMetricStreams)
-        .SetMaxMetricPointsPerMetricStream(OpenTelemetryOptions.MaxMetricPointsPerMetricStream)
         .AddPrometheusExporter()
     );
 
-configuration.InitializeLogger(environment, webAppBuilder);
+services.AddLogging(loggerBuilder => configuration.InitializeLogger(environment, loggerBuilder, webAppBuilder.Host));
+
+webHost.AddAndConfigureSentry();
 
 // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 var webApp = webAppBuilder.Build();

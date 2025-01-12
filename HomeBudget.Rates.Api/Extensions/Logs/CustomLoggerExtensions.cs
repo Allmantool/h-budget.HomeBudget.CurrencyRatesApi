@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Core;
 using Serilog.Enrichers.Span;
 using Serilog.Events;
 using Serilog.Exceptions;
@@ -23,10 +24,11 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
 {
     internal static class CustomLoggerExtensions
     {
-        public static void InitializeLogger(
+        public static Logger InitializeLogger(
             this IConfiguration configuration,
             IWebHostEnvironment environment,
-            WebApplicationBuilder webAppBuilder)
+            ILoggingBuilder loggingBuilder,
+            ConfigureHostBuilder configureHostBuilder)
         {
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
@@ -38,14 +40,20 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
                 .Enrich.WithSpan()
                 .WriteTo.Debug()
                 .WriteTo.Console()
+                .WriteTo.AddAndConfigureSentry(configuration, environment)
+                .Enrich.WithElasticApmCorrelationInfo()
                 .AddElasticSearchSupport(configuration, environment)
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
 
-            webAppBuilder.Logging.ClearProviders();
+            loggingBuilder.ClearProviders();
+            loggingBuilder.AddSerilog(logger);
 
-            webAppBuilder.Logging.AddSerilog(logger);
-            webAppBuilder.Host.UseSerilog(logger);
+            configureHostBuilder.UseSerilog(logger);
+
+            Log.Logger = logger;
+
+            return logger;
         }
 
         private static LoggerConfiguration AddElasticSearchSupport(
