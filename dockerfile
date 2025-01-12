@@ -46,10 +46,6 @@ RUN dotnet tool restore
 RUN echo "##vso[task.prependpath]$HOME/.dotnet/tools"
 RUN export PATH="$PATH:/root/.dotnet/tools"
 
-COPY ["HomeBudget.Components.CurrencyRates.Tests/*.csproj", "HomeBudget.Components.CurrencyRates.Tests/"]
-COPY ["HomeBudget.Components.IntegrationTests/*.csproj", "HomeBudget.Components.IntegrationTests/"]
-COPY ["HomeBudget.Rates.Api.Tests/*.csproj", "HomeBudget.Rates.Api.Tests/"]
-
 COPY ["HomeBudget.Components.CurrencyRates/*.csproj", "HomeBudget.Components.CurrencyRates/"]
 COPY ["HomeBudget.Components.Exchange/*.csproj", "HomeBudget.Components.Exchange/"]
 COPY ["HomeBudget.DataAccess/*.csproj", "HomeBudget.DataAccess/"]
