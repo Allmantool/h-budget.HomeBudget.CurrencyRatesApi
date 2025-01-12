@@ -61,9 +61,9 @@ COPY . .
 
 # Clean artifacts from test projects
 RUN dotnet sln HomeBudgetRatesApi.sln remove \
-    HomeBudget.Components.IntegrationTests\HomeBudget.Components.IntegrationTests.csproj \
-    HomeBudget.Components.CurrencyRates.Tests\HomeBudget.Components.CurrencyRates.Tests.csproj \
-    HomeBudget.Rates.Api.Tests\HomeBudget.Rates.Api.Tests.csproj
+    HomeBudget.Components.IntegrationTests/HomeBudget.Components.IntegrationTests.csproj \
+    HomeBudget.Components.CurrencyRates.Tests/HomeBudget.Components.CurrencyRates.Tests.csproj \
+    HomeBudget.Rates.Api.Tests/HomeBudget.Rates.Api.Tests.csproj
 
 RUN dotnet build HomeBudgetRatesApi.sln -c Release --no-incremental --framework:net9.0 -maxcpucount:1 -o /app/build
 
