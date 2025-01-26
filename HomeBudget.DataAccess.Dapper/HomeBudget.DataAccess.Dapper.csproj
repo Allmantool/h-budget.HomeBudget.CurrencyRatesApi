@@ -3,14 +3,14 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <GenerateDependencyFile>false</GenerateDependencyFile>
-	<DebugType>Full</DebugType>
+    <DebugType>Full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.35" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.1" />
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="SonarAnalyzer.CSharp" Version="10.5.0.109200" />
+    <PackageReference Update="SonarAnalyzer.CSharp" />
   </ItemGroup>
 
 </Project>

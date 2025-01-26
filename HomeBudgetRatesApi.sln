@@ -26,7 +26,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{41306DD5-1160-4327-8C4B-6A5A878FEE0C}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
+		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeBudget.Components.IntegrationTests", "HomeBudget.Components.IntegrationTests\HomeBudget.Components.IntegrationTests.csproj", "{7FA2CED0-B951-426F-BC2F-88C7958D7327}"
