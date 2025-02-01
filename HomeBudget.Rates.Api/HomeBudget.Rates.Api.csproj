@@ -1,11 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>HomeBudget.Rates.Api</RootNamespace>
     <UserSecretsId>643b3ebf-9227-4642-9075-ffa462c6b4d3</UserSecretsId>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DebugType>Full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
