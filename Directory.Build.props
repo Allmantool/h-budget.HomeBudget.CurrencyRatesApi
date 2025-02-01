@@ -9,7 +9,7 @@
     <CodeAnalysisRuleSet>$(SolutionDir)StyleCopConfig.ruleset</CodeAnalysisRuleSet>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DebugType>Full</DebugType>
-    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
   </PropertyGroup>
   <ItemGroup Condition="$(MSBuildProjectExtension) != '.dbproj'">
     <PackageReference Include="StyleCop.Analyzers" PrivateAssets="all" />
