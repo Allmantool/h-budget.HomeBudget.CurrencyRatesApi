@@ -7,10 +7,10 @@ using HomeBudget.Components.Exchange.Configuration;
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Extensions;
 using HomeBudget.Core.Models;
+using HomeBudget.Core.Options;
 using HomeBudget.DataAccess.Dapper.Extensions;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Exceptions.Handlers;
-using HomeBudget.Core.Options;
 
 namespace HomeBudget.Rates.Api.Configuration
 {
@@ -23,7 +23,7 @@ namespace HomeBudget.Rates.Api.Configuration
         {
             services
                 .Configure<DatabaseConnectionOptions>(configuration.GetSection(ConfigurationSectionKeys.DatabaseOptions))
-                .Configure<CacheStoreOptions>(configuration.GetSection(ConfigurationSectionKeys.SeqOptions))
+                .Configure<CacheStoreOptions>(configuration.GetSection(ConfigurationSectionKeys.CacheStoreOptions))
                 .Configure<ExternalResourceUrls>(configuration.GetSection(ConfigurationSectionKeys.ExternalResourceUrls))
                 .Configure<PollyRetryOptions>(configuration.GetSection(ConfigurationSectionKeys.PollyRetryOptions))
                 .RegisterCoreIoCDependency()
