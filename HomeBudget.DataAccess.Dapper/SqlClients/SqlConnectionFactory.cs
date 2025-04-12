@@ -1,13 +1,12 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using HomeBudget.Core.Extensions;
-using HomeBudget.DataAccess.Interfaces;
 using HomeBudget.Core.Options;
+using HomeBudget.DataAccess.Interfaces;
 
 namespace HomeBudget.DataAccess.Dapper.SqlClients
 {

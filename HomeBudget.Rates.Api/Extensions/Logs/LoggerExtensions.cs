@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace HomeBudget.Rates.Api.Extensions.Logs
+﻿namespace HomeBudget.Rates.Api.Extensions.Logs
 {
     public static partial class LoggerExtensions
     {

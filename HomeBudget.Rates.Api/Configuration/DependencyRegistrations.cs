@@ -1,10 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 using HomeBudget.Components.CurrencyRates.Configuration;
@@ -29,7 +23,7 @@ namespace HomeBudget.Rates.Api.Configuration
         {
             services
                 .Configure<DatabaseConnectionOptions>(configuration.GetSection(ConfigurationSectionKeys.DatabaseOptions))
-                .Configure<CacheStoreOptions>(configuration.GetSection(ConfigurationSectionKeys.CacheStoreOptions))
+                .Configure<CacheStoreOptions>(configuration.GetSection(ConfigurationSectionKeys.SeqOptions))
                 .Configure<ExternalResourceUrls>(configuration.GetSection(ConfigurationSectionKeys.ExternalResourceUrls))
                 .Configure<PollyRetryOptions>(configuration.GetSection(ConfigurationSectionKeys.PollyRetryOptions))
                 .RegisterCoreIoCDependency()
