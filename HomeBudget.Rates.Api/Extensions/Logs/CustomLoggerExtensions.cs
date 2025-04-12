@@ -59,7 +59,7 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
         {
             try
             {
-                var seqOptions = configuration.GetSection(ConfigurationSectionKeys.SeqOptions).Get<SeqOptions>();
+                var seqOptions = configuration.GetSection(ConfigurationSectionKeys.SeqOptions)?.Get<SeqOptions>();
 
                 if (!seqOptions.IsEnabled)
                 {
@@ -85,7 +85,7 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
         {
             try
             {
-                var elasticOptions = configuration.GetSection(ConfigurationSectionKeys.ElasticSearchOptions).Get<ElasticSearchOptions>();
+                var elasticOptions = configuration.GetSection(ConfigurationSectionKeys.ElasticSearchOptions)?.Get<ElasticSearchOptions>();
 
                 if (!elasticOptions.IsEnabled)
                 {
