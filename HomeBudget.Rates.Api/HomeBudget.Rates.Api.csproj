@@ -3,6 +3,7 @@
   <PropertyGroup>
     <RootNamespace>HomeBudget.Rates.Api</RootNamespace>
     <UserSecretsId>643b3ebf-9227-4642-9075-ffa462c6b4d3</UserSecretsId>
+    <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
