@@ -21,9 +21,9 @@ namespace HomeBudget.Components.CurrencyRates.Tests
         }
 
         [Test]
-        public void Validate_WithNullCurrencyRate_ThenArgumentNullException()
+        public void Validate_WithNullCurrencyRate_ThenInvalidOperationException()
         {
-            Assert.ThrowsAsync<ArgumentNullException>(() => _sut.TestValidateAsync(null, null));
+            Assert.ThrowsAsync<InvalidOperationException>(() => _sut.TestValidateAsync(null, null));
         }
 
         [Test]

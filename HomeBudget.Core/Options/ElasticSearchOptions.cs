@@ -1,4 +1,6 @@
-﻿namespace HomeBudget.Core.Options
+﻿using System;
+
+namespace HomeBudget.Core.Options
 {
     public record ElasticSearchOptions
     {
