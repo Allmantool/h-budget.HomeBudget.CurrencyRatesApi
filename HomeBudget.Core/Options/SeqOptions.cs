@@ -1,6 +1,8 @@
-﻿namespace HomeBudget.Core.Options
+﻿using System;
+
+namespace HomeBudget.Core.Options
 {
-    public class SeqOptions
+    public record SeqOptions
     {
         public bool IsEnabled { get; init; }
 

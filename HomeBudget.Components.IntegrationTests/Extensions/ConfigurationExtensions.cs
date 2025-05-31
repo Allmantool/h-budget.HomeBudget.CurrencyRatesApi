@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace HomeBudget.Components.IntegrationTests.Extensions
 {
