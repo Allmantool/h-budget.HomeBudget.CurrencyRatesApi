@@ -89,8 +89,8 @@
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.4" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
     <PackageVersion Include="System.Text.Json" Version="9.0.6" />
-    <PackageVersion Include="Testcontainers" Version="4.5.0" />
-    <PackageVersion Include="Testcontainers.MsSql" Version="4.5.0" />
-    <PackageVersion Include="Testcontainers.Redis" Version="4.5.0" />
+    <PackageVersion Include="Testcontainers" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers.MsSql" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers.Redis" Version="4.6.0" />
   </ItemGroup>
 </Project>
