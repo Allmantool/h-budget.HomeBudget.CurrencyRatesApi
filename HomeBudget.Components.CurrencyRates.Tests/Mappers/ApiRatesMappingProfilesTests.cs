@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 
 using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
@@ -8,11 +10,16 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Mappers
     [TestFixture]
     public class CurrencyRatesMappingProfilesTests
     {
-        private readonly MapperConfiguration _mapperConfiguration = new(x => x.AddMaps(CurrencyRatesMappingProfiles.GetExecutingAssembly()));
+        private MapperConfiguration _mapperConfiguration;
 
         [SetUp]
         public void Setup()
         {
+            var configurationExpression = new MapperConfigurationExpression();
+            configurationExpression.AddMaps(CurrencyRatesMappingProfiles.GetExecutingAssembly());
+
+            _mapperConfiguration = new MapperConfiguration(configurationExpression, NullLoggerFactory.Instance);
+
             _mapperConfiguration.CreateMapper();
         }
 

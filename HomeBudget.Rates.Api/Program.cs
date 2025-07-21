@@ -55,12 +55,14 @@ services.AddControllers(o =>
 
 // services.AddJwtAuthentication(configuration);
 await services.SetUpDiAsync(configuration, environment);
-services.AddAutoMapper(new List<Assembly>
-{
-    ApiRatesMappingProfiles.GetExecutingAssembly(),
-    CurrencyRatesMappingProfiles.GetExecutingAssembly(),
-    ExchangeMappingProfiles.GetExecutingAssembly(),
-});
+services.AddAutoMapper(
+    cfg =>
+    {
+        cfg.AddMaps(typeof(Program).Assembly);
+        cfg.AddMaps(ApiRatesMappingProfiles.GetExecutingAssembly());
+        cfg.AddMaps(CurrencyRatesMappingProfiles.GetExecutingAssembly());
+        cfg.AddMaps(ExchangeMappingProfiles.GetExecutingAssembly());
+    });
 
 services.AddExceptionHandler<BadExternalApiRequestExceptionHandler>();
 services.AddExceptionHandler<GlobalExceptionHandler>();
