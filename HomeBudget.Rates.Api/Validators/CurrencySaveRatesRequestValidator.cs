@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+
 using HomeBudget.Rates.Api.Models.Requests;
 
 namespace HomeBudget.Rates.Api.Validators

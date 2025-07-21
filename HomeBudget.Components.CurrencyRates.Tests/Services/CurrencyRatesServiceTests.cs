@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 
 using AutoMapper;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 
+using HomeBudget.Components.CurrencyRates.Clients;
 using HomeBudget.Components.CurrencyRates.Extensions;
 using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
 using HomeBudget.Components.CurrencyRates.Models;
@@ -16,7 +18,6 @@ using HomeBudget.Components.CurrencyRates.Providers;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.CurrencyRates.Services;
 using HomeBudget.Core.Constants;
-using HomeBudget.Components.CurrencyRates.Clients;
 
 namespace HomeBudget.Components.CurrencyRates.Tests.Services
 {
@@ -190,11 +191,13 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
 
         private static IMapper GetDefaultMapper()
         {
-            return new Mapper(new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<CurrencyRateMappingProfiler>();
-                cfg.AddProfile<CurrencyRateGroupedMappingProfile>();
-            }));
+            var configurationExpression = new MapperConfigurationExpression();
+            configurationExpression.AddProfile<CurrencyRateMappingProfiler>();
+            configurationExpression.AddProfile<CurrencyRateGroupedMappingProfile>();
+
+            var mapperConfiguration = new MapperConfiguration(configurationExpression, NullLoggerFactory.Instance);
+
+            return new Mapper(mapperConfiguration);
         }
     }
 }
