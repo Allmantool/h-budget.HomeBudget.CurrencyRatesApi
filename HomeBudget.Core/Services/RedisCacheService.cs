@@ -46,7 +46,7 @@ namespace HomeBudget.Core.Services
                 return await Task.FromResult<T>(default);
             }
 
-            return JsonSerializer.Deserialize<T>(value);
+            return JsonSerializer.Deserialize<T>((string)value);
         }
 
         private Task<bool> DoesKeyExistAsync(string key)

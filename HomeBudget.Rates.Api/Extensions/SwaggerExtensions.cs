@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
@@ -25,8 +27,8 @@ namespace HomeBudget.Rates.Api.Extensions
                     In = ParameterLocation.Header,
                     Description = "Please insert JWT token with the prefix Bearer into field",
                     Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "bearer",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
                     BearerFormat = "JWT"
                 });
 
@@ -35,14 +37,14 @@ namespace HomeBudget.Rates.Api.Extensions
                     {
                         {
                             new OpenApiSecurityScheme
-                         {
-                             Reference = new OpenApiReference
-                             {
-                                 Type = ReferenceType.SecurityScheme,
-                                 Id = "Bearer"
-                             }
-                         },
-                            new string[] { }
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            Array.Empty<string>()
                         }
                     });
             });
@@ -51,8 +53,16 @@ namespace HomeBudget.Rates.Api.Extensions
         public static IApplicationBuilder SetUpSwaggerUi(this IApplicationBuilder app)
         {
             return app
-                .UseSwagger()
-                .UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "HomeBudget_Rates_Api v1"));
+                .UseSwagger(options =>
+                {
+                    // Optional configuration
+                    options.RouteTemplate = "swagger/{documentName}/swagger.json";
+                })
+                .UseSwaggerUI(options =>
+                {
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "HomeBudget_Rates_Api v1");
+                    options.RoutePrefix = "swagger"; // Optional: set custom route
+                });
         }
     }
 }
