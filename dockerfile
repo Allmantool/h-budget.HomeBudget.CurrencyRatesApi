@@ -1,12 +1,12 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /scr
 
-COPY --from=mcr.microsoft.com/dotnet/sdk:9.0 /usr/share/dotnet/shared /usr/share/dotnet/shared
+COPY --from=mcr.microsoft.com/dotnet/sdk:10.0 /usr/share/dotnet/shared /usr/share/dotnet/shared
 
 ARG BUILD_VERSION
 ENV BUILD_VERSION=${BUILD_VERSION}
@@ -38,7 +38,7 @@ RUN export PATH=$JAVA_HOME/bin:$PATH
 
 RUN dotnet new tool-manifest
 
-# Not compatible with .net 9.0 (will be updated later)
+# Not compatible with .net 10.0 (will be updated later)
 # RUN dotnet tool install snitch --tool-path /tools --version 2.0.0
 
 RUN dotnet tool restore
@@ -65,16 +65,16 @@ RUN dotnet sln HomeBudgetRatesApi.sln remove \
     HomeBudget.Components.CurrencyRates.Tests/HomeBudget.Components.CurrencyRates.Tests.csproj \
     HomeBudget.Rates.Api.Tests/HomeBudget.Rates.Api.Tests.csproj
 
-RUN dotnet build HomeBudgetRatesApi.sln -c Release --no-incremental --framework:net9.0 -maxcpucount:1 -o /app/build
+RUN dotnet build HomeBudgetRatesApi.sln -c Release --no-incremental --framework:net10.0 -maxcpucount:1 -o /app/build
 
-# Not compatible with .net 9.0 (will be updated later)
+# Not compatible with .net 10.0 (will be updated later)
 # RUN /tools/snitch
 
 FROM build AS publish
 RUN dotnet publish HomeBudgetRatesApi.sln \
     --no-dependencies \
     --no-restore \
-    --framework net9.0 \
+    --framework net10.0 \
     -c Release \
     -v Diagnostic \
     -o /app/publish
