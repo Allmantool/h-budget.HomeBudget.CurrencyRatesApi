@@ -1,9 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace HomeBudget.Core.Constants
 {
     public class NationalBankCurrencies(int id, string name)
-        : BaseEnumeration(id, name)
+        : BaseEnumeration<NationalBankCurrencies, int>(id, name)
     {
         public static readonly NationalBankCurrencies Blr = new(-1, CurrencyCodes.Blr);
         public static readonly NationalBankCurrencies Usd = new(431, CurrencyCodes.Usd);
@@ -14,6 +15,6 @@ namespace HomeBudget.Core.Constants
         public static readonly NationalBankCurrencies Try = new(460, CurrencyCodes.Try);
 
         public static int? GetIdByAbbreviation(string abbreviation)
-            => GetAll<NationalBankCurrencies>().FirstOrDefault(i => string.Equals(abbreviation, i.Name))?.Id;
+            => GetAll().FirstOrDefault(i => string.Equals(abbreviation, i.Name, StringComparison.OrdinalIgnoreCase))?.Id;
     }
 }

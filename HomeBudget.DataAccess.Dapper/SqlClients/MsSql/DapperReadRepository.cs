@@ -3,19 +3,22 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Dapper;
+using Microsoft.Extensions.Options;
 
+using HomeBudget.Core.Options;
 using HomeBudget.DataAccess.Interfaces;
 
 namespace HomeBudget.DataAccess.Dapper.SqlClients.MsSql
 {
-    internal class DapperReadRepository(ISqlConnectionFactory sqlConnectionFactory) : IBaseReadRepository
+    internal class DapperReadRepository(ISqlConnectionFactory sqlConnectionFactory, IOptions<DatabaseConnectionOptions> sqlOptions)
+        : IBaseReadRepository
     {
         public async Task<IReadOnlyCollection<T>> GetAsync<T>(string sqlQuery, object parameters = null)
         {
             using var db = sqlConnectionFactory.Create();
             var result = parameters == null
-                ? await db.QueryAsync<T>(sqlQuery)
-                : await db.QueryAsync<T>(sqlQuery, parameters);
+                ? await db.QueryAsync<T>(sqlQuery, commandTimeout: sqlOptions.Value.SqlReadCommandTimeoutSeconds)
+                : await db.QueryAsync<T>(sqlQuery, parameters, commandTimeout: sqlOptions.Value.SqlReadCommandTimeoutSeconds);
 
             return result.ToList();
         }
@@ -24,7 +27,7 @@ namespace HomeBudget.DataAccess.Dapper.SqlClients.MsSql
         {
             using var db = sqlConnectionFactory.Create();
 
-            return await db.QuerySingleAsync<T>(sqlQuery, parameters);
+            return await db.QuerySingleAsync<T>(sqlQuery, parameters, commandTimeout: sqlOptions.Value.SqlReadCommandTimeoutSeconds);
         }
     }
 }
