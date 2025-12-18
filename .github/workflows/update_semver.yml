@@ -1,34 +1,31 @@
 name: Update Semver
 
 on:
-  push:
-    branches:
-      - master
-      - develop
-      - feature/*
-      - test/*
-      - hotfix/*
-      - fix/*
-      - tech/*
-    tags:
-      - "v*"
-
   pull_request:
     types: [closed]
+    branches:
+      - master
 
 jobs:
   update-semver_if_merged:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out code
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          persist-credentials: false # Required for PAT-based push
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Git Semantic Version
         id: tag_version
-        uses: PaulHatch/semantic-version@v5.3.0
+        uses: PaulHatch/semantic-version@v5.4.0
         with:
           tag_prefix: "v"
           version_format: "${major}.${minor}.${patch}-build${increment}"
@@ -36,14 +33,20 @@ jobs:
           version_from_branch: true
           debug: true
 
-      - name: Tag Release (vX.Y.Z)
+      - name: Tag Release & Push
+        env:
+          PAT_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          git tag ${{ steps.tag_version.outputs.version_tag }}
-          git push origin ${{ steps.tag_version.outputs.version_tag }}
+          TAG=${{ steps.tag_version.outputs.version_tag }}
 
-      - name: Show generated tag
+          git tag $TAG
+
+          git push https://x-access-token:${PAT_TOKEN}@github.com/${{ github.repository }}.git $TAG
+
+          echo "✅ Generated and pushed tag: $TAG"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Show latest tag
         run: |
-          tag_v=$(git describe --tags $(git rev-list --tags --max-count=1))
-          tag=$(echo $tag_v | sed 's/v//')
-
-          echo ${tag}
+          TAG_LATEST=$(git describe --tags $(git rev-list --tags --max-count=1))
+          echo "🔹 Latest tag in repo: $TAG_LATEST"
