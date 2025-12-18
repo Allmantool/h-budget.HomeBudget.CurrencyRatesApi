@@ -26,9 +26,9 @@ namespace HomeBudget.Rates.Api.Configuration
             services
                 .AddHealthChecks()
                 .AddCheck("heartbeat", () => HealthCheckResult.Healthy())
-                .AddCheck<CustomLogicHealthCheck>(nameof(CustomLogicHealthCheck), tags: new[] { "custom" })
-                .AddSqlServer(msSqlConnectionString, tags: new[] { "sqlServer" })
-                .AddRedis(redisConnectionString, tags: new[] { "redis" });
+                .AddCheck<CustomLogicHealthCheck>(nameof(CustomLogicHealthCheck), tags: ["custom"])
+                .AddSqlServer(msSqlConnectionString, tags: ["sqlServer"])
+                .AddRedis(redisConnectionString, tags: ["redis"]);
 
             services.AddHealthChecksUI(setupSettings: setup =>
                 {

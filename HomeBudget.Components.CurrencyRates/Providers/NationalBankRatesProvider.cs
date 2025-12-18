@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.Options;
 
 using HomeBudget.Components.CurrencyRates.Clients;
 using HomeBudget.Components.CurrencyRates.Models;
@@ -10,11 +13,13 @@ using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Extensions;
 using HomeBudget.Core.Models;
+using HomeBudget.Core.Options;
 
 namespace HomeBudget.Components.CurrencyRates.Providers
 {
     internal class NationalBankRatesProvider(
         ConfigSettings configSettings,
+        IOptions<HttpClientOptions> httpClientOptions,
         INationalBankApiClient nationalBankApiClient)
         : INationalBankRatesProvider
     {
@@ -24,17 +29,25 @@ namespace HomeBudget.Components.CurrencyRates.Providers
         {
             var yearRatesRequestPayloads = GetYearPeriodRequests(currenciesIds, periodRange);
 
-            var getRatesFromExternalApiTasks = yearRatesRequestPayloads.Select(payload => nationalBankApiClient
-                .GetRatesForPeriodAsync(
-                    payload.CurrencyId,
-                    payload.Period.StartDate.ToString(DateFormats.NationalBankApiRequest),
-                    payload.Period.EndDate.ToString(DateFormats.NationalBankApiRequest)));
+            using var semaphore = new SemaphoreSlim(httpClientOptions.Value.MaxConcurrentRequests);
 
-            var ratesFromExternalApiByChunks = await Task.WhenAll(getRatesFromExternalApiTasks);
+            var tasks = yearRatesRequestPayloads.Select(async payload =>
+            {
+                await semaphore.WaitAsync();
+                try
+                {
+                    return await nationalBankApiClient.GetRatesForPeriodAsync(
+                        payload.CurrencyId,
+                        payload.Period.StartDate.ToString(DateFormats.NationalBankApiRequest),
+                        payload.Period.EndDate.ToString(DateFormats.NationalBankApiRequest));
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            });
 
-            return ratesFromExternalApiByChunks
-                .SelectMany(i => i)
-                .ToList();
+            return (await Task.WhenAll(tasks)).SelectMany(x => x).ToList();
         }
 
         public async Task<IReadOnlyCollection<NationalBankCurrencyRate>> GetTodayActiveRatesAsync()
@@ -54,30 +67,17 @@ namespace HomeBudget.Components.CurrencyRates.Providers
             IEnumerable<int> currenciesIds,
             PeriodRange period)
         {
-            var ratesForYearPeriods = new List<PeriodRange>(period.GetFullYearsDateRangesForPeriod())
-            {
-                period with
-                {
-                    EndDate = period.IsWithinTheSameYear()
-                        ? period.EndDate
-                        : period.StartDate.LastDateOfYear()
-                },
-                period with
-                {
-                    StartDate = period.IsWithinTheSameYear()
-                        ? period.StartDate
-                        : period.EndDate.FirstDateOfYear()
-                }
-            }.DistinctBy(i => new { i.StartDate, i.EndDate });
+            var yearRanges = period.SplitByYear();
 
-            return currenciesIds.SelectMany(
-                _ => ratesForYearPeriods,
-                (id, rangePeriod) => new YearRatesRequestPayload
-                {
-                    CurrencyId = id,
-                    Period = rangePeriod
-                }
-            ).ToList();
+            return currenciesIds
+                .SelectMany(
+                    id => yearRanges,
+                    (id, range) => new YearRatesRequestPayload
+                    {
+                        CurrencyId = id,
+                        Period = range
+                    })
+                .ToList();
         }
     }
 }

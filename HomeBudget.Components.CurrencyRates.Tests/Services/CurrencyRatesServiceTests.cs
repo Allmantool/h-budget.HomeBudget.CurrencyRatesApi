@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 
@@ -18,6 +19,7 @@ using HomeBudget.Components.CurrencyRates.Providers;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.CurrencyRates.Services;
 using HomeBudget.Core.Constants;
+using HomeBudget.Core.Options;
 
 namespace HomeBudget.Components.CurrencyRates.Tests.Services
 {
@@ -128,6 +130,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
                             }
                         }
                     },
+                    Options.Create(new HttpClientOptions()),
                     _nationalBankApiClientMock.Object));
 
             var rates = await _sut.GetRatesForPeriodAsync(testStartDate, testEndDate);
