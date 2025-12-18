@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FluentAssertions;
 
+using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 
@@ -13,6 +14,7 @@ using HomeBudget.Components.CurrencyRates.Providers;
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Extensions;
 using HomeBudget.Core.Models;
+using HomeBudget.Core.Options;
 
 namespace HomeBudget.Components.CurrencyRates.Tests.Providers
 {
@@ -89,7 +91,10 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Providers
                 }
             };
 
-            _sut = new NationalBankRatesProvider(configSettings, _mockNationalBankApiClient.Object);
+            _sut = new NationalBankRatesProvider(
+                configSettings,
+                Options.Create(new HttpClientOptions()),
+                _mockNationalBankApiClient.Object);
 
             var result = await _sut.GetRatesForPeriodAsync(
                 [NationalBankCurrencies.Usd.Id, CurrencyTypeBId],

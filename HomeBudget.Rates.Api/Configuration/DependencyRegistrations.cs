@@ -32,6 +32,7 @@ namespace HomeBudget.Rates.Api.Configuration
                 .Configure<CacheStoreOptions>(configuration.GetSection(ConfigurationSectionKeys.CacheStoreOptions))
                 .Configure<ExternalResourceUrls>(configuration.GetSection(ConfigurationSectionKeys.ExternalResourceUrls))
                 .Configure<PollyRetryOptions>(configuration.GetSection(ConfigurationSectionKeys.PollyRetryOptions))
+                .Configure<HttpClientOptions>(configuration.GetSection(ConfigurationSectionKeys.HttpClientOptions))
                 .RegisterCoreIoCDependency()
                 .RegisterCurrencyRatesIoCDependency()
                 .RegisterExchangeIoCDependency()

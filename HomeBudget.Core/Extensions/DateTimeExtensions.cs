@@ -28,5 +28,31 @@ namespace HomeBudget.Core.Extensions
                 };
             }
         }
+
+        public static IEnumerable<PeriodRange> SplitByYear(this PeriodRange period)
+        {
+            if (period.StartDate > period.EndDate)
+            {
+                throw new ArgumentException("StartDate must be before EndDate");
+            }
+
+            var currentStart = period.StartDate;
+
+            while (currentStart <= period.EndDate)
+            {
+                var endOfYear = currentStart.LastDateOfYear();
+                var currentEnd = endOfYear < period.EndDate
+                    ? endOfYear
+                    : period.EndDate;
+
+                yield return new PeriodRange
+                {
+                    StartDate = currentStart,
+                    EndDate = currentEnd
+                };
+
+                currentStart = currentEnd.AddDays(1);
+            }
+        }
     }
 }
