@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -88,15 +89,37 @@ services
         .AddService(HostServiceOptions.Name)
         .AddAttributes(new Dictionary<string, object>
         {
-            [OpenTelemetryKeys.DeploymentEnvironment] = environment.EnvironmentName
+            [OpenTelemetryTags.DeploymentEnvironment] = environment.EnvironmentName
         }))
-    .WithTracing(t =>
+    .WithTracing(traceBuilder =>
     {
-        t.AddAspNetCoreInstrumentation()
+        traceBuilder
+        .AddAspNetCoreInstrumentation(options =>
+        {
+            options.EnrichWithHttpRequest = (activity, request) =>
+            {
+                if (request.Headers.TryGetValue(HttpHeaderKeys.CorrelationId, out var cid))
+                {
+                    activity.SetTag(ActivityTags.CorrelationId, cid.ToString());
+                }
+            };
+
+            options.EnrichWithHttpResponse = (activity, response) =>
+            {
+                activity.SetTag(ActivityTags.HttpStatusCode, response.StatusCode);
+            };
+
+            options.EnrichWithException = (activity, exception) =>
+            {
+                activity.SetTag(ActivityTags.ExceptionMessage, exception.Message);
+            };
+        })
          .AddHttpClientInstrumentation()
+         .AddSource(HostServiceOptions.Name)
          .AddOtlpExporter(o =>
          {
              o.Endpoint = new Uri(configuration.GetSection("ObservabilityOptions:TelemetryEndpoint")?.Value);
+             o.Protocol = OtlpExportProtocol.Grpc;
          });
     })
     .ConfigureResource(resource => resource.AddService(serviceName: environment.ApplicationName))
@@ -104,12 +127,12 @@ services
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
         .AddRuntimeInstrumentation()
-        .AddMeter(Meters.Hosting)
-        .AddMeter(Meters.Routing)
-        .AddMeter(Meters.Diagnostics)
-        .AddMeter(Meters.Kestrel)
-        .AddMeter(Meters.HttpConnections)
-        .AddMeter(Meters.HealthChecks)
+        .AddMeter(MetersTags.Hosting)
+        .AddMeter(MetersTags.Routing)
+        .AddMeter(MetersTags.Diagnostics)
+        .AddMeter(MetersTags.Kestrel)
+        .AddMeter(MetersTags.HttpConnections)
+        .AddMeter(MetersTags.HealthChecks)
         .SetMaxMetricStreams(OpenTelemetryOptions.MaxMetricStreams)
         .AddPrometheusExporter()
     );
