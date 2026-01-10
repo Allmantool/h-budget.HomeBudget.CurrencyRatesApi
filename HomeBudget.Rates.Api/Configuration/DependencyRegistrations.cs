@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,7 @@ using HomeBudget.Core.Options;
 using HomeBudget.DataAccess.Dapper.Extensions;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Exceptions.Handlers;
+using HomeBudget.Rates.Api.Pipelines;
 
 namespace HomeBudget.Rates.Api.Configuration
 {
@@ -33,6 +35,7 @@ namespace HomeBudget.Rates.Api.Configuration
                 .Configure<ExternalResourceUrls>(configuration.GetSection(ConfigurationSectionKeys.ExternalResourceUrls))
                 .Configure<PollyRetryOptions>(configuration.GetSection(ConfigurationSectionKeys.PollyRetryOptions))
                 .Configure<HttpClientOptions>(configuration.GetSection(ConfigurationSectionKeys.HttpClientOptions))
+                .AddTransient(typeof(IPipelineBehavior<,>), typeof(TracingBehavior<,>))
                 .RegisterCoreIoCDependency()
                 .RegisterCurrencyRatesIoCDependency()
                 .RegisterExchangeIoCDependency()

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using FluentValidation;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +15,7 @@ using Serilog;
 
 using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
 using HomeBudget.Components.Exchange.MapperProfileConfigurations;
+using HomeBudget.Core;
 using HomeBudget.Core.Constants;
 using HomeBudget.Rates.Api.Configuration;
 using HomeBudget.Rates.Api.Constants;
@@ -94,33 +95,34 @@ services
     .WithTracing(traceBuilder =>
     {
         traceBuilder
-        .AddAspNetCoreInstrumentation(options =>
-        {
-            options.EnrichWithHttpRequest = (activity, request) =>
+            .AddSource(Observability.ActivitySourceName)
+            .AddAspNetCoreInstrumentation(options =>
             {
-                if (request.Headers.TryGetValue(HttpHeaderKeys.CorrelationId, out var cid))
+                options.EnrichWithHttpRequest = (activity, request) =>
                 {
-                    activity.SetTag(ActivityTags.CorrelationId, cid.ToString());
-                }
-            };
+                    if (request.Headers.TryGetValue(HttpHeaderKeys.CorrelationId, out var cid))
+                    {
+                        activity.SetTag(ActivityTags.CorrelationId, cid.ToString());
+                    }
+                };
 
-            options.EnrichWithHttpResponse = (activity, response) =>
-            {
-                activity.SetTag(ActivityTags.HttpStatusCode, response.StatusCode);
-            };
+                options.EnrichWithHttpResponse = (activity, response) =>
+                {
+                    activity.SetTag(ActivityTags.HttpStatusCode, response.StatusCode);
+                };
 
-            options.EnrichWithException = (activity, exception) =>
-            {
-                activity.SetTag(ActivityTags.ExceptionMessage, exception.Message);
-            };
-        })
-         .AddHttpClientInstrumentation()
-         .AddSource(HostServiceOptions.Name)
-         .AddOtlpExporter(o =>
-         {
-             o.Endpoint = new Uri(configuration.GetSection("ObservabilityOptions:TelemetryEndpoint")?.Value);
-             o.Protocol = OtlpExportProtocol.Grpc;
-         });
+                options.EnrichWithException = (activity, exception) =>
+                {
+                    activity.SetTag(ActivityTags.ExceptionMessage, exception.Message);
+                };
+            })
+             .AddHttpClientInstrumentation()
+             .AddSource(HostServiceOptions.Name)
+             .AddOtlpExporter(o =>
+             {
+                 o.Endpoint = new Uri(configuration.GetSection("ObservabilityOptions:TelemetryEndpoint")?.Value);
+                 o.Protocol = OtlpExportProtocol.Grpc;
+             });
     })
     .ConfigureResource(resource => resource.AddService(serviceName: environment.ApplicationName))
     .WithMetrics(metrics => metrics

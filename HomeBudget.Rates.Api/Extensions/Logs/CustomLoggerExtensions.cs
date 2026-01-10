@@ -53,8 +53,8 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
                 .WriteTo.AddAndConfigureSentry(configuration, environment)
                 .WriteTo.OpenTelemetry(o =>
                 {
-                    o.Endpoint = configuration.GetSection("ObservabilityOptions:TelemetryEndpoint")?.Value;
-                    o.Protocol = OtlpProtocol.HttpProtobuf;
+                    o.Endpoint = configuration.GetSection("ObservabilityOptions:LogsEndpoint")?.Value;
+                    o.Protocol = OtlpProtocol.Grpc;
                 })
                 .TryAddSeqSupport(configuration)
                 .TryAddElasticSearchSupport(configuration, environment)
@@ -66,8 +66,7 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
 
             configureHostBuilder.UseSerilog(logger);
 
-            SelfLog.Enable(msg => File.AppendAllText("serilog-selflog.txt", msg));
-
+            // SelfLog.Enable(msg => File.AppendAllText("serilog-selflog.txt", msg));
             Log.Logger = logger;
 
             return logger;
