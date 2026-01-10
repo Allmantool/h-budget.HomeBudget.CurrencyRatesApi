@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 
 namespace HomeBudget.Rates.Api.Extensions
 {
@@ -30,10 +32,21 @@ namespace HomeBudget.Rates.Api.Extensions
                     BearerFormat = "JWT"
                 });
 
-                options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-                {
-                    [new OpenApiSecuritySchemeReference("bearer", document)] = []
-                });
+                options.AddSecurityRequirement(
+                    new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            Array.Empty<string>()
+                        }
+                    });
             });
         }
 
