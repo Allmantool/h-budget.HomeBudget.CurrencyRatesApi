@@ -11,8 +11,8 @@ using HomeBudget.DataAccess.Interfaces;
 namespace HomeBudget.DataAccess.Dapper.SqlClients
 {
     internal class SqlConnectionFactory(
-    ILogger<SqlConnectionFactory> logger,
-    IOptions<DatabaseConnectionOptions> options)
+        ILogger<SqlConnectionFactory> logger,
+        IOptions<DatabaseConnectionOptions> options)
     : ISqlConnectionFactory
     {
         private static readonly Action<ILogger, string, Exception> _logConnectionFailure =

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 
 using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
@@ -67,7 +69,7 @@ services.AddExceptionHandler<GlobalExceptionHandler>();
 services.AddProblemDetails();
 
 services
-    .SetUpHealthCheck(configuration, Environment.GetEnvironmentVariable("ASPNETCORE_URLS"))
+    .SetUpHealthCheck(configuration, Environment.GetEnvironmentVariable(EnvironmentsVariables.AspNetCoreUrls))
     .AddValidatorsFromAssemblyContaining<HomeBudget.Rates.Api.Program>()
     .AddResponseCaching()
     .SetupSwaggerGen();
@@ -80,20 +82,34 @@ services.AddHeaderPropagation(options =>
     options.Headers.Add(HttpHeaderKeys.CorrelationId);
 });
 
-// Add relevant services for OTel to function
 services
     .AddOpenTelemetry()
+    .ConfigureResource(r => r
+        .AddService(HostServiceOptions.Name)
+        .AddAttributes(new Dictionary<string, object>
+        {
+            [OpenTelemetryKeys.DeploymentEnvironment] = environment.EnvironmentName
+        }))
+    .WithTracing(t =>
+    {
+        t.AddAspNetCoreInstrumentation()
+         .AddHttpClientInstrumentation()
+         .AddOtlpExporter(o =>
+         {
+             o.Endpoint = new Uri(configuration.GetSection("ObservabilityOptions:TelemetryEndpoint")?.Value);
+         });
+    })
     .ConfigureResource(resource => resource.AddService(serviceName: environment.ApplicationName))
     .WithMetrics(metrics => metrics
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
         .AddRuntimeInstrumentation()
-        .AddMeter("Microsoft.AspNetCore.Hosting")
-        .AddMeter("Microsoft.AspNetCore.Routing")
-        .AddMeter("Microsoft.AspNetCore.Diagnostics")
-        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
-        .AddMeter("Microsoft.AspNetCore.Http.Connections")
-        .AddMeter("Microsoft.Extensions.Diagnostics.HealthChecks")
+        .AddMeter(Meters.Hosting)
+        .AddMeter(Meters.Routing)
+        .AddMeter(Meters.Diagnostics)
+        .AddMeter(Meters.Kestrel)
+        .AddMeter(Meters.HttpConnections)
+        .AddMeter(Meters.HealthChecks)
         .SetMaxMetricStreams(OpenTelemetryOptions.MaxMetricStreams)
         .AddPrometheusExporter()
     );
@@ -102,7 +118,6 @@ services.AddLogging(loggerBuilder => configuration.InitializeLogger(environment,
 
 webHost.AddAndConfigureSentry();
 
-// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 var webApp = webAppBuilder.Build();
 
 // Map the /metrics endpoint
@@ -118,12 +133,12 @@ try
 {
     Log.Information("The app '{0}' is about to start.", executionAppName);
 
-    webApp.Run();
+    await webApp.RunAsync();
 }
 catch (Exception ex)
 {
     Log.Fatal(ex, $"Application terminated unexpectedly, failed to start {executionAppName}");
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }
 
 // To add visibility for integration tests

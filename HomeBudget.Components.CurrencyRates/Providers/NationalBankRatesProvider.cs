@@ -36,10 +36,12 @@ namespace HomeBudget.Components.CurrencyRates.Providers
                 await semaphore.WaitAsync();
                 try
                 {
+                    var period = payload.Period;
+
                     return await nationalBankApiClient.GetRatesForPeriodAsync(
                         payload.CurrencyId,
-                        payload.Period.StartDate.ToString(DateFormats.NationalBankApiRequest),
-                        payload.Period.EndDate.ToString(DateFormats.NationalBankApiRequest));
+                        period.StartDate.ToString(DateFormats.NationalBankApiRequest),
+                        period.EndDate.ToString(DateFormats.NationalBankApiRequest));
                 }
                 finally
                 {

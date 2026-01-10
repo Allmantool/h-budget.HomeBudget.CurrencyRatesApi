@@ -13,8 +13,8 @@ using Refit;
 
 using HomeBudget.Components.CurrencyRates.Clients;
 using HomeBudget.Core.Models;
-using HomeBudget.Rates.Api.Exceptions.Handlers;
 using HomeBudget.Core.Options;
+using HomeBudget.Rates.Api.Exceptions.Handlers;
 
 namespace HomeBudget.Rates.Api.Configuration
 {
@@ -26,12 +26,15 @@ namespace HomeBudget.Rates.Api.Configuration
         {
             var externalResourceUrls = serviceProvider.GetRequiredService<IOptions<ExternalResourceUrls>>().Value;
 
+            var httpClientOptions = serviceProvider.GetRequiredService<IOptions<HttpClientOptions>>();
+
             services
                 .AddRefitClient<INationalBankApiClient>(_ => GetRefitSettings())
                 .ConfigureHttpClient(httpClient =>
                 {
                     httpClient.BaseAddress = externalResourceUrls.NationalBankUrl;
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    httpClient.Timeout = TimeSpan.FromSeconds(httpClientOptions.Value.TimeoutInSeconds);
                 })
                 .ConfigurePrimaryHttpMessageHandler(
                     () => new HttpClientHandler
@@ -41,7 +44,7 @@ namespace HomeBudget.Rates.Api.Configuration
                 )
                 .AddPolicyHandler(GetRetryPolicy(serviceProvider))
                 .AddHttpMessageHandler<HttpLoggingHandler>()
-                .SetHandlerLifetime(TimeSpan.FromMinutes(15))
+                .SetHandlerLifetime(TimeSpan.FromMinutes(httpClientOptions.Value.HandlerLifetimeInMinutes))
                 .AddHeaderPropagation();
 
             return services;
