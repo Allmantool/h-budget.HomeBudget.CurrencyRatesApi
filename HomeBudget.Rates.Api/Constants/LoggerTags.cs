@@ -2,7 +2,8 @@
 {
     internal static class LoggerTags
     {
-        public const string Environment = nameof(Environment);
-        public const string HostService = nameof(HostService);
+        public const string ServiceName = "service.name";
+        public const string Environment = "environment.name";
+        public const string HostService = "host.name";
     }
 }

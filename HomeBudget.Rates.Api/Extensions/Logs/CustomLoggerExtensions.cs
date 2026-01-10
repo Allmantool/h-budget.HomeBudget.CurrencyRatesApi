@@ -19,6 +19,7 @@ using Serilog.Debugging;
 using Serilog.Enrichers.Span;
 using Serilog.Events;
 using Serilog.Exceptions;
+using Serilog.Sinks.OpenTelemetry;
 
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Options;
@@ -38,14 +39,20 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
                 .MinimumLevel.Debug()
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
-                .Enrich.WithExceptionDetails()
+                .Enrich.WithProperty(LoggerTags.ServiceName, HostServiceOptions.Name)
                 .Enrich.WithProperty(LoggerTags.Environment, environment)
-                .Enrich.WithProperty(LoggerTags.HostService, HostServiceOptions.Name)
+                .Enrich.WithProperty(LoggerTags.HostService, environment.EnvironmentName)
+                .Enrich.WithExceptionDetails()
                 .Enrich.WithSpan()
+                .Enrich.WithElasticApmCorrelationInfo()
                 .WriteTo.Debug()
                 .WriteTo.Console()
                 .WriteTo.AddAndConfigureSentry(configuration, environment)
-                .Enrich.WithElasticApmCorrelationInfo()
+                .WriteTo.OpenTelemetry(o =>
+                {
+                    o.Endpoint = configuration.GetSection("ObservabilityOptions:TelemetryEndpoint")?.Value;
+                    o.Protocol = OtlpProtocol.HttpProtobuf;
+                })
                 .TryAddSeqSupport(configuration)
                 .TryAddElasticSearchSupport(configuration, environment)
                 .ReadFrom.Configuration(configuration)
@@ -100,7 +107,7 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
                     return loggerConfiguration;
                 }
 
-                var elasticNodeUrl = (elasticOptions.Uri?.ToString() ?? Environment.GetEnvironmentVariable("ASPNETCORE_URLS")) ?? string.Empty;
+                var elasticNodeUrl = (elasticOptions.Uri?.ToString() ?? Environment.GetEnvironmentVariable(EnvironmentsVariables.AspNetCoreUrls)) ?? string.Empty;
 
                 return string.IsNullOrWhiteSpace(elasticNodeUrl)
                     ? loggerConfiguration

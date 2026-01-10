@@ -67,7 +67,7 @@ namespace HomeBudget.Components.CurrencyRates.Services
 
             var currencyGroups = ratesFromApiCall.MapToCurrencyRateGrouped(mapper);
 
-            // TODO: SignalR
+            // TODO: SignalR or .net 10 SSE
             return Result<IReadOnlyCollection<CurrencyRateGrouped>>.Succeeded(currencyGroups);
         }
 
