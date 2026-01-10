@@ -1,6 +1,6 @@
 ﻿namespace HomeBudget.Core.Constants
 {
-    public static class Meters
+    public static class MetersTags
     {
         public static readonly string Hosting = "Microsoft.AspNetCore.Hosting";
         public static readonly string Routing = "Microsoft.AspNetCore.Routing";
