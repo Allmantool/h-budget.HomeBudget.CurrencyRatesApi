@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Threading.Channels;
 
+using System.Threading.Channels;
 using Elastic.Apm.SerilogEnricher;
 using Elastic.Channels;
 using Elastic.Ingest.Elasticsearch;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Logs;
 using Serilog;
 using Serilog.Core;
 using Serilog.Debugging;
@@ -66,7 +66,15 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
 
             configureHostBuilder.UseSerilog(logger);
 
-            // SelfLog.Enable(msg => File.AppendAllText("serilog-selflog.txt", msg));
+            loggingBuilder.AddOpenTelemetry(options =>
+            {
+                options.IncludeScopes = true;
+                options.ParseStateValues = true;
+                options.IncludeFormattedMessage = true;
+                options.AddOtlpExporter();
+            });
+
+            // SelfLog.Enable(msg => File.AppendAllText("serilog-rates-api-selflog.txt", msg));
             Log.Logger = logger;
 
             return logger;
