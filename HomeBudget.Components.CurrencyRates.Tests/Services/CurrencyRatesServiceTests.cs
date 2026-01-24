@@ -1,5 +1,18 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+using AutoMapper;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using Moq;
+using NUnit.Framework;
+
 using HomeBudget.Components.CurrencyRates.Clients;
 using HomeBudget.Components.CurrencyRates.Extensions;
 using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
@@ -11,18 +24,6 @@ using HomeBudget.Components.CurrencyRates.Services;
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Limiters;
 using HomeBudget.Core.Options;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
-using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.RateLimiting;
-using System.Threading.Tasks;
 
 namespace HomeBudget.Components.CurrencyRates.Tests.Services
 {
