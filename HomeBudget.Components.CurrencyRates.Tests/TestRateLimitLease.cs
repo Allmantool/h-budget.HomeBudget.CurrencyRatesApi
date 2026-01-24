@@ -28,5 +28,4 @@ namespace HomeBudget.Components.CurrencyRates.Tests
             // nothing to dispose
         }
     }
-
 }
