@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using AutoMapper;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -19,6 +20,7 @@ using HomeBudget.Components.CurrencyRates.Providers;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.CurrencyRates.Services;
 using HomeBudget.Core.Constants;
+using HomeBudget.Core.Limiters;
 using HomeBudget.Core.Options;
 
 namespace HomeBudget.Components.CurrencyRates.Tests.Services
@@ -130,8 +132,10 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
                             }
                         }
                     },
+                    Mock.Of<ILogger<NationalBankRatesProvider>>(),
                     Options.Create(new HttpClientOptions()),
-                    _nationalBankApiClientMock.Object));
+                    _nationalBankApiClientMock.Object,
+                    Mock.Of<IHttpClientRateLimiter>()));
 
             var rates = await _sut.GetRatesForPeriodAsync(testStartDate, testEndDate);
 
