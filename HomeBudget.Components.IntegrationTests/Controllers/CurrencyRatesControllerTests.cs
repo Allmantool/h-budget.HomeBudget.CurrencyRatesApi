@@ -20,12 +20,16 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
 {
     [Category(TestTypes.Integration)]
     [TestFixture]
-    public class CurrencyRatesControllerTests : IAsyncDisposable
+    public class CurrencyRatesControllerTests : BaseIntegrationTests
     {
         private readonly CurrencyRatesTestWebApp _sut = new();
 
-        [OneTimeTearDown]
-        public async Task StopAsync() => await _sut.StopAsync();
+        [OneTimeSetUp]
+        public override async Task SetupAsync()
+        {
+            await _sut.InitAsync();
+            await base.SetupAsync();
+        }
 
         [Test]
         public async Task GetRatesForPeriodAsync_WhenExecuteTheCallToEnquireRatesForPeriodOfTime_ThenIsSuccessStatusCode()

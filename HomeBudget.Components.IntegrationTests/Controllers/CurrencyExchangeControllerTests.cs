@@ -16,9 +16,16 @@ using HomeBudget.Rates.Api.Models.Requests;
 namespace HomeBudget.Components.IntegrationTests.Controllers
 {
     [Category(TestTypes.Integration)]
-    public class CurrencyExchangeControllerTests : IAsyncDisposable
+    public class CurrencyExchangeControllerTests : BaseIntegrationTests
     {
         private readonly CurrencyExchangeTestWebApp _sut = new();
+
+        [OneTimeSetUp]
+        public override async Task SetupAsync()
+        {
+            await _sut.InitAsync();
+            await base.SetupAsync();
+        }
 
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithBlrCases))]

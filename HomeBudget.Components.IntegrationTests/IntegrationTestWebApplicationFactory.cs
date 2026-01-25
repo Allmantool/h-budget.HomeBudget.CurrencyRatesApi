@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -10,26 +10,29 @@ using Microsoft.Extensions.DependencyInjection;
 
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.IntegrationTests.MockServices;
+using HomeBudget.Components.IntegrationTests.Models;
 using HomeBudget.Rates.Api.Configuration;
 using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Components.IntegrationTests
 {
     public class IntegrationTestWebApplicationFactory<TStartup>
-        (Func<Task> webHostInitializationCallback) : WebApplicationFactory<TStartup>
+        (Func<TestContainersConnections> webHostInitializationCallback) : WebApplicationFactory<TStartup>
         where TStartup : class
     {
+        private TestContainersConnections _containersConnections;
+
         internal IConfiguration Configuration { get; private set; }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureTestServices(services =>
             {
-               _ = services.SetDiForConnectionsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                _ = services.SetDiForConnectionsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
-               services.AddScoped<INationalBankRatesProvider, MockNationalBankRatesProvider>();
+                services.AddScoped<INationalBankRatesProvider, MockNationalBankRatesProvider>();
 
-               services.AddHttpClient("test-default").SetHandlerLifetime(TimeSpan.FromMinutes(10));
+                services.AddHttpClient("test-default").SetHandlerLifetime(TimeSpan.FromMinutes(10));
             });
 
             builder.ConfigureAppConfiguration((_, conf) =>
@@ -39,9 +42,15 @@ namespace HomeBudget.Components.IntegrationTests
 
                 Configuration = conf.Build();
 
-                var hostInitializationTask = webHostInitializationCallback?.Invoke();
+                _containersConnections = webHostInitializationCallback.Invoke();
 
-                hostInitializationTask?.ConfigureAwait(false).GetAwaiter().GetResult();
+                conf.AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    ["DatabaseOptions:ConnectionString"] = _containersConnections.MsSqlContainer,
+                    ["DatabaseOptions:RedisConnectionString"] = $"{_containersConnections.RedisContainer},allowAdmin=true"
+                });
+
+                Configuration = conf.Build();
             });
 
             builder.UseEnvironment(HostEnvironments.Integration);

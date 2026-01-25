@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
+using NUnit.Framework;
 using RestSharp;
 
+using HomeBudget.Components.IntegrationTests.Constants;
+using HomeBudget.Components.IntegrationTests.Models;
 using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Components.IntegrationTests.WebApps
@@ -11,40 +16,77 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
     internal abstract class BaseTestWebApp<TEntryPoint> : BaseTestWebAppDispose
         where TEntryPoint : class
     {
-        private IntegrationTestWebApplicationFactory<TEntryPoint> WebFactory { get; }
-        private TestContainersService TestContainersService { get; set; }
+        private IntegrationTestWebApplicationFactory<TEntryPoint> WebFactory { get; set; }
+        internal static TestContainersService TestContainersService { get; set; }
 
-        internal RestClient RestHttpClient { get; }
+        internal RestClient RestHttpClient { get; set; }
 
-        protected BaseTestWebApp()
+        public async Task<bool> InitAsync(int workersMaxAmount = 1)
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", HostEnvironments.Integration);
+            try
+            {
+                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", HostEnvironments.Integration);
+                Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", HostEnvironments.Integration);
 
-            WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(
-                async () =>
+                var testProperties = TestContext.CurrentContext.Test.Properties;
+                var testCategory = testProperties.Get("Category") as string;
+
+                if (!TestTypes.Integration.Equals(testCategory, StringComparison.OrdinalIgnoreCase))
                 {
-                    TestContainersService = new TestContainersService(WebFactory?.Configuration);
+                    return false;
+                }
 
-                    await StartAsync();
+                TestContainersService = await TestContainersService.InitAsync();
+                await StartContainersAsync();
+
+                WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(
+                    () => new TestContainersConnections
+                    {
+                        MsSqlContainer = TestContainersService.MsSqlDbContainer.GetConnectionString(),
+                        RedisContainer = TestContainersService.CacheContainer.GetConnectionString()
+                    });
+
+                var server = WebFactory.Server;
+                var addresses = server.Features.Get<IServerAddressesFeature>();
+                var realAddress = addresses.Addresses.FirstOrDefault();
+                var baseAddress = realAddress is null ?
+                    WebFactory.ClientOptions.BaseAddress
+                    : new Uri(realAddress);
+
+                var clientOptions = new WebApplicationFactoryClientOptions
+                {
+                    BaseAddress = baseAddress,
+                    AllowAutoRedirect = true,
+                    HandleCookies = true
+                };
+
+                var baseClient = WebFactory.CreateClient(clientOptions);
+                baseClient.Timeout = TimeSpan.FromMinutes(BaseTestWebAppOptions.WebClientTimeoutInMinutes);
+
+                var httpClient = WebFactory.CreateClient(new WebApplicationFactoryClientOptions
+                {
+                    AllowAutoRedirect = false,
+                    BaseAddress = new Uri("http://localhost:7064")
                 });
 
-            var httpClient = WebFactory.CreateClient(new WebApplicationFactoryClientOptions
+                RestHttpClient = new RestClient(httpClient);
+
+                return true;
+            }
+            catch (Exception ex)
             {
-                AllowAutoRedirect = false,
-                BaseAddress = new Uri("http://localhost:7064")
-            });
-
-            RestHttpClient = new RestClient(httpClient);
+                throw;
+            }
         }
 
-        public async Task StartAsync()
+        public static async Task<bool> StartContainersAsync()
         {
-            await TestContainersService.UpAndRunningContainersAsync();
-        }
+            if (TestContainersService is null)
+            {
+                return false;
+            }
 
-        public async Task StopAsync()
-        {
-            await TestContainersService.StopAsync();
+            return TestContainersService.IsReadyForUse;
         }
 
         protected override async ValueTask DisposeAsyncCoreAsync()
