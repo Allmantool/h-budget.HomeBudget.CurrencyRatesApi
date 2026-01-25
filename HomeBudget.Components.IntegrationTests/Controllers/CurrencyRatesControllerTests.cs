@@ -107,13 +107,5 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
-
-        public async ValueTask DisposeAsync()
-        {
-            if (_sut != null)
-            {
-                await _sut.DisposeAsync();
-            }
-        }
     }
 }

@@ -78,13 +78,5 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
                 payload.Payload.Should().Be(0.31471M);
             });
         }
-
-        public async ValueTask DisposeAsync()
-        {
-            if (_sut != null)
-            {
-                await _sut.DisposeAsync();
-            }
-        }
     }
 }
