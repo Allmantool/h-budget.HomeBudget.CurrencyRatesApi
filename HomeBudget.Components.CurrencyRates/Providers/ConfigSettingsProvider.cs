@@ -17,10 +17,10 @@ namespace HomeBudget.Components.CurrencyRates.Providers
         private readonly IBaseReadRepository _readRepository;
 
         public ConfigSettingsProvider(
-            IBaseWriteRepository baseWriteRepository,
+            IBaseWriteRepository writeRepository,
             IBaseReadRepository readRepository)
         {
-            _writeRepository = baseWriteRepository;
+            _writeRepository = writeRepository;
             _readRepository = readRepository;
 
             _readRepository.Database = DatabaseName;
