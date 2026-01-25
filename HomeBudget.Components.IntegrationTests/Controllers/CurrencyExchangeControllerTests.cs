@@ -15,7 +15,10 @@ using HomeBudget.Rates.Api.Models.Requests;
 
 namespace HomeBudget.Components.IntegrationTests.Controllers
 {
+    [TestFixture]
     [Category(TestTypes.Integration)]
+    [NonParallelizable]
+    [Order(IntegrationTestOrderIndex.CurrencyExchangeControllerTests)]
     public class CurrencyExchangeControllerTests : BaseIntegrationTests
     {
         private readonly CurrencyExchangeTestWebApp _sut = new();

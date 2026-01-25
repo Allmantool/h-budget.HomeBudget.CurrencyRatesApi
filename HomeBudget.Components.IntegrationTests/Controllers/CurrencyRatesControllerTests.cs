@@ -18,8 +18,10 @@ using CurrencyRate = HomeBudget.Rates.Api.Models.CurrencyRate;
 
 namespace HomeBudget.Components.IntegrationTests.Controllers
 {
-    [Category(TestTypes.Integration)]
     [TestFixture]
+    [Category(TestTypes.Integration)]
+    [NonParallelizable]
+    [Order(IntegrationTestOrderIndex.CurrencyRatesControllerTests)]
     public class CurrencyRatesControllerTests : BaseIntegrationTests
     {
         private readonly CurrencyRatesTestWebApp _sut = new();
