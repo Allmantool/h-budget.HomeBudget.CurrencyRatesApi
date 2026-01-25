@@ -33,6 +33,12 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             await base.SetupAsync();
         }
 
+        [OneTimeTearDown]
+        public async Task CleanupAsync()
+        {
+            await _sut.DisposeAsync();
+        }
+
         [Test]
         public async Task GetRatesForPeriodAsync_WhenExecuteTheCallToEnquireRatesForPeriodOfTime_ThenIsSuccessStatusCode()
         {

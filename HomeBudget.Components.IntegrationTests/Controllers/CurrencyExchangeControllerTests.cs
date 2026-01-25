@@ -30,6 +30,12 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             await base.SetupAsync();
         }
 
+        [OneTimeTearDown]
+        public async Task CleanupAsync()
+        {
+            await _sut.DisposeAsync();
+        }
+
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithBlrCases))]
         public async Task GetExchangeAsync_WhenFromBlrToUsd_ThenExpectedExchangeOutput(
