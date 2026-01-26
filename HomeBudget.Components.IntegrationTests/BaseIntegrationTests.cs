@@ -11,7 +11,7 @@ namespace HomeBudget.Components.IntegrationTests
     public abstract class BaseIntegrationTests
     {
         private static bool _initialized;
-        internal static TestContainersService TestContainers { get; private set; }
+        internal TestContainersService TestContainers { get; private set; }
 
         [OneTimeSetUp]
         public virtual async Task SetupAsync()

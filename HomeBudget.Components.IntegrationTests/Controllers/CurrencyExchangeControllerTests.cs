@@ -19,7 +19,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
     [Category(TestTypes.Integration)]
     [NonParallelizable]
     [Order(IntegrationTestOrderIndex.CurrencyExchangeControllerTests)]
-    public class CurrencyExchangeControllerTests : BaseIntegrationTests, IDisposable
+    public class CurrencyExchangeControllerTests : BaseIntegrationTests
     {
         private CurrencyRatesTestWebApp _sut;
         private RestClient _restClient;
@@ -33,12 +33,6 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             await base.SetupAsync();
 
             _restClient = _sut.RestHttpClient;
-        }
-
-        [OneTimeTearDown]
-        public async Task CleanupAsync()
-        {
-            await _sut.DisposeAsync();
         }
 
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]
@@ -91,17 +85,6 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
                 payload.IsSucceeded.Should().BeTrue();
                 payload.Payload.Should().Be(0.31471M);
             });
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            _sut?.Dispose();
         }
     }
 }

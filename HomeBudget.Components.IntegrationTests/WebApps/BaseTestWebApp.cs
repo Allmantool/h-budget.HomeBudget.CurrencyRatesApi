@@ -22,7 +22,7 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
 
         internal RestClient RestHttpClient { get; set; }
 
-        public async Task<bool> InitAsync(int workersMaxAmount = 1)
+        public async Task<bool> InitAsync()
         {
             try
             {

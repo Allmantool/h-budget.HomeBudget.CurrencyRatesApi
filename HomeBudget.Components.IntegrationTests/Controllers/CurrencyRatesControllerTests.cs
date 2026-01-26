@@ -22,7 +22,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
     [Category(TestTypes.Integration)]
     [NonParallelizable]
     [Order(IntegrationTestOrderIndex.CurrencyRatesControllerTests)]
-    public class CurrencyRatesControllerTests : BaseIntegrationTests, IDisposable
+    public class CurrencyRatesControllerTests : BaseIntegrationTests
     {
         private CurrencyRatesTestWebApp _sut;
         private RestClient _restClient;
@@ -35,12 +35,6 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             await base.SetupAsync();
 
             _restClient = _sut.RestHttpClient;
-        }
-
-        [OneTimeTearDown]
-        public async Task CleanupAsync()
-        {
-            await _sut.DisposeAsync();
         }
 
         [Test]
@@ -118,18 +112,6 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var response = await _restClient!.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            _restClient?.Dispose();
-            _sut?.Dispose();
         }
     }
 }
