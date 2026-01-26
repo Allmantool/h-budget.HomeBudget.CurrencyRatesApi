@@ -21,7 +21,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
     [Order(IntegrationTestOrderIndex.CurrencyExchangeControllerTests)]
     public class CurrencyExchangeControllerTests : BaseIntegrationTests
     {
-        private readonly CurrencyExchangeTestWebApp _sut = new();
+        private static readonly CurrencyExchangeTestWebApp _sut = new();
 
         [OneTimeSetUp]
         public override async Task SetupAsync()
