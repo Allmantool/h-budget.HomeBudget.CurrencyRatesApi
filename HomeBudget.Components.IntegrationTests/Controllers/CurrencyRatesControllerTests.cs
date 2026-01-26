@@ -24,14 +24,16 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
     [Order(IntegrationTestOrderIndex.CurrencyRatesControllerTests)]
     public class CurrencyRatesControllerTests : BaseIntegrationTests, IDisposable
     {
-        private static readonly CurrencyRatesTestWebApp _sut = new();
-        private static readonly RestClient _restClient = _sut.RestHttpClient;
+        private readonly CurrencyRatesTestWebApp _sut = new();
+        private RestClient _restClient;
 
         [OneTimeSetUp]
         public override async Task SetupAsync()
         {
             await _sut.InitAsync();
             await base.SetupAsync();
+
+            _restClient = _sut.RestHttpClient;
         }
 
         [OneTimeTearDown]
