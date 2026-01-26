@@ -22,9 +22,10 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
     [Category(TestTypes.Integration)]
     [NonParallelizable]
     [Order(IntegrationTestOrderIndex.CurrencyRatesControllerTests)]
-    public class CurrencyRatesControllerTests : BaseIntegrationTests
+    public class CurrencyRatesControllerTests : BaseIntegrationTests, IDisposable
     {
         private static readonly CurrencyRatesTestWebApp _sut = new();
+        private static readonly RestClient _restClient = _sut.RestHttpClient;
 
         [OneTimeSetUp]
         public override async Task SetupAsync()
@@ -47,7 +48,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
 
             var getCurrencyRatesForPeriodRequest = new RestRequest($"/{Endpoints.RatesApi}/period/{startDay}/{endDate}");
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
+            var response = await _restClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
 
             response.IsSuccessful.Should().BeTrue();
         }
@@ -61,7 +62,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
 
             var getCurrencyRatesForPeriodRequest = new RestRequest($"/{Endpoints.RatesApi}/period/{startDay}/{endDate}");
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
+            var response = await _restClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
             var payload = response.Data;
             var currencyGroupAmount = payload?.Payload.Count;
 
@@ -73,7 +74,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         {
             var getRatesRequest = new RestRequest($"/{Endpoints.RatesApi}");
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getRatesRequest);
+            var response = await _restClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getRatesRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -83,7 +84,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         {
             var getTodayRatesRequest = new RestRequest($"/{Endpoints.RatesApi}/today");
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getTodayRatesRequest);
+            var response = await _restClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getTodayRatesRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -111,9 +112,21 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var currencySaveRatesRequest = new RestRequest($"/{Endpoints.RatesApi}", Method.Post)
                 .AddJsonBody(requestBody);
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
+            var response = await _restClient!.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            _restClient?.Dispose();
+            _sut?.Dispose();
         }
     }
 }

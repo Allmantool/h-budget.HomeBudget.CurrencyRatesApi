@@ -16,6 +16,7 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
     internal abstract class BaseTestWebApp<TEntryPoint> : BaseTestWebAppDispose
         where TEntryPoint : class
     {
+        private bool _disposed;
         private IntegrationTestWebApplicationFactory<TEntryPoint> WebFactory { get; set; }
         internal static TestContainersService TestContainersService { get; set; }
 
@@ -25,6 +26,8 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
         {
             try
             {
+                ObjectDisposedException.ThrowIf(_disposed, nameof(BaseTestWebApp<TEntryPoint>));
+
                 Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", HostEnvironments.Integration);
                 Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", HostEnvironments.Integration);
 
@@ -102,6 +105,8 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
             }
 
             RestHttpClient?.Dispose();
+
+            _disposed = true;
         }
     }
 }

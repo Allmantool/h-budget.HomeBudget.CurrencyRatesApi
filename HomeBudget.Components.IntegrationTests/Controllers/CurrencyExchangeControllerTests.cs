@@ -19,9 +19,10 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
     [Category(TestTypes.Integration)]
     [NonParallelizable]
     [Order(IntegrationTestOrderIndex.CurrencyExchangeControllerTests)]
-    public class CurrencyExchangeControllerTests : BaseIntegrationTests
+    public class CurrencyExchangeControllerTests : BaseIntegrationTests, IDisposable
     {
         private static readonly CurrencyExchangeTestWebApp _sut = new();
+        private static readonly RestClient _restClient = _sut.RestHttpClient;
 
         [OneTimeSetUp]
         public override async Task SetupAsync()
@@ -54,7 +55,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var currencyExchangeRequest = new RestRequest($"/{Endpoints.CurrencyExchangeApi}", Method.Post)
                 .AddJsonBody(requestBody);
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
+            var response = await _restClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
             var payload = response.Data;
 
             Assert.Multiple(() =>
@@ -77,7 +78,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var currencyExchangeRequest = new RestRequest($"/{Endpoints.CurrencyExchangeApi}/multiplier", Method.Post)
                 .AddJsonBody(requestBodyAsJson);
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
+            var response = await _restClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
             var payload = response.Data;
 
             Assert.Multiple(() =>
@@ -86,6 +87,17 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
                 payload.IsSucceeded.Should().BeTrue();
                 payload.Payload.Should().Be(0.31471M);
             });
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            _sut?.Dispose();
         }
     }
 }
