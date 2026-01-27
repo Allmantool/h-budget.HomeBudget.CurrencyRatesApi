@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Mvc.Testing;
 using NUnit.Framework;
 using RestSharp;
 
