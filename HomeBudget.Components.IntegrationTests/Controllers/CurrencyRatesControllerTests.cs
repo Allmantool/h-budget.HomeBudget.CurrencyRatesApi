@@ -37,6 +37,14 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             _restClient = _sut.RestHttpClient;
         }
 
+        [OneTimeTearDown]
+        public override Task TerminateAsync()
+        {
+            _restClient?.Dispose();
+            _sut?.Dispose();
+            return base.TerminateAsync();
+        }
+
         [Test]
         public async Task GetRatesForPeriodAsync_WhenExecuteTheCallToEnquireRatesForPeriodOfTime_ThenIsSuccessStatusCode()
         {

@@ -46,7 +46,7 @@ namespace HomeBudget.Components.IntegrationTests
         }
 
         [OneTimeTearDown]
-        public async Task TerminateAsync()
+        public virtual async Task TerminateAsync()
         {
             // await OperationsTestWebApp.ResetAsync();
         }

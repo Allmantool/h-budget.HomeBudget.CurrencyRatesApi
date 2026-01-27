@@ -35,6 +35,14 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             _restClient = _sut.RestHttpClient;
         }
 
+        [OneTimeTearDown]
+        public override Task TerminateAsync()
+        {
+            _restClient?.Dispose();
+            _sut?.Dispose();
+            return base.TerminateAsync();
+        }
+
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithBlrCases))]
         public async Task GetExchangeAsync_WhenFromBlrToUsd_ThenExpectedExchangeOutput(
