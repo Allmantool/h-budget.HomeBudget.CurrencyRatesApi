@@ -1,89 +1,143 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
+using DotNet.Testcontainers.Builders;
 using EvolveDb;
+using EvolveDb.Configuration;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using Testcontainers.MsSql;
 using Testcontainers.Redis;
 
-using HomeBudget.Components.IntegrationTests.Extensions;
+using HomeBudget.Components.IntegrationTests.Constants;
+using HomeBudget.Core;
 
 namespace HomeBudget.Components.IntegrationTests
 {
-    internal class TestContainersService(IConfiguration configuration) : IAsyncDisposable
+    internal class TestContainersService : IAsyncDisposable
     {
-        protected MsSqlContainer DbContainer { get; private set; }
-        protected RedisContainer CacheContainer { get; private set; }
+        private static readonly SemaphoreSlim _lock = new(1, 1);
+        private static TestContainersService _instance;
+        private bool _isDisposed;
+
+        public bool IsReadyForUse { get; private set; }
+
+        public static TestContainersService GetInstance { get; private set; } = _instance;
+        public MsSqlContainer MsSqlDbContainer { get; private set; }
+        public RedisContainer CacheContainer { get; private set; }
+
+        protected TestContainersService()
+        {
+        }
 
         public void ApplyDbMigrations()
         {
-            var cnx = new SqlConnection(DbContainer.GetConnectionString());
+            using var cnx = new SqlConnection(MsSqlDbContainer.GetConnectionString());
             var evolve = new Evolve(cnx)
             {
-                Locations = new[] { "db/migrations" },
-                EnableClusterMode = false
+                Locations = ["db/migrations"],
+                EnableClusterMode = false,
+                TransactionMode = TransactionKind.CommitEach
             };
 
             evolve.Migrate();
         }
 
-        public async Task UpAndRunningContainersAsync()
+        public static async Task<TestContainersService> InitAsync()
         {
-            if (configuration == null)
+            if (GetInstance is not null)
             {
-                return;
+                return GetInstance;
             }
 
-            var sqlConnectionPort = configuration.GetTestSqlConnectionPort();
-
-            if (sqlConnectionPort.HasValue)
+            await using (await SemaphoreGuard.WaitAsync(_lock))
             {
-                DbContainer = new MsSqlBuilder()
+                if (_instance is null)
+                {
+                    _instance = new TestContainersService();
+                    await _instance.UpAndRunningContainersAsync();
+                }
+
+                GetInstance = _instance;
+
+                return GetInstance;
+            }
+        }
+
+        private async Task<bool> UpAndRunningContainersAsync()
+        {
+            if (IsReadyForUse)
+            {
+                return true;
+            }
+
+            try
+            {
+                MsSqlDbContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest")
                     .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
                     .WithName("integration-sql-server")
-                    .WithPassword(configuration.GetTestSqlPassword())
+                    .WithPassword("Passw0rd!")
                     .WithEnvironment("ACCEPT_EULA", "Y")
-                    .WithEnvironment("SA_PASSWORD", configuration.GetTestSqlPassword())
-                    .WithPortBinding(sqlConnectionPort.Value, 1433)
-                    .Build();
-            }
+                    .WithEnvironment("SA_PASSWORD", "Passw0rd!")
+                    .WithPortBinding(1433, true)
+                    .WithWaitStrategy(
+                        Wait.ForUnixContainer()
+                            .AddCustomWaitStrategy(
+                                new CustomWaitStrategy(TimeSpan.FromMinutes(BaseTestContainerOptions.StopTimeoutInMinutes))
+                        )
+                   )
+                  .Build();
 
-            var redistPort = configuration.GetTestRedisPort();
-
-            if (redistPort.HasValue)
-            {
-                CacheContainer = new RedisBuilder()
+                CacheContainer = new RedisBuilder("redis:7.0.7")
                     .WithImage("redis:7.0.7")
-                    .WithPortBinding(redistPort.Value, 6379)
+                    .WithPortBinding(6379, true)
                     .WithName("integration-redis_server")
+                    .WithWaitStrategy(
+                        Wait.ForUnixContainer()
+                            .AddCustomWaitStrategy(
+                                new CustomWaitStrategy(TimeSpan.FromMinutes(BaseTestContainerOptions.StopTimeoutInMinutes))
+                        )
+                    )
                     .Build();
-            }
 
-            if (DbContainer != null)
+                if (MsSqlDbContainer != null)
+                {
+                    await MsSqlDbContainer.StartAsync();
+                }
+
+                if (CacheContainer != null)
+                {
+                    await CacheContainer.StartAsync();
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(BaseTestContainerOptions.WaitUntilContainersInitInSeconds));
+
+                ApplyDbMigrations();
+
+                IsReadyForUse = true;
+
+                return true;
+            }
+            catch (Exception ex)
             {
-                await DbContainer.StartAsync();
-            }
+                Console.WriteLine(ex);
+                IsReadyForUse = false;
 
-            if (CacheContainer != null)
-            {
-                await CacheContainer.StartAsync();
+                throw;
             }
-
-            ApplyDbMigrations();
         }
 
         public async Task StopAsync()
         {
             await CacheContainer.StopAsync();
-            await DbContainer.StopAsync();
+            await MsSqlDbContainer.StopAsync();
         }
 
         public async ValueTask DisposeAsync()
         {
-            if (DbContainer != null)
+            if (MsSqlDbContainer != null)
             {
-                await DbContainer.DisposeAsync();
+                await MsSqlDbContainer.DisposeAsync();
             }
 
             if (CacheContainer != null)

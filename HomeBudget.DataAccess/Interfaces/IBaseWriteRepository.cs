@@ -5,6 +5,8 @@ namespace HomeBudget.DataAccess.Interfaces
 {
     public interface IBaseWriteRepository
     {
+        string Database { get; set; }
+
         Task<int> ExecuteAsync<T>(string sqlQuery, T parameters, IDbTransaction dbTransaction = null)
             where T : IDbEntity;
 

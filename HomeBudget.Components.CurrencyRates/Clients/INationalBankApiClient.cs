@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Refit;
@@ -19,7 +20,8 @@ namespace HomeBudget.Components.CurrencyRates.Clients
         Task<IEnumerable<NationalBankShortCurrencyRate>> GetRatesForPeriodAsync(
             [AliasAs("id")] int currencyId,
             [AliasAs("startDate")] string startDate,
-            [AliasAs("endDate")] string endDate);
+            [AliasAs("endDate")] string endDate,
+            CancellationToken ct = default);
 
         [Get("/api/exrates/currencies")]
         Task<IEnumerable<NationalBankCurrency>> GetCurrenciesAsync();

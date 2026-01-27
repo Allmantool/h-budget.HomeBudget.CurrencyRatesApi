@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 
 using MediatR;
@@ -19,8 +20,11 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Commands.Handlers
             RequestRatesForPeriodCommand request,
             CancellationToken cancellationToken)
         {
+            var startDate = request.StartDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture);
+            var endDate = request.EndDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture);
+
             var cacheKey = $"{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}" +
-                           $"|{request.StartDate.ToString(DateFormats.NationalBankApiRequest)}-{request.EndDate.ToString(DateFormats.NationalBankApiRequest)}";
+                           $"|{startDate}-{endDate}";
 
             var operationResult = await cacheService.GetOrCreateAsync(
                  cacheKey,

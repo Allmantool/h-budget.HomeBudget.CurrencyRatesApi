@@ -14,11 +14,23 @@ using HomeBudget.DataAccess.Interfaces;
 
 namespace HomeBudget.Components.CurrencyRates.Providers
 {
-    public class CurrencyRatesWriteProvider(
-        IMapper mapper,
-        IBaseWriteRepository writeRepository)
-        : ICurrencyRatesWriteProvider
+    internal class CurrencyRatesWriteProvider : ICurrencyRatesWriteProvider
     {
+        private const string DatabaseName = "HomeBudget.CurrencyRates";
+
+        private readonly IMapper _mapper;
+        private readonly IBaseWriteRepository _writeRepository;
+
+        public CurrencyRatesWriteProvider(
+            IMapper mapper,
+            IBaseWriteRepository writeRepository)
+        {
+            _mapper = mapper;
+            _writeRepository = writeRepository;
+
+            writeRepository.Database = DatabaseName;
+        }
+
         public async Task<int> UpsertRatesWithSaveAsync(IReadOnlyCollection<CurrencyRate> rates)
         {
             using var upsertTransaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -32,7 +44,7 @@ namespace HomeBudget.Components.CurrencyRates.Providers
 
         private async IAsyncEnumerable<int> UpsertRatesRequestAsync(IEnumerable<CurrencyRate> rates)
         {
-            var dbEntities = mapper.Map<IEnumerable<CurrencyRateEntity>>(rates);
+            var dbEntities = _mapper.Map<IEnumerable<CurrencyRateEntity>>(rates);
 
             var dt = dbEntities.ToDataTable();
 
@@ -52,7 +64,7 @@ namespace HomeBudget.Components.CurrencyRates.Providers
                 VALUES (SRC.CurrencyId, SRC.Name, SRC.Abbreviation, SRC.Scale, SRC.OfficialRate, SRC.RatePerUnit, SRC.UpdateDate);
                 ";
 
-            yield return await writeRepository.ExecuteAsync(mergeQuery, dt, TableTypes.CurrencyRateEntityType);
+            yield return await _writeRepository.ExecuteAsync(mergeQuery, dt, TableTypes.CurrencyRateEntityType);
         }
     }
 }

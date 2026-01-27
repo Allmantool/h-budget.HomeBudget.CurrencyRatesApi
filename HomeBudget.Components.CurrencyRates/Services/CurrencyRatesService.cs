@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -33,7 +34,8 @@ namespace HomeBudget.Components.CurrencyRates.Services
 
         public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesForPeriodAsync(
             DateOnly startDate,
-            DateOnly endDate)
+            DateOnly endDate,
+            CancellationToken ct = default)
         {
             var todayRatesResponse = await GetTodayRatesAsync();
 
@@ -43,7 +45,8 @@ namespace HomeBudget.Components.CurrencyRates.Services
                 {
                     StartDate = startDate,
                     EndDate = endDate
-                });
+                },
+                ct);
 
             var ratesFromApiCall = mapper.Map<IReadOnlyCollection<CurrencyRate>>(shortRates);
 

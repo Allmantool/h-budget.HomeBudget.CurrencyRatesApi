@@ -15,6 +15,8 @@ namespace HomeBudget.Components.CurrencyRates.Providers
 {
     internal class CurrencyRatesReadProvider : ICurrencyRatesReadProvider
     {
+        private const string DatabaseName = "HomeBudget.CurrencyRates";
+
         private readonly string _ratesAbbreviationPredicate;
         private readonly IMapper _mapper;
         private readonly IBaseReadRepository _readRepository;
@@ -30,12 +32,14 @@ namespace HomeBudget.Components.CurrencyRates.Providers
             _mapper = mapper;
             _readRepository = readRepository;
             _ratesAbbreviationPredicate = $"[Abbreviation] IN ({abbreviations})";
+
+            _readRepository.Database = DatabaseName;
         }
 
         public async Task<IReadOnlyCollection<CurrencyRate>> GetRatesForPeriodAsync(DateOnly startDate, DateOnly endDate)
         {
             var query = "SELECT * " +
-                          "FROM [CurrencyRates] WITH (NOLOCK) " +
+                          $"FROM dbo.[CurrencyRates] WITH (NOLOCK) " +
                          "WHERE [UpdateDate] BETWEEN @StartDate AND @EndDate " +
                           $"AND {_ratesAbbreviationPredicate};";
 
@@ -53,7 +57,7 @@ namespace HomeBudget.Components.CurrencyRates.Providers
         public async Task<IReadOnlyCollection<CurrencyRate>> GetRatesAsync()
         {
             var query = "SELECT * " +
-                          "FROM [CurrencyRates] WITH (NOLOCK) " +
+                          $"FROM dbo.[CurrencyRates] WITH (NOLOCK) " +
                         $"WHERE {_ratesAbbreviationPredicate};";
 
             var response = await _readRepository.GetAsync<CurrencyRateEntity>(query);
@@ -64,7 +68,7 @@ namespace HomeBudget.Components.CurrencyRates.Providers
         public async Task<IReadOnlyCollection<CurrencyRate>> GetTodayRatesAsync()
         {
             var query = "SELECT * " +
-                          "FROM [CurrencyRates] WITH (NOLOCK) " +
+                          $"FROM dbo.[CurrencyRates] WITH (NOLOCK) " +
                          "WHERE [UpdateDate] = @Today " +
                           $"AND {_ratesAbbreviationPredicate};";
 

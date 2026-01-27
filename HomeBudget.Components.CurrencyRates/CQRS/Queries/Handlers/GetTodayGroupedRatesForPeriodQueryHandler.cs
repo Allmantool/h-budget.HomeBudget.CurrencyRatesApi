@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,16 +22,19 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Queries.Handlers
         ICurrencyRatesService currencyRatesService)
         : IRequestHandler<GetCurrencyGroupedRatesForPeriodQuery, Result<IReadOnlyCollection<CurrencyRateGrouped>>>
     {
-        public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> Handle(GetCurrencyGroupedRatesForPeriodQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> Handle(GetCurrencyGroupedRatesForPeriodQuery request, CancellationToken ct)
         {
+            var startDate = request.StartDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture);
+            var endDate = request.EndDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture);
+
             var cacheKey = $"{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}" +
-                           $"|{request.StartDate.ToString(DateFormats.NationalBankApiRequest)}-{request.EndDate.ToString(DateFormats.NationalBankApiRequest)}";
+                           $"|{startDate}-{endDate}";
 
             logger.LogWithExecutionMemberName($"Method: '{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}' with key: '{cacheKey}'");
 
             return await cacheService.GetOrCreateAsync(
                   cacheKey,
-                  () => currencyRatesService.GetRatesForPeriodAsync(request.StartDate, request.EndDate));
+                  () => currencyRatesService.GetRatesForPeriodAsync(request.StartDate, request.EndDate, ct));
         }
     }
 }

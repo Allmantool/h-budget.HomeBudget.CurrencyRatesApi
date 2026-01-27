@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using HomeBudget.Components.CurrencyRates.CQRS.Commands.Models;
@@ -14,7 +15,10 @@ namespace HomeBudget.Components.CurrencyRates.Services.Interfaces
 
         public Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesAsync();
 
-        public Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesForPeriodAsync(DateOnly startDate, DateOnly endDate);
+        public Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesForPeriodAsync(
+            DateOnly startDate,
+            DateOnly endDate,
+            CancellationToken ct = default);
 
         public Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetTodayRatesAsync();
     }

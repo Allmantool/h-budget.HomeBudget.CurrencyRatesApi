@@ -15,10 +15,32 @@ using HomeBudget.Rates.Api.Models.Requests;
 
 namespace HomeBudget.Components.IntegrationTests.Controllers
 {
+    [TestFixture]
     [Category(TestTypes.Integration)]
-    public class CurrencyExchangeControllerTests : IAsyncDisposable
+    [NonParallelizable]
+    [Order(IntegrationTestOrderIndex.CurrencyExchangeControllerTests)]
+    public class CurrencyExchangeControllerTests : BaseIntegrationTests
     {
-        private readonly CurrencyExchangeTestWebApp _sut = new();
+        private CurrencyRatesTestWebApp _sut;
+        private RestClient _restClient;
+
+        [OneTimeSetUp]
+        public override async Task SetupAsync()
+        {
+            _sut = new CurrencyRatesTestWebApp();
+
+            await _sut.InitAsync();
+            await base.SetupAsync();
+
+            _restClient = _sut.RestHttpClient;
+        }
+
+        [OneTimeTearDown]
+        public override async Task TerminateAsync()
+        {
+            await _sut.ShutdownAsync();
+            await base.TerminateAsync();
+        }
 
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithBlrCases))]
@@ -38,7 +60,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var currencyExchangeRequest = new RestRequest($"/{Endpoints.CurrencyExchangeApi}", Method.Post)
                 .AddJsonBody(requestBody);
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
+            var response = await _restClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
             var payload = response.Data;
 
             Assert.Multiple(() =>
@@ -61,7 +83,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var currencyExchangeRequest = new RestRequest($"/{Endpoints.CurrencyExchangeApi}/multiplier", Method.Post)
                 .AddJsonBody(requestBodyAsJson);
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
+            var response = await _restClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
             var payload = response.Data;
 
             Assert.Multiple(() =>
@@ -70,14 +92,6 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
                 payload.IsSucceeded.Should().BeTrue();
                 payload.Payload.Should().Be(0.31471M);
             });
-        }
-
-        public async ValueTask DisposeAsync()
-        {
-            if (_sut != null)
-            {
-                await _sut.DisposeAsync();
-            }
         }
     }
 }

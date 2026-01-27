@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using HomeBudget.Components.CurrencyRates.Models.Api;
@@ -13,7 +14,8 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
     {
         public Task<IReadOnlyCollection<NationalBankShortCurrencyRate>> GetRatesForPeriodAsync(
             IEnumerable<int> currenciesIds,
-            PeriodRange periodRange)
+            PeriodRange periodRange,
+            CancellationToken ct = default)
         {
             IReadOnlyCollection<NationalBankShortCurrencyRate> responsePayload = new List<NationalBankShortCurrencyRate>
             {
@@ -58,7 +60,7 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
             return Task.FromResult(responsePayload);
         }
 
-        public Task<IReadOnlyCollection<NationalBankCurrencyRate>> GetTodayActiveRatesAsync()
+        public Task<IReadOnlyCollection<NationalBankCurrencyRate>> GetTodayActiveRatesAsync(CancellationToken ct = default)
         {
             var today = new DateTime(2023, 11, 14);
 

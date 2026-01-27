@@ -138,7 +138,7 @@ jobs:
             dotnet-deps-
 
       - name: Run tests for coverage
-        continue-on-error: true
+        continue-on-error: false
         timeout-minutes: 15
         shell: bash
         run: |

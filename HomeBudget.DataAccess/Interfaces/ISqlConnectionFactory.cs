@@ -4,6 +4,6 @@ namespace HomeBudget.DataAccess.Interfaces
 {
     public interface ISqlConnectionFactory
     {
-        IDbConnection Create();
+        IDbConnection Create(string databasename);
     }
 }

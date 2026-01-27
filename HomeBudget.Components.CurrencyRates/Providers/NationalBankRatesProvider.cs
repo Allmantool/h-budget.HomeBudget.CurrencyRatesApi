@@ -1,58 +1,103 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Threading.RateLimiting;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using HomeBudget.Components.CurrencyRates.Clients;
+using HomeBudget.Components.CurrencyRates.Logs;
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Components.CurrencyRates.Models.Api;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Extensions;
+using HomeBudget.Core.Limiters;
 using HomeBudget.Core.Models;
 using HomeBudget.Core.Options;
 
 namespace HomeBudget.Components.CurrencyRates.Providers
 {
-    internal class NationalBankRatesProvider(
-        ConfigSettings configSettings,
-        IOptions<HttpClientOptions> httpClientOptions,
-        INationalBankApiClient nationalBankApiClient)
-        : INationalBankRatesProvider
+    internal class NationalBankRatesProvider : INationalBankRatesProvider
     {
-        public async Task<IReadOnlyCollection<NationalBankShortCurrencyRate>> GetRatesForPeriodAsync(
-            IEnumerable<int> currenciesIds,
-            PeriodRange periodRange)
+        private readonly ILogger<NationalBankRatesProvider> logger;
+        private readonly HttpClientOptions httpClientOptions;
+        private readonly IHttpClientRateLimiter nationalBankHttpRateLimiter;
+        private readonly ConfigSettings configSettings;
+        private readonly INationalBankApiClient nationalBankApiClient;
+
+        public NationalBankRatesProvider(
+            ConfigSettings configSettings,
+            ILogger<NationalBankRatesProvider> logger,
+            IOptions<HttpClientOptions> httpOptions,
+            INationalBankApiClient nationalBankApiClient,
+            IHttpClientRateLimiter nationalBankHttpClientRateLimiter)
         {
-            var yearRatesRequestPayloads = GetYearPeriodRequests(currenciesIds, periodRange);
-
-            using var semaphore = new SemaphoreSlim(httpClientOptions.Value.MaxConcurrentRequests);
-
-            var tasks = yearRatesRequestPayloads.Select(async payload =>
-            {
-                await semaphore.WaitAsync();
-                try
-                {
-                    var period = payload.Period;
-
-                    return await nationalBankApiClient.GetRatesForPeriodAsync(
-                        payload.CurrencyId,
-                        period.StartDate.ToString(DateFormats.NationalBankApiRequest),
-                        period.EndDate.ToString(DateFormats.NationalBankApiRequest));
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            });
-
-            return (await Task.WhenAll(tasks)).SelectMany(x => x).ToList();
+            this.httpClientOptions = httpOptions.Value;
+            this.configSettings = configSettings;
+            this.nationalBankApiClient = nationalBankApiClient;
+            this.nationalBankHttpRateLimiter = nationalBankHttpClientRateLimiter;
+            this.logger = logger;
         }
 
-        public async Task<IReadOnlyCollection<NationalBankCurrencyRate>> GetTodayActiveRatesAsync()
+        public async Task<IReadOnlyCollection<NationalBankShortCurrencyRate>> GetRatesForPeriodAsync(
+             IEnumerable<int> currenciesIds,
+             PeriodRange periodRange,
+             CancellationToken ct = default)
+        {
+            var yearRatesRequestPayloads = GetYearPeriodRequests(currenciesIds, periodRange);
+            var ratesForPeriod = new ConcurrentBag<NationalBankShortCurrencyRate>();
+
+            await Parallel.ForEachAsync(
+                yearRatesRequestPayloads,
+                new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = Math.Min(
+                        httpClientOptions.MaxConcurrentRequests,
+                        httpClientOptions.RateLimiterBurstLimit),
+                    CancellationToken = ct
+                },
+                async (payload, loopCt) =>
+                {
+                    using var requestCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+
+                    requestCts.CancelAfter(TimeSpan.FromSeconds(httpClientOptions.TimeoutInSeconds));
+                    using var lease = await nationalBankHttpRateLimiter.AcquireAsync(1, requestCts.Token);
+
+                    if (!lease.IsAcquired)
+                    {
+                        var warningReason = lease.TryGetMetadata(MetadataName.ReasonPhrase, out var reason)
+                                ? reason
+                                : "unknown";
+
+                        logger.RateLimiterExceed(nameof(INationalBankApiClient), warningReason);
+
+                        return;
+                    }
+
+                    var period = payload.Period;
+
+                    var rates = await nationalBankApiClient.GetRatesForPeriodAsync(
+                        payload.CurrencyId,
+                        period.StartDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture),
+                        period.EndDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture),
+                        requestCts.Token);
+
+                    foreach (var rate in rates)
+                    {
+                        ratesForPeriod.Add(rate);
+                    }
+                });
+
+            return ratesForPeriod.ToList();
+        }
+
+        public async Task<IReadOnlyCollection<NationalBankCurrencyRate>> GetTodayActiveRatesAsync(CancellationToken ct = default)
         {
             var activeCurrencyAbbreviations = configSettings
                 .ActiveNationalBankCurrencies

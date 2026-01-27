@@ -23,10 +23,20 @@ namespace HomeBudget.DataAccess.Dapper.SqlClients
 
         private readonly DatabaseConnectionOptions _databaseConnectionOptions = options.Value;
 
-        public IDbConnection Create()
+        public IDbConnection Create(string databasename)
         {
             try
             {
+                if (!string.IsNullOrWhiteSpace(databasename))
+                {
+                    var builder = new SqlConnectionStringBuilder(_databaseConnectionOptions.ConnectionString)
+                    {
+                        InitialCatalog = databasename
+                    };
+
+                    return new SqlConnection(builder.ConnectionString);
+                }
+
                 return new SqlConnection(_databaseConnectionOptions.ConnectionString);
             }
             catch (Exception ex)
