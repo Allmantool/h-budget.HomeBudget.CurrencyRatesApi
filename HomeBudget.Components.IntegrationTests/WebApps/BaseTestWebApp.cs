@@ -18,7 +18,7 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
     {
         private bool _disposed;
         private IntegrationTestWebApplicationFactory<TEntryPoint> WebFactory { get; set; }
-        internal static TestContainersService TestContainersService { get; set; }
+        internal TestContainersService TestContainersService { get; set; }
 
         internal RestClient RestHttpClient { get; set; }
 
@@ -82,7 +82,7 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
             }
         }
 
-        public static async Task<bool> StartContainersAsync()
+        public async Task<bool> StartContainersAsync()
         {
             if (TestContainersService is null)
             {
