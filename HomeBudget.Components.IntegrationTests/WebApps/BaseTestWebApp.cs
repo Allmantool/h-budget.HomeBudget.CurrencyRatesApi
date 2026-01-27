@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
 using NUnit.Framework;
 using RestSharp;
@@ -49,31 +47,10 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
                         RedisContainer = TestContainersService.CacheContainer.GetConnectionString()
                     });
 
-                var server = WebFactory.Server;
-                var addresses = server.Features.Get<IServerAddressesFeature>();
-                var realAddress = addresses.Addresses.FirstOrDefault();
-                var baseAddress = realAddress is null ?
-                    WebFactory.ClientOptions.BaseAddress
-                    : new Uri(realAddress);
-
-                var clientOptions = new WebApplicationFactoryClientOptions
-                {
-                    BaseAddress = baseAddress,
-                    AllowAutoRedirect = true,
-                    HandleCookies = true
-                };
-
-                var baseClient = WebFactory.CreateClient(clientOptions);
+                var baseClient = WebFactory.CreateDefaultClient();
                 baseClient.Timeout = TimeSpan.FromMinutes(BaseTestWebAppOptions.WebClientTimeoutInMinutes);
 
-                // var httpClient = WebFactory.CreateClient(new WebApplicationFactoryClientOptions
-                // {
-                //    AllowAutoRedirect = false,
-                //    BaseAddress = new Uri("http://localhost:7064")
-                // });
-                var httpClient = WebFactory.CreateDefaultClient();
-
-                RestHttpClient = new RestClient(httpClient);
+                RestHttpClient = new RestClient(baseClient);
 
                 return true;
             }
