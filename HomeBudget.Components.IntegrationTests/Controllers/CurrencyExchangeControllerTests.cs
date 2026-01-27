@@ -36,11 +36,10 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         }
 
         [OneTimeTearDown]
-        public override Task TerminateAsync()
+        public override async Task TerminateAsync()
         {
-            _restClient?.Dispose();
-            _sut?.Dispose();
-            return base.TerminateAsync();
+            await _sut.ShutdownAsync();
+            await base.TerminateAsync();
         }
 
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]

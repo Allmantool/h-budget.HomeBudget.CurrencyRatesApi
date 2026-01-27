@@ -10,7 +10,7 @@ using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Components.IntegrationTests.WebApps
 {
-    internal abstract class BaseTestWebApp<TEntryPoint> : BaseTestWebAppDispose
+    internal abstract class BaseTestWebApp<TEntryPoint> // : BaseTestWebAppDispose
         where TEntryPoint : class
     {
         private bool _disposed;
@@ -66,16 +66,13 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
             return TestContainersService.IsReadyForUse;
         }
 
-        protected override async ValueTask DisposeAsyncCoreAsync()
+        public async Task ShutdownAsync()
         {
             if (WebFactory != null)
             {
                 await WebFactory.DisposeAsync();
+                WebFactory = null;
             }
-
-            RestHttpClient?.Dispose();
-
-            _disposed = true;
         }
     }
 }

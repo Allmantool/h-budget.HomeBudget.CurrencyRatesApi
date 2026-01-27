@@ -16,7 +16,7 @@ using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Components.IntegrationTests
 {
-    public class IntegrationTestWebApplicationFactory<TStartup>
+    internal class IntegrationTestWebApplicationFactory<TStartup>
         (Func<TestContainersConnections> webHostInitializationCallback) : WebApplicationFactory<TStartup>
         where TStartup : class
     {
