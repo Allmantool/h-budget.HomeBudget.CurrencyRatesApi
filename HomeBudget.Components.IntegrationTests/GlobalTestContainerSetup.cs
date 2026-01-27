@@ -2,29 +2,25 @@
 
 using NUnit.Framework;
 
-using HomeBudget.Components.IntegrationTests.WebApps;
-
 namespace HomeBudget.Components.IntegrationTests
 {
     [SetUpFixture]
     public class GlobalTestContainerSetup
     {
-        private GlobalWebApp _webAppSut;
+        internal static TestContainersService TestContainersService { get; private set; }
 
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
-            _webAppSut = new GlobalWebApp();
-
-            await _webAppSut.InitAsync();
+            TestContainersService = await TestContainersService.InitAsync();
         }
 
         [OneTimeTearDown]
         public async Task TeardownAsync()
         {
-            if (_webAppSut != null)
+            if (TestContainersService != null)
             {
-                await _webAppSut.DisposeAsync();
+                await TestContainersService.DisposeAsync();
             }
         }
     }

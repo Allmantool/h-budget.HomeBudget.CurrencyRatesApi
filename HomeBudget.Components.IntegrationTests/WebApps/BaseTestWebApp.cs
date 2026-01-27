@@ -15,7 +15,7 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
     {
         private bool _disposed;
         private IntegrationTestWebApplicationFactory<TEntryPoint> WebFactory { get; set; }
-        internal TestContainersService TestContainersService { get; set; }
+        internal TestContainersService TestContainersService { get; private set; } = GlobalTestContainerSetup.TestContainersService;
 
         internal RestClient RestHttpClient { get; set; }
 
@@ -35,9 +35,6 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
                 {
                     return false;
                 }
-
-                TestContainersService = await TestContainersService.InitAsync();
-                await StartContainersAsync();
 
                 WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(
                     () => new TestContainersConnections
@@ -71,11 +68,6 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
 
         protected override async ValueTask DisposeAsyncCoreAsync()
         {
-            if (TestContainersService != null)
-            {
-                await TestContainersService.DisposeAsync();
-            }
-
             if (WebFactory != null)
             {
                 await WebFactory.DisposeAsync();
