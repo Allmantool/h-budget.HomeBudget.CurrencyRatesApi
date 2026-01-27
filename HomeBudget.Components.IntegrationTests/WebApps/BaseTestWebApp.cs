@@ -66,11 +66,12 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
                 var baseClient = WebFactory.CreateClient(clientOptions);
                 baseClient.Timeout = TimeSpan.FromMinutes(BaseTestWebAppOptions.WebClientTimeoutInMinutes);
 
-                var httpClient = WebFactory.CreateClient(new WebApplicationFactoryClientOptions
-                {
-                    AllowAutoRedirect = false,
-                    BaseAddress = new Uri("http://localhost:7064")
-                });
+                // var httpClient = WebFactory.CreateClient(new WebApplicationFactoryClientOptions
+                // {
+                //    AllowAutoRedirect = false,
+                //    BaseAddress = new Uri("http://localhost:7064")
+                // });
+                var httpClient = WebFactory.CreateDefaultClient();
 
                 RestHttpClient = new RestClient(httpClient);
 
