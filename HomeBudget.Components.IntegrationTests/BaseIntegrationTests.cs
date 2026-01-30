@@ -10,7 +10,7 @@ namespace HomeBudget.Components.IntegrationTests
 {
     public abstract class BaseIntegrationTests
     {
-        internal TestContainersService TestContainers { get; private set; }
+        internal TestContainersService TestContainers { get; private set; } = GlobalTestContainerSetup.TestContainersService;
 
         [OneTimeSetUp]
         public virtual async Task SetupAsync()
