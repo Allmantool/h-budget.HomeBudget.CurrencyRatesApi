@@ -29,7 +29,6 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         private readonly int _id = Interlocked.Increment(ref _counter);
 
         private CurrencyRatesTestWebApp _sut;
-        private RestClient _restClient;
 
         [OneTimeSetUp]
         public override async Task SetupAsync()
@@ -39,21 +38,17 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             _sut = new CurrencyRatesTestWebApp();
             await base.SetupAsync();
 
-            _restClient = _sut.RestHttpClient;
-
             TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp END");
         }
 
         [OneTimeTearDown]
         public async Task OneTimeTearDown()
         {
-            TestContext.Progress.WriteLine(
-                $"[WebApp {_id}] OneTimeTearDown START");
+            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeTearDown START");
 
             await this.TerminateAsync();
 
-            TestContext.Progress.WriteLine(
-                $"[WebApp {_id}] OneTimeTearDown END");
+            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeTearDown END");
         }
 
         [Test]
@@ -64,7 +59,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
 
             var getCurrencyRatesForPeriodRequest = new RestRequest($"/{Endpoints.RatesApi}/period/{startDay}/{endDate}");
 
-            var response = await _restClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
+            var response = await _sut.RestHttpClient.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
 
             response.IsSuccessful.Should().BeTrue();
         }
@@ -78,7 +73,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
 
             var getCurrencyRatesForPeriodRequest = new RestRequest($"/{Endpoints.RatesApi}/period/{startDay}/{endDate}");
 
-            var response = await _restClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
             var payload = response.Data;
             var currencyGroupAmount = payload?.Payload.Count;
 
@@ -90,7 +85,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         {
             var getRatesRequest = new RestRequest($"/{Endpoints.RatesApi}");
 
-            var response = await _restClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getRatesRequest);
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getRatesRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -100,7 +95,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         {
             var getTodayRatesRequest = new RestRequest($"/{Endpoints.RatesApi}/today");
 
-            var response = await _restClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getTodayRatesRequest);
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getTodayRatesRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -128,7 +123,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var currencySaveRatesRequest = new RestRequest($"/{Endpoints.RatesApi}", Method.Post)
                 .AddJsonBody(requestBody);
 
-            var response = await _restClient!.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }

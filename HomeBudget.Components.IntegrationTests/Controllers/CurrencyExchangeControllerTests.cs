@@ -26,7 +26,6 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         private readonly int _id = Interlocked.Increment(ref _counter);
 
         private CurrencyRatesTestWebApp _sut;
-        private RestClient _restClient;
 
         [OneTimeSetUp]
         public override async Task SetupAsync()
@@ -37,21 +36,17 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
 
             await base.SetupAsync();
 
-            _restClient = _sut.RestHttpClient;
-
             TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp END");
         }
 
         [OneTimeTearDown]
         public async Task OneTimeTearDown()
         {
-            TestContext.Progress.WriteLine(
-                $"[WebApp {_id}] OneTimeTearDown START");
+            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeTearDown START");
 
             await this.TerminateAsync();
 
-            TestContext.Progress.WriteLine(
-                $"[WebApp {_id}] OneTimeTearDown END");
+            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeTearDown END");
         }
 
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]
@@ -72,7 +67,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var currencyExchangeRequest = new RestRequest($"/{Endpoints.CurrencyExchangeApi}", Method.Post)
                 .AddJsonBody(requestBody);
 
-            var response = await _restClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
             var payload = response.Data;
 
             Assert.Multiple(() =>
@@ -95,7 +90,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var currencyExchangeRequest = new RestRequest($"/{Endpoints.CurrencyExchangeApi}/multiplier", Method.Post)
                 .AddJsonBody(requestBodyAsJson);
 
-            var response = await _restClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
+            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
             var payload = response.Data;
 
             Assert.Multiple(() =>
