@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
-
 using FluentAssertions;
+
 using NUnit.Framework;
 using RestSharp;
 
@@ -21,18 +22,25 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
     [Order(IntegrationTestOrderIndex.CurrencyExchangeControllerTests)]
     public class CurrencyExchangeControllerTests : BaseIntegrationTests
     {
+        private static int _counter;
+        private readonly int _id = Interlocked.Increment(ref _counter);
+
         private CurrencyRatesTestWebApp _sut;
         private RestClient _restClient;
 
         [OneTimeSetUp]
         public override async Task SetupAsync()
         {
+            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp START ({GetType().Name})");
+
             _sut = new CurrencyRatesTestWebApp();
 
             await _sut.InitAsync();
 
             // await base.SetupAsync();
             _restClient = _sut.RestHttpClient;
+
+            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp END");
         }
 
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]

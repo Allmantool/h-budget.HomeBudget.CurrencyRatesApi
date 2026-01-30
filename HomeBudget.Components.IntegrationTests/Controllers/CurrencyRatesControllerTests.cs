@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-
-using FluentAssertions;
-using NUnit.Framework;
-using RestSharp;
-
-using HomeBudget.Rates.Api.Constants;
+﻿using FluentAssertions;
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Components.IntegrationTests.Constants;
 using HomeBudget.Components.IntegrationTests.WebApps;
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Models;
+using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Models.Requests;
+using NUnit.Framework;
+using RestSharp;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using CurrencyRate = HomeBudget.Rates.Api.Models.CurrencyRate;
 
 namespace HomeBudget.Components.IntegrationTests.Controllers
@@ -24,18 +23,25 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
     [Order(IntegrationTestOrderIndex.CurrencyRatesControllerTests)]
     public class CurrencyRatesControllerTests : BaseIntegrationTests
     {
+        private static int _counter;
+        private readonly int _id = Interlocked.Increment(ref _counter);
+
         private CurrencyRatesTestWebApp _sut;
         private RestClient _restClient;
 
         [OneTimeSetUp]
         public override async Task SetupAsync()
         {
+            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp START ({GetType().Name})");
+
             _sut = new CurrencyRatesTestWebApp();
 
             await _sut.InitAsync();
 
             // await base.SetupAsync();
             _restClient = _sut.RestHttpClient;
+
+            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp END");
         }
 
         [Test]

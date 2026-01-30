@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using NUnit.Framework;
 
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.IntegrationTests.MockServices;
@@ -20,9 +23,18 @@ namespace HomeBudget.Components.IntegrationTests
         (Func<TestContainersConnections> webHostInitializationCallback) : WebApplicationFactory<TStartup>
         where TStartup : class
     {
+        private static int _counter;
+        private readonly int _id = Interlocked.Increment(ref _counter);
+
         private TestContainersConnections _containersConnections;
 
         internal IConfiguration Configuration { get; private set; }
+
+        protected override IHost CreateHost(IHostBuilder builder)
+        {
+            TestContext.Progress.WriteLine($"[WebFactory {_id}] CreateHost()");
+            return base.CreateHost(builder);
+        }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -54,6 +66,17 @@ namespace HomeBudget.Components.IntegrationTests
             });
 
             builder.UseEnvironment(HostEnvironments.Integration);
+
+            TestContext.Progress.WriteLine($"[WebFactory {_id}] ConfigureWebHost()");
+            base.ConfigureWebHost(builder);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            TestContext.Progress.WriteLine(
+                $"[WebFactory {_id}] Dispose(disposing={disposing})");
+
+            base.Dispose(disposing);
         }
     }
 }
