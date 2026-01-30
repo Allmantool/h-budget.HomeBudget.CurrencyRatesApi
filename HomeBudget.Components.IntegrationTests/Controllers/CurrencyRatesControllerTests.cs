@@ -31,17 +31,11 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         public override async Task SetupAsync()
         {
             _sut = new CurrencyRatesTestWebApp();
+
             await _sut.InitAsync();
-            await base.SetupAsync();
 
+            // await base.SetupAsync();
             _restClient = _sut.RestHttpClient;
-        }
-
-        [OneTimeTearDown]
-        public override async Task TerminateAsync()
-        {
-            await _sut.ShutdownAsync();
-            await base.TerminateAsync();
         }
 
         [Test]

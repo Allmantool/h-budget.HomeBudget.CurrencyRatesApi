@@ -30,16 +30,9 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             _sut = new CurrencyRatesTestWebApp();
 
             await _sut.InitAsync();
-            await base.SetupAsync();
 
+            // await base.SetupAsync();
             _restClient = _sut.RestHttpClient;
-        }
-
-        [OneTimeTearDown]
-        public override async Task TerminateAsync()
-        {
-            await _sut.ShutdownAsync();
-            await base.TerminateAsync();
         }
 
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]
