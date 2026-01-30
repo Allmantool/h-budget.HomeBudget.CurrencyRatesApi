@@ -1,4 +1,13 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+
+using FluentAssertions;
+using NUnit.Framework;
+using RestSharp;
+
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Components.IntegrationTests.Constants;
 using HomeBudget.Components.IntegrationTests.WebApps;
@@ -6,13 +15,6 @@ using HomeBudget.Core.Constants;
 using HomeBudget.Core.Models;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Models.Requests;
-using NUnit.Framework;
-using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 using CurrencyRate = HomeBudget.Rates.Api.Models.CurrencyRate;
 
 namespace HomeBudget.Components.IntegrationTests.Controllers
