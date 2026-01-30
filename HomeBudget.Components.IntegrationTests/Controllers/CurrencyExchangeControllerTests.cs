@@ -43,6 +43,18 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp END");
         }
 
+        [OneTimeTearDown]
+        public async Task OneTimeTearDown()
+        {
+            TestContext.Progress.WriteLine(
+                $"[WebApp {_id}] OneTimeTearDown START");
+
+            await this.TerminateAsync();
+
+            TestContext.Progress.WriteLine(
+                $"[WebApp {_id}] OneTimeTearDown END");
+        }
+
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithBlrCases))]
         public async Task GetExchangeAsync_WhenFromBlrToUsd_ThenExpectedExchangeOutput(
