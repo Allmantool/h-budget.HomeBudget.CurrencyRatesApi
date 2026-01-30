@@ -37,11 +37,9 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp START ({GetType().Name})");
 
             _sut = new CurrencyRatesTestWebApp();
-
-            await _sut.InitAsync();
-
-            // await base.SetupAsync();
             _restClient = _sut.RestHttpClient;
+
+            await base.SetupAsync();
 
             TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp END");
         }

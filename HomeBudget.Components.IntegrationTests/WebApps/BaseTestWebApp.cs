@@ -23,6 +23,11 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
         {
             try
             {
+                if (WebFactory is not null)
+                {
+                    return true;
+                }
+
                 Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", HostEnvironments.Integration);
                 Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", HostEnvironments.Integration);
 
