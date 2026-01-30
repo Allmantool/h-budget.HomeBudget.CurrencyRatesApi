@@ -146,7 +146,8 @@ jobs:
           dotnet-dotcover test HomeBudgetRatesApi.sln \
             --dcReportType=XML \
             --dcOutput="test-results/rates-coverage.xml" \
-            --dcFilters="+:HomeBudget.*;-:type=*.IntegrationTests;-:type=*.Tests"
+            --dcFilters="+:HomeBudget.*;-:type=*.IntegrationTests;-:type=*.Tests" \
+            --verbosity normal
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v5
