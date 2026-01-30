@@ -10,7 +10,7 @@ using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Components.IntegrationTests.WebApps
 {
-    internal abstract class BaseTestWebApp<TEntryPoint> // : BaseTestWebAppDispose
+    internal abstract class BaseTestWebApp<TEntryPoint> : BaseTestWebAppDispose
         where TEntryPoint : class
     {
         private IntegrationTestWebApplicationFactory<TEntryPoint> WebFactory { get; set; }

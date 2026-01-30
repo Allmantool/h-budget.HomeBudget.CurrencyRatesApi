@@ -10,13 +10,12 @@ namespace HomeBudget.Components.IntegrationTests
 {
     public abstract class BaseIntegrationTests
     {
-        private static bool _initialized;
         internal TestContainersService TestContainers { get; private set; }
 
         [OneTimeSetUp]
         public virtual async Task SetupAsync()
         {
-            if (_initialized && TestContainers is not null && TestContainers.IsReadyForUse)
+            if (TestContainers is not null && TestContainers.IsReadyForUse)
             {
                 return;
             }
@@ -41,8 +40,6 @@ namespace HomeBudget.Components.IntegrationTests
             sw.Stop();
 
             await Task.Delay(TimeSpan.FromSeconds(ComponentTestOptions.TestContainersWaitingInSeconds));
-
-            _initialized = true;
         }
 
         [OneTimeTearDown]

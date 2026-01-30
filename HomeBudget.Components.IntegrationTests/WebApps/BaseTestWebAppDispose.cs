@@ -13,7 +13,7 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
             GC.SuppressFinalize(this);
         }
 
-        public async ValueTask DisposeAsync()
+        public virtual async ValueTask DisposeAsync()
         {
             await DisposeAsyncCoreAsync();
 
