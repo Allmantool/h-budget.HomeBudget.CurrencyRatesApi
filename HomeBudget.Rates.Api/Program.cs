@@ -94,6 +94,11 @@ services
         }))
     .WithTracing(traceBuilder =>
     {
+        if (!environment.IsProduction())
+        {
+            return;
+        }
+
         traceBuilder
             .AddSource(Observability.ActivitySourceName)
             .AddAspNetCoreInstrumentation(options =>
