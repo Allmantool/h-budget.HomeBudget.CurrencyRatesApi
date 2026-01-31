@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
@@ -18,6 +19,7 @@ using HomeBudget.Core.Options;
 using HomeBudget.DataAccess.Dapper.Extensions;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Exceptions.Handlers;
+using HomeBudget.Rates.Api.Monitoring;
 using HomeBudget.Rates.Api.Pipelines;
 
 namespace HomeBudget.Rates.Api.Configuration
@@ -44,6 +46,11 @@ namespace HomeBudget.Rates.Api.Configuration
             if (!HostEnvironments.Integration.Equals(webHostEnvironment.EnvironmentName, StringComparison.OrdinalIgnoreCase))
             {
                 await services.SetDiForConnectionsAsync();
+            }
+
+            if (!webHostEnvironment.IsProduction())
+            {
+                services.AddSingleton<ServiceProviderTracer>();
             }
 
             services.SetDiForHttpClient();
