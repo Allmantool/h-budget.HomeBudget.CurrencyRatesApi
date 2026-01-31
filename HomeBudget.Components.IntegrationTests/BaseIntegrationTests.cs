@@ -8,7 +8,7 @@ using HomeBudget.Components.IntegrationTests.Constants;
 
 namespace HomeBudget.Components.IntegrationTests
 {
-    public abstract class BaseIntegrationTests : IAsyncDisposable
+    internal abstract class BaseIntegrationTests : IAsyncDisposable
     {
         private bool _ownsContainers;
         private bool _disposed;
