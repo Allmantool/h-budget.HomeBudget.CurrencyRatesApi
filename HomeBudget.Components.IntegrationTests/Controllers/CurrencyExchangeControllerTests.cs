@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 
@@ -17,36 +16,30 @@ using HomeBudget.Rates.Api.Models.Requests;
 namespace HomeBudget.Components.IntegrationTests.Controllers
 {
     [TestFixture]
-    [Category(TestTypes.Integration)]
     [NonParallelizable]
+    [Category(TestTypes.Integration)]
     [Order(IntegrationTestOrderIndex.CurrencyExchangeControllerTests)]
-    public class CurrencyExchangeControllerTests : BaseIntegrationTests
+    internal class CurrencyExchangeControllerTests : BaseIntegrationTests
     {
-        private static int _counter;
-        private readonly int _id = Interlocked.Increment(ref _counter);
+        private readonly CurrencyRatesTestWebApp _sut;
+        private RestClient _httpClient;
 
-        private CurrencyRatesTestWebApp _sut;
-
-        [OneTimeSetUp]
-        public override async Task SetupAsync()
+        public CurrencyExchangeControllerTests()
         {
-            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp START ({GetType().Name})");
-
             _sut = new CurrencyRatesTestWebApp();
-
-            await Task.WhenAll(base.SetupAsync(), _sut.InitAsync());
-
-            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp END");
         }
 
-        [OneTimeTearDown]
-        public async Task OneTimeTearDown()
+        [SetUp]
+        public override async Task SetupAsync()
         {
-            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeTearDown START");
+            await _sut.InitAsync();
 
-            await this.TerminateAsync();
+            _httpClient = _sut.RestHttpClient;
+        }
 
-            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeTearDown END");
+        public override async Task TerminateAsync()
+        {
+            await _sut.DisposeAsync();
         }
 
         [TestCaseSource(typeof(ExchangeControllerTestCases), nameof(ExchangeControllerTestCases.WithUsdCases))]
@@ -67,7 +60,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var currencyExchangeRequest = new RestRequest($"/{Endpoints.CurrencyExchangeApi}", Method.Post)
                 .AddJsonBody(requestBody);
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
+            var response = await _httpClient.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
             var payload = response.Data;
 
             Assert.Multiple(() =>
@@ -90,7 +83,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var currencyExchangeRequest = new RestRequest($"/{Endpoints.CurrencyExchangeApi}/multiplier", Method.Post)
                 .AddJsonBody(requestBodyAsJson);
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
+            var response = await _httpClient.ExecuteAsync<Result<decimal>>(currencyExchangeRequest);
             var payload = response.Data;
 
             Assert.Multiple(() =>

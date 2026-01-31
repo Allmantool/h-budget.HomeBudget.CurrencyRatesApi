@@ -12,7 +12,6 @@ namespace HomeBudget.Components.IntegrationTests
     {
         internal TestContainersService TestContainers { get; private set; } = GlobalTestContainerSetup.TestContainersService;
 
-        [OneTimeSetUp]
         public virtual async Task SetupAsync()
         {
             if (TestContainers is not null && TestContainers.IsReadyForUse)
@@ -42,10 +41,9 @@ namespace HomeBudget.Components.IntegrationTests
             await Task.Delay(TimeSpan.FromSeconds(ComponentTestOptions.TestContainersWaitingInSeconds));
         }
 
-        [OneTimeTearDown]
         public virtual async Task TerminateAsync()
         {
-            // await OperationsTestWebApp.ResetAsync();
+            await TestContainers.DisposeAsync();
         }
     }
 }

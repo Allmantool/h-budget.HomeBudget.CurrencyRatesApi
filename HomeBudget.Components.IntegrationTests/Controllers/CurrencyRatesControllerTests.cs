@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 using FluentAssertions;
@@ -23,43 +23,38 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
     [Category(TestTypes.Integration)]
     [NonParallelizable]
     [Order(IntegrationTestOrderIndex.CurrencyRatesControllerTests)]
-    public class CurrencyRatesControllerTests : BaseIntegrationTests
+    internal class CurrencyRatesControllerTests : BaseIntegrationTests
     {
-        private static int _counter;
-        private readonly int _id = Interlocked.Increment(ref _counter);
+        private readonly CurrencyRatesTestWebApp _sut;
+        private RestClient _httpClient;
 
-        private CurrencyRatesTestWebApp _sut;
-
-        [OneTimeSetUp]
-        public override async Task SetupAsync()
+        public CurrencyRatesControllerTests()
         {
-            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp START ({GetType().Name})");
-
             _sut = new CurrencyRatesTestWebApp();
-            await Task.WhenAll(base.SetupAsync(), _sut.InitAsync());
-
-            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeSetUp END");
         }
 
-        [OneTimeTearDown]
-        public async Task OneTimeTearDown()
+        [SetUp]
+        public override async Task SetupAsync()
         {
-            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeTearDown START");
+            await _sut.InitAsync();
 
-            await this.TerminateAsync();
+            _httpClient = _sut.RestHttpClient;
+        }
 
-            TestContext.Progress.WriteLine($"[WebApp {_id}] OneTimeTearDown END");
+        public override async Task TerminateAsync()
+        {
+            await _sut.DisposeAsync();
         }
 
         [Test]
         public async Task GetRatesForPeriodAsync_WhenExecuteTheCallToEnquireRatesForPeriodOfTime_ThenIsSuccessStatusCode()
         {
-            var startDay = new DateTime(2022, 10, 25).ToString(DateFormats.RatesApiRequestFormat);
-            var endDate = new DateTime(2022, 12, 25).ToString(DateFormats.RatesApiRequestFormat);
+            var startDay = new DateTime(2022, 10, 25).ToString(DateFormats.RatesApiRequestFormat, CultureInfo.InvariantCulture);
+            var endDate = new DateTime(2022, 12, 25).ToString(DateFormats.RatesApiRequestFormat, CultureInfo.InvariantCulture);
 
             var getCurrencyRatesForPeriodRequest = new RestRequest($"/{Endpoints.RatesApi}/period/{startDay}/{endDate}");
 
-            var response = await _sut.RestHttpClient.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
+            var response = await _httpClient.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
 
             response.IsSuccessful.Should().BeTrue();
         }
@@ -68,12 +63,12 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         public async Task GetRatesForPeriodAsync_WhenExecuteTheCallToEnquireRatesForPeriodOfTime_ThenReturnsExpectedAmountOfCurrencyGroupsInResponse()
         {
             // "2023-07-30"
-            var startDay = new DateTime(2022, 10, 25).ToString(DateFormats.RatesApiRequestFormat);
-            var endDate = new DateTime(2022, 12, 25).ToString(DateFormats.RatesApiRequestFormat);
+            var startDay = new DateTime(2022, 10, 25).ToString(DateFormats.RatesApiRequestFormat, CultureInfo.InvariantCulture);
+            var endDate = new DateTime(2022, 12, 25).ToString(DateFormats.RatesApiRequestFormat, CultureInfo.InvariantCulture);
 
             var getCurrencyRatesForPeriodRequest = new RestRequest($"/{Endpoints.RatesApi}/period/{startDay}/{endDate}");
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
+            var response = await _httpClient.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getCurrencyRatesForPeriodRequest);
             var payload = response.Data;
             var currencyGroupAmount = payload?.Payload.Count;
 
@@ -85,7 +80,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         {
             var getRatesRequest = new RestRequest($"/{Endpoints.RatesApi}");
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getRatesRequest);
+            var response = await _httpClient.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getRatesRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -95,7 +90,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
         {
             var getTodayRatesRequest = new RestRequest($"/{Endpoints.RatesApi}/today");
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getTodayRatesRequest);
+            var response = await _httpClient.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(getTodayRatesRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
@@ -123,7 +118,7 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var currencySaveRatesRequest = new RestRequest($"/{Endpoints.RatesApi}", Method.Post)
                 .AddJsonBody(requestBody);
 
-            var response = await _sut.RestHttpClient!.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
+            var response = await _httpClient.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }

@@ -18,12 +18,11 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
 
         internal RestClient RestHttpClient { get; set; }
 
-        [OneTimeSetUp]
         public async Task<bool> InitAsync()
         {
             try
             {
-                if (WebFactory is not null)
+                if (WebFactory is not null && WebFactory.IsInitialized)
                 {
                     return true;
                 }
@@ -33,11 +32,6 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
 
                 var testProperties = TestContext.CurrentContext.Test.Properties;
                 var testCategory = testProperties.Get("Category") as string;
-
-                if (!TestTypes.Integration.Equals(testCategory, StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
 
                 WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(
                     () => new TestContainersConnections
@@ -69,7 +63,6 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
             return TestContainersService.IsReadyForUse;
         }
 
-        [OneTimeTearDown]
         public async Task ShutdownAsync()
         {
             if (RestHttpClient is not null)
