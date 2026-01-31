@@ -17,11 +17,13 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Providers
         private ConfigSettingsProvider _sut;
 
         private Mock<IBaseReadRepository> _mockBaseReadRepository;
+        private Mock<IBaseWriteRepository> _mockBaseWriteRepository;
 
         [SetUp]
         public void SetUp()
         {
             _mockBaseReadRepository = new Mock<IBaseReadRepository>();
+            _mockBaseWriteRepository = new Mock<IBaseWriteRepository>();
         }
 
         [Test]
@@ -43,7 +45,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Providers
                 .Setup(r => r.SingleAsync<string>(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(configAsJson);
 
-            _sut = new ConfigSettingsProvider(null, _mockBaseReadRepository.Object);
+            _sut = new ConfigSettingsProvider(_mockBaseWriteRepository.Object, _mockBaseReadRepository.Object);
 
             var result = await _sut.GetDefaultSettingsAsync();
 

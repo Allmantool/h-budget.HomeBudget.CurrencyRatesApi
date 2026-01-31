@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AutoMapper;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -19,6 +22,7 @@ using HomeBudget.Components.CurrencyRates.Providers;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.CurrencyRates.Services;
 using HomeBudget.Core.Constants;
+using HomeBudget.Core.Limiters;
 using HomeBudget.Core.Options;
 
 namespace HomeBudget.Components.CurrencyRates.Tests.Services
@@ -30,6 +34,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
         private readonly Mock<ICurrencyRatesReadProvider> _currencyRatesReadProviderMock = new();
         private readonly Mock<ICurrencyRatesWriteProvider> _currencyRatesWriteProviderMock = new();
         private readonly Mock<INationalBankRatesProvider> _nationalBankRatesProviderMock = new();
+        private readonly Mock<IHttpClientRateLimiter> _httpClientRateLimiterMock = new();
 
         private CurrencyRatesService _sut;
 
@@ -73,11 +78,18 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
             var testStartDate = new DateOnly(2021, 3, 2);
             var testEndDate = new DateOnly(2021, 8, 2);
 
+            using var lease = new TestRateLimitLease(isAcquired: true);
+
+            _httpClientRateLimiterMock
+                .Setup(x => x.AcquireAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(lease);
+
             _nationalBankApiClientMock
                 .Setup(i => i.GetRatesForPeriodAsync(
                     1,
-                    testStartDate.ToString(DateFormats.NationalBankApiRequest),
-                    testEndDate.ToString(DateFormats.NationalBankApiRequest)))
+                    testStartDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture),
+                    testEndDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<NationalBankShortCurrencyRate>
                 {
                     new ()
@@ -95,8 +107,9 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
             _nationalBankApiClientMock
                 .Setup(i => i.GetRatesForPeriodAsync(
                     2,
-                    testStartDate.ToString(DateFormats.NationalBankApiRequest),
-                    testEndDate.ToString(DateFormats.NationalBankApiRequest)))
+                    testStartDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture),
+                    testEndDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<NationalBankShortCurrencyRate>
                 {
                     new ()
@@ -130,8 +143,10 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
                             }
                         }
                     },
+                    Mock.Of<ILogger<NationalBankRatesProvider>>(),
                     Options.Create(new HttpClientOptions()),
-                    _nationalBankApiClientMock.Object));
+                    _nationalBankApiClientMock.Object,
+                    _httpClientRateLimiterMock.Object));
 
             var rates = await _sut.GetRatesForPeriodAsync(testStartDate, testEndDate);
 

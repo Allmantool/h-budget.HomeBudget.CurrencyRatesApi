@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Mvc.Testing;
+using NUnit.Framework;
 using RestSharp;
 
+using HomeBudget.Components.IntegrationTests.Constants;
+using HomeBudget.Components.IntegrationTests.Models;
 using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Components.IntegrationTests.WebApps
@@ -11,55 +13,68 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
     internal abstract class BaseTestWebApp<TEntryPoint> : BaseTestWebAppDispose
         where TEntryPoint : class
     {
-        private IntegrationTestWebApplicationFactory<TEntryPoint> WebFactory { get; }
-        private TestContainersService TestContainersService { get; set; }
+        private IntegrationTestWebApplicationFactory<TEntryPoint> WebFactory { get; set; }
+        internal TestContainersService TestContainersService { get; private set; } = GlobalTestContainerSetup.TestContainersService;
 
-        internal RestClient RestHttpClient { get; }
+        internal RestClient RestHttpClient { get; set; }
 
-        protected BaseTestWebApp()
+        public async Task<bool> InitAsync()
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", HostEnvironments.Integration);
-
-            WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(
-                async () =>
+            try
+            {
+                if (WebFactory is not null && WebFactory.IsInitialized)
                 {
-                    TestContainersService = new TestContainersService(WebFactory?.Configuration);
+                    return true;
+                }
 
-                    await StartAsync();
-                });
+                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", HostEnvironments.Integration);
+                Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", HostEnvironments.Integration);
 
-            var httpClient = WebFactory.CreateClient(new WebApplicationFactoryClientOptions
+                var testProperties = TestContext.CurrentContext.Test.Properties;
+                var testCategory = testProperties.Get("Category") as string;
+
+                WebFactory = new IntegrationTestWebApplicationFactory<TEntryPoint>(
+                    () => new TestContainersConnections
+                    {
+                        MsSqlContainer = TestContainersService.MsSqlDbContainer.GetConnectionString(),
+                        RedisContainer = TestContainersService.CacheContainer.GetConnectionString()
+                    });
+
+                var baseClient = WebFactory.CreateDefaultClient();
+                baseClient.Timeout = TimeSpan.FromMinutes(BaseTestWebAppOptions.WebClientTimeoutInMinutes);
+
+                RestHttpClient = new RestClient(baseClient);
+
+                return true;
+            }
+            catch (Exception ex)
             {
-                AllowAutoRedirect = false,
-                BaseAddress = new Uri("http://localhost:7064")
-            });
-
-            RestHttpClient = new RestClient(httpClient);
+                throw;
+            }
         }
 
-        public async Task StartAsync()
+        public async Task<bool> StartContainersAsync()
         {
-            await TestContainersService.UpAndRunningContainersAsync();
-        }
-
-        public async Task StopAsync()
-        {
-            await TestContainersService.StopAsync();
-        }
-
-        protected override async ValueTask DisposeAsyncCoreAsync()
-        {
-            if (TestContainersService != null)
+            if (TestContainersService is null)
             {
-                await TestContainersService.DisposeAsync();
+                return false;
+            }
+
+            return TestContainersService.IsReadyForUse;
+        }
+
+        public async Task ShutdownAsync()
+        {
+            if (RestHttpClient is not null)
+            {
+                RestHttpClient.Dispose();
             }
 
             if (WebFactory != null)
             {
                 await WebFactory.DisposeAsync();
+                WebFactory = null;
             }
-
-            RestHttpClient?.Dispose();
         }
     }
 }

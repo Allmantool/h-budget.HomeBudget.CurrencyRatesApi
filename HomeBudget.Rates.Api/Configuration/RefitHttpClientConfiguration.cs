@@ -26,7 +26,7 @@ namespace HomeBudget.Rates.Api.Configuration
         {
             var externalResourceUrls = serviceProvider.GetRequiredService<IOptions<ExternalResourceUrls>>().Value;
 
-            var httpClientOptions = serviceProvider.GetRequiredService<IOptions<HttpClientOptions>>();
+            var httpClientOptions = serviceProvider.GetRequiredService<IOptions<HttpClientOptions>>().Value;
 
             services
                 .AddRefitClient<INationalBankApiClient>(_ => GetRefitSettings())
@@ -34,17 +34,12 @@ namespace HomeBudget.Rates.Api.Configuration
                 {
                     httpClient.BaseAddress = externalResourceUrls.NationalBankUrl;
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    httpClient.Timeout = TimeSpan.FromSeconds(httpClientOptions.Value.TimeoutInSeconds);
+                    httpClient.Timeout = TimeSpan.FromSeconds(httpClientOptions.TimeoutInSeconds);
                 })
-                .ConfigurePrimaryHttpMessageHandler(
-                    () => new HttpClientHandler
-                    {
-                        ServerCertificateCustomValidationCallback = (_, _, _, _) => true
-                    }
-                )
+                .ConfigurePrimaryHttpMessageHandler(() => CreateSocketsHttpHandler(httpClientOptions))
                 .AddPolicyHandler(GetRetryPolicy(serviceProvider))
                 .AddHttpMessageHandler<HttpLoggingHandler>()
-                .SetHandlerLifetime(TimeSpan.FromMinutes(httpClientOptions.Value.HandlerLifetimeInMinutes))
+                .SetHandlerLifetime(TimeSpan.FromMinutes(httpClientOptions.HandlerLifetimeInMinutes))
                 .AddHeaderPropagation();
 
             return services;
@@ -75,6 +70,22 @@ namespace HomeBudget.Rates.Api.Configuration
             };
 
             return new NewtonsoftJsonContentSerializer(serializerSettings);
+        }
+
+        private static SocketsHttpHandler CreateSocketsHttpHandler(
+            HttpClientOptions options)
+        {
+            return new SocketsHttpHandler
+            {
+                MaxConnectionsPerServer = options.MaxConcurrentRequests,
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+                PooledConnectionLifetime = TimeSpan.FromMinutes(options.HandlerLifetimeInMinutes),
+                PooledConnectionIdleTimeout = TimeSpan.FromMinutes(options.PooledConnectionIdleTimeoutInMinutes),
+                SslOptions =
+                {
+                    RemoteCertificateValidationCallback = (_, _, _, _) => true
+                }
+            };
         }
 
         private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(IServiceProvider serviceProvider)

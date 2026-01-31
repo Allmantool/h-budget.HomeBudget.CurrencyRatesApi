@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using FluentValidation;
 
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -94,6 +94,11 @@ services
         }))
     .WithTracing(traceBuilder =>
     {
+        if (!environment.IsProduction())
+        {
+            return;
+        }
+
         traceBuilder
             .AddSource(Observability.ActivitySourceName)
             .AddAspNetCoreInstrumentation(options =>
@@ -144,6 +149,26 @@ services.AddLogging(loggerBuilder => configuration.InitializeLogger(environment,
 webHost.AddAndConfigureSentry();
 
 var webApp = webAppBuilder.Build();
+
+var webAppLifetie = webApp.Lifetime;
+
+if (!environment.IsProduction())
+{
+    webAppLifetie.ApplicationStarted.Register(() =>
+    {
+        Console.WriteLine("🚀 Host STARTED");
+    });
+
+    webAppLifetie.ApplicationStopping.Register(() =>
+    {
+        Console.WriteLine("🛑 Host STOPPING");
+    });
+
+    webAppLifetie.ApplicationStopped.Register(() =>
+    {
+        Console.WriteLine("💀 Host STOPPED");
+    });
+}
 
 // Map the /metrics endpoint
 webApp.UseOpenTelemetryPrometheusScrapingEndpoint();

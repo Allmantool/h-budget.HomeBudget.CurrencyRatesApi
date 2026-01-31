@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using HomeBudget.Components.CurrencyRates.Models.Api;
@@ -10,8 +11,9 @@ namespace HomeBudget.Components.CurrencyRates.Providers.Interfaces
     {
         Task<IReadOnlyCollection<NationalBankShortCurrencyRate>> GetRatesForPeriodAsync(
             IEnumerable<int> currenciesIds,
-            PeriodRange periodRange);
+            PeriodRange periodRange,
+            CancellationToken ct = default);
 
-        Task<IReadOnlyCollection<NationalBankCurrencyRate>> GetTodayActiveRatesAsync();
+        Task<IReadOnlyCollection<NationalBankCurrencyRate>> GetTodayActiveRatesAsync(CancellationToken ct = default);
     }
 }

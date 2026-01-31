@@ -11,10 +11,12 @@ namespace HomeBudget.DataAccess.Dapper.SqlClients.MsSql
 {
     public class DapperWriteRepository(ISqlConnectionFactory sqlConnectionFactory, IOptions<DatabaseConnectionOptions> sqlOptions) : IBaseWriteRepository
     {
+        public string Database { get; set; }
+
         public async Task<int> ExecuteAsync<T>(string sqlQuery, T parameters, IDbTransaction dbTransaction = null)
             where T : IDbEntity
         {
-            using var db = sqlConnectionFactory.Create();
+            using var db = sqlConnectionFactory.Create(Database);
 
             return dbTransaction == null
                 ? await db.ExecuteAsync(sqlQuery, parameters)
@@ -24,7 +26,7 @@ namespace HomeBudget.DataAccess.Dapper.SqlClients.MsSql
         public async Task<int> ExecuteAsync<T>(string sqlQuery, T[] parameters, IDbTransaction dbTransaction = null)
             where T : IDbEntity
         {
-            using var db = sqlConnectionFactory.Create();
+            using var db = sqlConnectionFactory.Create(Database);
 
             return dbTransaction == null
                 ? await db.ExecuteAsync(sqlQuery, parameters, commandTimeout: sqlOptions.Value.SqlWriteCommandTimeoutSeconds)
@@ -37,7 +39,7 @@ namespace HomeBudget.DataAccess.Dapper.SqlClients.MsSql
             string mapToDbType,
             IDbTransaction dbTransaction = null)
         {
-            using var db = sqlConnectionFactory.Create();
+            using var db = sqlConnectionFactory.Create(Database);
 
             var parameters = new DynamicParameters();
             parameters.Add($"@{dt.TableName}", dt.AsTableValuedParameter(mapToDbType));
