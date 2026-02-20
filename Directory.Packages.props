@@ -68,7 +68,7 @@
     <PackageVersion Include="Serilog.Sinks.Seq" Version="9.0.0" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.1.118" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.19.0.132793" />
-    <PackageVersion Include="StackExchange.Redis" Version="2.11.0" />
+    <PackageVersion Include="StackExchange.Redis" Version="2.11.3" />
     <PackageVersion Include="Microsoft.OpenApi" Version="1.6.28" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.0.1" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="7.0.1" />
