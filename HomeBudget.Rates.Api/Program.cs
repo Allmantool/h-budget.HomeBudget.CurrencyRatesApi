@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
@@ -7,15 +6,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Serilog;
 
 using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
 using HomeBudget.Components.Exchange.MapperProfileConfigurations;
-using HomeBudget.Core;
 using HomeBudget.Core.Constants;
 using HomeBudget.Rates.Api.Configuration;
 using HomeBudget.Rates.Api.Constants;
@@ -49,7 +43,6 @@ webHost
         }
     });
 
-// This method gets called by the runtime. Use this method to add services to the container.
 services.AddControllers(o =>
 {
     o.Conventions.Add(new SwaggerControllerDocConvention());
@@ -84,65 +77,7 @@ services.AddHeaderPropagation(options =>
     options.Headers.Add(HttpHeaderKeys.CorrelationId);
 });
 
-services
-    .AddOpenTelemetry()
-    .ConfigureResource(r => r
-        .AddService(HostServiceOptions.Name)
-        .AddAttributes(new Dictionary<string, object>
-        {
-            [OpenTelemetryTags.DeploymentEnvironment] = environment.EnvironmentName
-        }))
-    .WithTracing(traceBuilder =>
-    {
-        if (!environment.IsProduction())
-        {
-            return;
-        }
-
-        traceBuilder
-            .AddSource(Observability.ActivitySourceName)
-            .AddAspNetCoreInstrumentation(options =>
-            {
-                options.EnrichWithHttpRequest = (activity, request) =>
-                {
-                    if (request.Headers.TryGetValue(HttpHeaderKeys.CorrelationId, out var cid))
-                    {
-                        activity.SetTag(ActivityTags.CorrelationId, cid.ToString());
-                    }
-                };
-
-                options.EnrichWithHttpResponse = (activity, response) =>
-                {
-                    activity.SetTag(ActivityTags.HttpStatusCode, response.StatusCode);
-                };
-
-                options.EnrichWithException = (activity, exception) =>
-                {
-                    activity.SetTag(ActivityTags.ExceptionMessage, exception.Message);
-                };
-            })
-             .AddHttpClientInstrumentation()
-             .AddSource(HostServiceOptions.Name)
-             .AddOtlpExporter(o =>
-             {
-                 o.Endpoint = new Uri(configuration.GetSection("ObservabilityOptions:TelemetryEndpoint")?.Value);
-                 o.Protocol = OtlpExportProtocol.Grpc;
-             });
-    })
-    .ConfigureResource(resource => resource.AddService(serviceName: environment.ApplicationName))
-    .WithMetrics(metrics => metrics
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddRuntimeInstrumentation()
-        .AddMeter(MetersTags.Hosting)
-        .AddMeter(MetersTags.Routing)
-        .AddMeter(MetersTags.Diagnostics)
-        .AddMeter(MetersTags.Kestrel)
-        .AddMeter(MetersTags.HttpConnections)
-        .AddMeter(MetersTags.HealthChecks)
-        .SetMaxMetricStreams(OpenTelemetryOptions.MaxMetricStreams)
-        .AddPrometheusExporter()
-    );
+services.TryAddTracingSupport(environment, configuration);
 
 services.AddLogging(loggerBuilder => configuration.InitializeLogger(environment, loggerBuilder, webAppBuilder.Host));
 
