@@ -31,6 +31,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
     <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.StackExchangeRedis" />
     <PackageReference Include="prometheus-net" />
     <PackageReference Include="prometheus-net.AspNetCore" />
     <PackageReference Include="prometheus-net.AspNetCore.HealthChecks" />

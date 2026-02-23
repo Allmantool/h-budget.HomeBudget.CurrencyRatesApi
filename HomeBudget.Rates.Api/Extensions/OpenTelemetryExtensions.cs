@@ -52,6 +52,7 @@ namespace HomeBudget.Rates.Api.Extensions
                                };
                                options.RecordException = true;
                            })
+                           .AddRedisInstrumentation()
                            .AddAspNetCoreInstrumentation(options =>
                            {
                                options.EnrichWithHttpRequest = (activity, request) =>
