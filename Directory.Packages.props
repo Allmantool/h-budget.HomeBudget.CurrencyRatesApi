@@ -69,7 +69,7 @@
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
     <PackageVersion Include="Serilog.Sinks.Seq" Version="9.0.0" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.1.118" />
-    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.19.0.132793" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.20.0.135146" />
     <PackageVersion Include="StackExchange.Redis" Version="2.11.8" />
     <PackageVersion Include="Microsoft.OpenApi" Version="1.6.28" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.0.1" />
