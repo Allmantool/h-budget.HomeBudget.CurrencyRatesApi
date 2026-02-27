@@ -44,8 +44,9 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
                 .Enrich.WithProperty(LoggerTags.ServiceName, HostServiceOptions.Name)
                 .Enrich.WithProperty(LoggerTags.Environment, environment)
                 .Enrich.WithProperty(LoggerTags.HostService, environment.EnvironmentName)
-                .Enrich.WithProperty(LoggerTags.TraceId, Activity.Current?.TraceId.ToString())
-                .Enrich.WithProperty(LoggerTags.SpanId, Activity.Current?.SpanId.ToString())
+
+                // .Enrich.WithProperty(LoggerTags.TraceId, Activity.Current?.TraceId.ToString())
+                // .Enrich.WithProperty(LoggerTags.SpanId, Activity.Current?.SpanId.ToString())
                 .Enrich.WithExceptionDetails()
                 .Enrich.WithSpan()
                 .Enrich.WithElasticApmCorrelationInfo()

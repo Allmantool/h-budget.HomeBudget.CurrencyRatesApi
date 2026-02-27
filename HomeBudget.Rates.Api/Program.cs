@@ -79,7 +79,9 @@ services.AddHeaderPropagation(options =>
 
 services.TryAddTracingSupport(environment, configuration);
 
-services.AddLogging(loggerBuilder => configuration.InitializeLogger(environment, loggerBuilder, webAppBuilder.Host));
+services
+    .AddAllElasticApm()
+    .AddLogging(loggerBuilder => configuration.InitializeLogger(environment, loggerBuilder, webAppBuilder.Host));
 
 webHost.AddAndConfigureSentry();
 
