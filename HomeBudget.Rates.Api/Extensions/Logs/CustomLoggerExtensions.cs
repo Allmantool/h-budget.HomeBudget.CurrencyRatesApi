@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 
 using System.Threading.Channels;
@@ -40,15 +39,17 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .Enrich.FromLogContext()
+                .Enrich.WithEnvironmentName()
                 .Enrich.WithMachineName()
+                .Enrich.WithProcessId()
+                .Enrich.WithProcessName()
+                .Enrich.WithExceptionDetails()
                 .Enrich.WithProperty(LoggerTags.ServiceName, HostServiceOptions.Name)
                 .Enrich.WithProperty(LoggerTags.Environment, environment)
                 .Enrich.WithProperty(LoggerTags.HostService, environment.EnvironmentName)
-
-                // .Enrich.WithProperty(LoggerTags.TraceId, Activity.Current?.TraceId.ToString())
-                // .Enrich.WithProperty(LoggerTags.SpanId, Activity.Current?.SpanId.ToString())
-                .Enrich.WithExceptionDetails()
                 .Enrich.WithSpan()
+                .Enrich.WithActivityId()
+                .Enrich.WithActivityTags()
                 .Enrich.WithElasticApmCorrelationInfo()
                 .WriteTo.Debug()
                 .WriteTo.Console()
