@@ -15,6 +15,7 @@
     <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" />
     <PackageReference Include="Elastic.Apm.NetCoreAll" />
     <PackageReference Include="Elastic.Apm.SerilogEnricher" />
+    <PackageReference Include="Elastic.Clients.Elasticsearch" />
     <PackageReference Include="Elastic.Serilog.Sinks" />
     <PackageReference Include="FluentValidation.AspNetCore" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
