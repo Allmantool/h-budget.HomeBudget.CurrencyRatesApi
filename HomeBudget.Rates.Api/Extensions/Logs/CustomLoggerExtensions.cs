@@ -48,6 +48,7 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
                 .Enrich.WithProperty(LoggerTags.Environment, environment)
                 .Enrich.WithProperty(LoggerTags.HostService, environment.EnvironmentName)
                 .Enrich.WithSpan()
+                .Enrich.With<ActivityEnricher>()
                 .Enrich.WithActivityId()
                 .Enrich.WithActivityTags()
                 .Enrich.WithElasticApmCorrelationInfo()
