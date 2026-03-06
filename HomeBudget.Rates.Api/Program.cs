@@ -75,6 +75,7 @@ services.AddHeaderPropagation(options =>
 {
     options.Headers.Add(HttpHeaderKeys.HostService, HostServiceOptions.Name);
     options.Headers.Add(HttpHeaderKeys.CorrelationId);
+    options.Headers.Add("traceparent");
 });
 
 services.TryAddTracingSupport(environment, configuration);

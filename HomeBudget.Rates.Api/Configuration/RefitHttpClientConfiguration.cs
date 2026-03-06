@@ -12,8 +12,10 @@ using Polly.Extensions.Http;
 using Refit;
 
 using HomeBudget.Components.CurrencyRates.Clients;
+using HomeBudget.Core.Constants;
 using HomeBudget.Core.Models;
 using HomeBudget.Core.Options;
+using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Exceptions.Handlers;
 
 namespace HomeBudget.Rates.Api.Configuration
@@ -40,7 +42,12 @@ namespace HomeBudget.Rates.Api.Configuration
                 .AddPolicyHandler(GetRetryPolicy(serviceProvider))
                 .AddHttpMessageHandler<HttpLoggingHandler>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(httpClientOptions.HandlerLifetimeInMinutes))
-                .AddHeaderPropagation();
+                .AddHeaderPropagation(options =>
+                {
+                    options.Headers.Add(HttpHeaderKeys.HostService, HostServiceOptions.Name);
+                    options.Headers.Add(HttpHeaderKeys.CorrelationId);
+                    options.Headers.Add("traceparent");
+                });
 
             return services;
         }
