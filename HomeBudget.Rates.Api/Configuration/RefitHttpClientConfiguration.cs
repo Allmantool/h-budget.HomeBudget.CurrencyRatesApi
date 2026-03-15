@@ -47,6 +47,8 @@ namespace HomeBudget.Rates.Api.Configuration
                     options.Headers.Add(HttpHeaderKeys.HostService, HostServiceOptions.Name);
                     options.Headers.Add(HttpHeaderKeys.CorrelationId);
                     options.Headers.Add("traceparent");
+                    options.Headers.Add("tracestate");
+                    options.Headers.Add("baggage");
                 });
 
             return services;
