@@ -24,77 +24,95 @@ namespace HomeBudget.Rates.Api.Extensions
             IWebHostEnvironment environment,
             IConfigurationRoot configuration)
         {
+            var telemetryEndpoint =
+                configuration.GetValue<string>("ObservabilityOptions:TelemetryEndpoint");
+
+            if (string.IsNullOrWhiteSpace(telemetryEndpoint))
+            {
+                return false;
+            }
+
+            var resourceBuilder = ResourceBuilder.CreateDefault()
+                .AddService(
+                    serviceName: HostServiceOptions.Name,
+                    serviceInstanceId: Environment.MachineName)
+                .AddAttributes(new Dictionary<string, object>
+                {
+                    [OpenTelemetryTags.DeploymentEnvironment] = environment.EnvironmentName
+                });
+
             services
                 .AddOpenTelemetry()
-                .ConfigureResource(r => r
-                       .AddService(HostServiceOptions.Name)
-                       .AddAttributes(new Dictionary<string, object>
-                       {
-                           [OpenTelemetryTags.DeploymentEnvironment] = environment.EnvironmentName
-                       }))
-                   .WithTracing(traceBuilder =>
-                   {
-                       if (!environment.IsProduction())
-                       {
-                           return;
-                       }
-
-                       traceBuilder
-                           .AddSource(Observability.ActivitySourceName)
-                           .AddSqlClientInstrumentation(options =>
-                           {
-                               options.EnrichWithSqlCommand = (activity, obj) =>
-                               {
-                                   if (obj is SqlCommand cmd)
-                                   {
-                                       activity.SetTag("db.commandTimeout", cmd.CommandTimeout);
-                                   }
-                               };
-                               options.RecordException = true;
-                           })
-                           .AddRedisInstrumentation()
-                           .AddAspNetCoreInstrumentation(options =>
-                           {
-                               options.EnrichWithHttpRequest = (activity, request) =>
-                               {
-                                   if (request.Headers.TryGetValue(HttpHeaderKeys.CorrelationId, out var cid))
-                                   {
-                                       activity.SetTag(ActivityTags.CorrelationId, cid.ToString());
-                                   }
-                               };
-
-                               options.EnrichWithHttpResponse = (activity, response) =>
-                               {
-                                   activity.SetTag(ActivityTags.HttpStatusCode, response.StatusCode);
-                               };
-
-                               options.EnrichWithException = (activity, exception) =>
-                               {
-                                   activity.SetTag(ActivityTags.ExceptionMessage, exception.Message);
-                               };
-                           })
-                            .AddHttpClientInstrumentation()
-                            .AddSource(HostServiceOptions.Name)
-                            .AddOtlpExporter(o =>
+                .WithTracing(traceBuilder =>
+                {
+                    traceBuilder
+                        .SetResourceBuilder(resourceBuilder)
+                        .AddSource(Observability.ActivitySourceName)
+                        .AddSource(HostServiceOptions.Name)
+                        .AddSqlClientInstrumentation(options =>
+                        {
+                            options.EnrichWithSqlCommand = (activity, obj) =>
                             {
-                                o.Endpoint = new Uri(configuration.GetSection("ObservabilityOptions:TelemetryEndpoint")?.Value);
-                                o.Protocol = OtlpExportProtocol.Grpc;
-                            });
-                   })
-                   .ConfigureResource(resource => resource.AddService(serviceName: environment.ApplicationName))
-                   .WithMetrics(metrics => metrics
-                       .AddAspNetCoreInstrumentation()
-                       .AddHttpClientInstrumentation()
-                       .AddRuntimeInstrumentation()
-                       .AddMeter(MetersTags.Hosting)
-                       .AddMeter(MetersTags.Routing)
-                       .AddMeter(MetersTags.Diagnostics)
-                       .AddMeter(MetersTags.Kestrel)
-                       .AddMeter(MetersTags.HttpConnections)
-                       .AddMeter(MetersTags.HealthChecks)
-                       .SetMaxMetricStreams(OpenTelemetryOptions.MaxMetricStreams)
-                       .AddPrometheusExporter()
-                   );
+                                if (obj is SqlCommand cmd)
+                                {
+                                    activity.SetTag("db.commandTimeout", cmd.CommandTimeout);
+                                }
+                            };
+                            options.RecordException = true;
+                        })
+                        .AddRedisInstrumentation()
+                        .AddAspNetCoreInstrumentation(options =>
+                        {
+                            options.RecordException = true;
+                            options.Filter = httpContext =>
+                            {
+                                var path = httpContext.Request.Path;
+                                return !path.StartsWithSegments("/health", StringComparison.OrdinalIgnoreCase)
+                                       && !path.StartsWithSegments("/metrics", StringComparison.OrdinalIgnoreCase);
+                            };
+
+                            options.EnrichWithHttpRequest = (activity, request) =>
+                            {
+                                if (request.Headers.TryGetValue(HttpHeaderKeys.CorrelationId, out var cid))
+                                {
+                                    activity.SetTag(ActivityTags.CorrelationId, cid.ToString());
+                                }
+                            };
+
+                            options.EnrichWithHttpResponse = (activity, response) =>
+                            {
+                                activity.SetTag(ActivityTags.HttpStatusCode, response.StatusCode);
+                            };
+
+                            options.EnrichWithException = (activity, exception) =>
+                            {
+                                activity.SetTag(ActivityTags.ExceptionMessage, exception.Message);
+                            };
+                        })
+                        .AddHttpClientInstrumentation(options =>
+                        {
+                            options.RecordException = true;
+                        })
+                        .AddOtlpExporter(o =>
+                        {
+                            o.Endpoint = new Uri(telemetryEndpoint);
+                            o.Protocol = OtlpExportProtocol.Grpc;
+                        });
+                })
+                .WithMetrics(metrics => metrics
+                    .SetResourceBuilder(resourceBuilder)
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddRuntimeInstrumentation()
+                    .AddMeter(MetersTags.Hosting)
+                    .AddMeter(MetersTags.Routing)
+                    .AddMeter(MetersTags.Diagnostics)
+                    .AddMeter(MetersTags.Kestrel)
+                    .AddMeter(MetersTags.HttpConnections)
+                    .AddMeter(MetersTags.HealthChecks)
+                    .SetMaxMetricStreams(OpenTelemetryOptions.MaxMetricStreams)
+                    .AddPrometheusExporter()
+                );
 
             return true;
         }

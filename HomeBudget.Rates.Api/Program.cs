@@ -76,9 +76,11 @@ services.AddHeaderPropagation(options =>
     options.Headers.Add(HttpHeaderKeys.HostService, HostServiceOptions.Name);
     options.Headers.Add(HttpHeaderKeys.CorrelationId);
     options.Headers.Add("traceparent");
+    options.Headers.Add("tracestate");
+    options.Headers.Add("baggage");
 });
 
-services.TryAddTracingSupport(environment, configuration);
+var isTracingEnabled = services.TryAddTracingSupport(environment, configuration);
 
 services
     .AddAllElasticApm()
@@ -108,8 +110,10 @@ if (!environment.IsProduction())
     });
 }
 
-// Map the /metrics endpoint
-webApp.UseOpenTelemetryPrometheusScrapingEndpoint();
+if (isTracingEnabled)
+{
+    webApp.UseOpenTelemetryPrometheusScrapingEndpoint();
+}
 
 // webApp.SetUpSecurity();
 webApp.SetUpBaseApplication(services, environment, configuration);
