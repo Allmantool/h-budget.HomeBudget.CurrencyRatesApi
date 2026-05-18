@@ -72,7 +72,7 @@
     <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
     <PackageVersion Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
-    <PackageVersion Include="Serilog.Sinks.Seq" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Seq" Version="9.1.0" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.1.118" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.25.0.139117" />
     <PackageVersion Include="StackExchange.Redis" Version="2.13.1" />
