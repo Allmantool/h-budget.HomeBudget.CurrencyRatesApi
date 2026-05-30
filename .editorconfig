@@ -1,10 +1,47 @@
-﻿[*.cs]
+root = true
 
-# SA1600: Elements should be documented
-dotnet_diagnostic.SA1600.severity = silent
+[*]
+indent_style = space
+indent_size = 4
 
+[*.{yml,yaml,json,md}]
+indent_size = 2
 
-# Async methods should have "Async" suffix
+[*.cs]
+# Keep analyzer rollout gradual for the existing codebase. Explicit rules below
+# opt in to maintainability and style checks without globally breaking builds.
+dotnet_analyzer_diagnostic.severity = silent
+
+# Style preferences enforced in build when analyzers report them.
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+dotnet_style_qualification_for_event = false:suggestion
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_readonly_field = true:warning
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+csharp_style_expression_bodied_methods = false:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_prefer_pattern_matching = true:suggestion
+csharp_style_prefer_not_pattern = true:suggestion
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_namespace_declarations = file_scoped:suggestion
+csharp_style_prefer_method_group_conversion = true:suggestion
+
+# Naming: async methods should have an Async suffix.
 dotnet_naming_rule.async_methods_end_in_async.symbols = any_async_methods
 dotnet_naming_rule.async_methods_end_in_async.style = end_in_async
 dotnet_naming_rule.async_methods_end_in_async.severity = warning
@@ -16,17 +53,60 @@ dotnet_naming_symbols.any_async_methods.required_modifiers = async
 dotnet_naming_style.end_in_async.required_suffix = Async
 dotnet_naming_style.end_in_async.capitalization = pascal_case
 
-# Default severity for analyzer diagnostics with category 'Reliability'
-dotnet_analyzer_diagnostic.category-Reliability.severity = none
-
-# CA2007: Consider calling ConfigureAwait on the awaited task
-dotnet_diagnostic.CA2007.severity = none
-
-# SA1210: Using directives should be ordered alphabetically by namespace
-dotnet_diagnostic.SA1210.severity = suggestion
-
-# Default severity for analyzer diagnostics with category 'StyleCop.CSharp.OrderingRules'
+# Analyzer categories.
 dotnet_analyzer_diagnostic.category-StyleCop.CSharp.OrderingRules.severity = suggestion
 
-# Default severity for all analyzer diagnostics
-dotnet_analyzer_diagnostic.severity = silent
+# Repository structure and maintainability.
+# File may only contain a single type.
+dotnet_diagnostic.SA1402.severity = warning
+# File name should match first type name.
+dotnet_diagnostic.SA1649.severity = warning
+# Using directives should be ordered alphabetically.
+dotnet_diagnostic.SA1210.severity = suggestion
+# XML docs are not required for every element.
+dotnet_diagnostic.SA1600.severity = silent
+# Avoid excessive cyclomatic complexity.
+dotnet_diagnostic.CA1502.severity = warning
+# Avoid excessive class coupling.
+dotnet_diagnostic.CA1506.severity = suggestion
+# Avoid dead conditional code.
+dotnet_diagnostic.CA1508.severity = suggestion
+# Mark members as static when possible.
+dotnet_diagnostic.CA1822.severity = suggestion
+# Seal internal types when inheritance is not needed.
+dotnet_diagnostic.CA1852.severity = suggestion
+# Use object initializers.
+dotnet_diagnostic.IDE0017.severity = suggestion
+# Use collection initializers.
+dotnet_diagnostic.IDE0028.severity = suggestion
+# Add accessibility modifiers.
+dotnet_diagnostic.IDE0040.severity = warning
+# Make fields readonly.
+dotnet_diagnostic.IDE0044.severity = warning
+# Remove unused private members.
+dotnet_diagnostic.IDE0051.severity = suggestion
+# Remove unread private members.
+dotnet_diagnostic.IDE0052.severity = suggestion
+# Simplify new expressions.
+dotnet_diagnostic.IDE0090.severity = suggestion
+
+# Sonar maintainability checks already referenced by the solution.
+# Lines should not be too long.
+dotnet_diagnostic.S103.severity = warning
+# Files should not have too many lines.
+dotnet_diagnostic.S104.severity = suggestion
+# Methods should not have too many parameters.
+dotnet_diagnostic.S107.severity = warning
+# Control flow should not be deeply nested.
+dotnet_diagnostic.S134.severity = warning
+# Methods should not have too many lines.
+dotnet_diagnostic.S138.severity = warning
+# Methods should not be too complex.
+dotnet_diagnostic.S1541.severity = suggestion
+# Cognitive complexity should be limited.
+dotnet_diagnostic.S3776.severity = warning
+
+# Async/reliability choices for this application.
+dotnet_analyzer_diagnostic.category-Reliability.severity = none
+# ConfigureAwait is not required in this ASP.NET Core codebase.
+dotnet_diagnostic.CA2007.severity = none
