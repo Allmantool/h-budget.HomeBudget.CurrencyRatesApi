@@ -54,9 +54,9 @@
     <PackageVersion Include="prometheus-net" Version="8.2.1" />
     <PackageVersion Include="prometheus-net.AspNetCore" Version="8.2.1" />
     <PackageVersion Include="prometheus-net.AspNetCore.HealthChecks" Version="8.2.1" />
-    <PackageVersion Include="Refit" Version="12.0.0" />
-    <PackageVersion Include="Refit.HttpClientFactory" Version="12.0.0" />
-    <PackageVersion Include="Refit.Newtonsoft.Json" Version="12.0.0" />
+    <PackageVersion Include="Refit" Version="12.1.0" />
+    <PackageVersion Include="Refit.HttpClientFactory" Version="12.1.0" />
+    <PackageVersion Include="Refit.Newtonsoft.Json" Version="12.1.0" />
     <PackageVersion Include="RestSharp" Version="114.0.0" />
     <PackageVersion Include="Sentry.AspNetCore" Version="6.6.0" />
     <PackageVersion Include="Sentry.Serilog" Version="6.6.0" />
