@@ -2,7 +2,12 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
+using HomeBudget.Components.CurrencyRates.Clients;
+using HomeBudget.Core.Constants;
+using HomeBudget.Core.Models;
+using HomeBudget.Core.Options;
+using HomeBudget.Rates.Api.Constants;
+using HomeBudget.Rates.Api.Exceptions.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -10,13 +15,6 @@ using Newtonsoft.Json.Serialization;
 using Polly;
 using Polly.Extensions.Http;
 using Refit;
-
-using HomeBudget.Components.CurrencyRates.Clients;
-using HomeBudget.Core.Constants;
-using HomeBudget.Core.Models;
-using HomeBudget.Core.Options;
-using HomeBudget.Rates.Api.Constants;
-using HomeBudget.Rates.Api.Exceptions.Handlers;
 
 namespace HomeBudget.Rates.Api.Configuration
 {
@@ -34,7 +32,7 @@ namespace HomeBudget.Rates.Api.Configuration
                 .AddRefitClient<INationalBankApiClient>(_ => GetRefitSettings())
                 .ConfigureHttpClient(httpClient =>
                 {
-                    httpClient.BaseAddress = externalResourceUrls.NationalBankUrl;
+                    httpClient.BaseAddress = GetNationalBankApiBaseAddress(externalResourceUrls.NationalBankUrl);
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     httpClient.Timeout = TimeSpan.FromSeconds(httpClientOptions.TimeoutInSeconds);
                 })
@@ -52,6 +50,18 @@ namespace HomeBudget.Rates.Api.Configuration
                 });
 
             return services;
+        }
+
+        private static Uri GetNationalBankApiBaseAddress(Uri configuredUrl)
+        {
+            const string LegacyNationalBankHost = "www.nbrb.by";
+
+            if (configuredUrl == null || !LegacyNationalBankHost.Equals(configuredUrl.Host, StringComparison.OrdinalIgnoreCase))
+            {
+                return configuredUrl;
+            }
+
+            return new Uri("https://api.nbrb.by");
         }
 
         private static RefitSettings GetRefitSettings()
@@ -89,11 +99,7 @@ namespace HomeBudget.Rates.Api.Configuration
                 MaxConnectionsPerServer = options.MaxConcurrentRequests,
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                 PooledConnectionLifetime = TimeSpan.FromMinutes(options.HandlerLifetimeInMinutes),
-                PooledConnectionIdleTimeout = TimeSpan.FromMinutes(options.PooledConnectionIdleTimeoutInMinutes),
-                SslOptions =
-                {
-                    RemoteCertificateValidationCallback = (_, _, _, _) => true
-                }
+                PooledConnectionIdleTimeout = TimeSpan.FromMinutes(options.PooledConnectionIdleTimeoutInMinutes)
             };
         }
 
@@ -103,7 +109,6 @@ namespace HomeBudget.Rates.Api.Configuration
 
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
-                .OrResult(msg => msg.StatusCode == HttpStatusCode.NotFound)
                 .WaitAndRetryAsync(
                     pollyRetryOptions.RetryCount,
                     retryAttempt => TimeSpan.FromSeconds(Math.Pow(pollyRetryOptions.SleepDurationInSeconds, retryAttempt)));

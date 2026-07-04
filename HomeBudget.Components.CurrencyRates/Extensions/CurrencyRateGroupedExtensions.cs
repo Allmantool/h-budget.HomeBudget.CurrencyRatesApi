@@ -14,23 +14,18 @@ namespace HomeBudget.Components.CurrencyRates.Extensions
             this IEnumerable<CurrencyRateGrouped> rateGrouped,
             string currency)
         {
-            var currencyId = NationalBankCurrencies.GetIdByAbbreviation(currency);
-
-            if (currencyId == null)
-            {
-                return Result<decimal>.Failure("No valid 'currency' has been provided");
-            }
-
-            if (currencyId == NationalBankCurrencies.Blr.Id)
+            if (string.Equals(currency, NationalBankCurrencies.Blr.Name, System.StringComparison.OrdinalIgnoreCase))
             {
                 return Result<decimal>.Succeeded(1m);
             }
 
-            var originCurrencyForPeriod = rateGrouped.Where(x => x.CurrencyId == currencyId).ToArray();
+            var originCurrencyForPeriod = rateGrouped
+                .Where(x => string.Equals(x.Abbreviation, currency, System.StringComparison.OrdinalIgnoreCase))
+                .ToArray();
 
             if (originCurrencyForPeriod.IsNullOrEmpty() || originCurrencyForPeriod.Length > 1)
             {
-                return Result<decimal>.Failure($"'{nameof(CurrencyRateGrouped)}' hasn't been found or has more then one entry for target currency id '{currencyId}'");
+                return Result<decimal>.Failure($"'{nameof(CurrencyRateGrouped)}' hasn't been found or has more then one entry for target currency '{currency}'");
             }
 
             var currencyGroup = originCurrencyForPeriod.Single();

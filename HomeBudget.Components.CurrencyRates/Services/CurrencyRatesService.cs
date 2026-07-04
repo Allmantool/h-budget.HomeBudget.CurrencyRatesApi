@@ -37,10 +37,10 @@ namespace HomeBudget.Components.CurrencyRates.Services
             DateOnly endDate,
             CancellationToken ct = default)
         {
-            var todayRatesResponse = await GetTodayRatesAsync();
+            var activeCurrencies = await nationalBankRatesProvider.GetActiveCurrenciesAsync(endDate, ct);
 
             var shortRates = await nationalBankRatesProvider.GetRatesForPeriodAsync(
-                todayRatesResponse.Payload.Select(r => r.CurrencyId),
+                activeCurrencies.Select(r => r.CurrencyId),
                 new PeriodRange
                 {
                     StartDate = startDate,
@@ -52,16 +52,15 @@ namespace HomeBudget.Components.CurrencyRates.Services
 
             foreach (var rate in ratesFromApiCall)
             {
-                var configInfo = todayRatesResponse
-                    .Payload
+                var currencyInfo = activeCurrencies
                     .SingleOrDefault(i => i.CurrencyId == rate.CurrencyId);
 
-                if (configInfo == null)
+                if (currencyInfo == null)
                 {
                     continue;
                 }
 
-                rate.EnrichWithRateGroupInfo(configInfo);
+                rate.EnrichWithRateGroupInfo(currencyInfo);
             }
 
             var ratesForPeriodFromDatabase = await currencyRatesReadProvider.GetRatesForPeriodAsync(startDate, endDate);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
+using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Components.CurrencyRates.Models.Api;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Core.Constants;
@@ -12,6 +13,23 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
 {
     internal class MockNationalBankRatesProvider : INationalBankRatesProvider
     {
+        public Task<IReadOnlyCollection<NationalBankCurrencyDefinition>> GetActiveCurrenciesAsync(
+            DateOnly requestedDate,
+            CancellationToken ct = default)
+        {
+            IReadOnlyCollection<NationalBankCurrencyDefinition> responsePayload = new List<NationalBankCurrencyDefinition>
+            {
+                CreateDefinition(NationalBankCurrencies.Usd.Id, NationalBankCurrencies.Usd.Name, "US Dollar", 1),
+                CreateDefinition(NationalBankCurrencies.Rub.Id, NationalBankCurrencies.Rub.Name, "Russian Ruble", 100),
+                CreateDefinition(NationalBankCurrencies.Pln.Id, NationalBankCurrencies.Pln.Name, "Polish Zloty", 10),
+                CreateDefinition(NationalBankCurrencies.Eur.Id, NationalBankCurrencies.Eur.Name, "Euro", 1),
+                CreateDefinition(NationalBankCurrencies.Uan.Id, NationalBankCurrencies.Uan.Name, "Hryvnia", 100),
+                CreateDefinition(NationalBankCurrencies.Try.Id, NationalBankCurrencies.Try.Name, "Turkish Lira", 10)
+            };
+
+            return Task.FromResult(responsePayload);
+        }
+
         public Task<IReadOnlyCollection<NationalBankShortCurrencyRate>> GetRatesForPeriodAsync(
             IEnumerable<int> currenciesIds,
             PeriodRange periodRange,
@@ -118,5 +136,22 @@ namespace HomeBudget.Components.IntegrationTests.MockServices
 
             return Task.FromResult(responsePayload);
         }
+
+        private static NationalBankCurrencyDefinition CreateDefinition(
+            int currencyId,
+            string abbreviation,
+            string name,
+            int scale)
+            => new(
+                currencyId,
+                null,
+                string.Empty,
+                abbreviation,
+                name,
+                name,
+                scale,
+                0,
+                new DateOnly(2000, 1, 1),
+                new DateOnly(2050, 1, 1));
     }
 }

@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-
 using System.Threading.Channels;
 using Elastic.Apm.SerilogEnricher;
 using Elastic.Channels;
 using Elastic.Ingest.Elasticsearch;
 using Elastic.Ingest.Elasticsearch.DataStreams;
 using Elastic.Serilog.Sinks;
+using HomeBudget.Core.Constants;
+using HomeBudget.Core.Options;
+using HomeBudget.Rates.Api.Constants;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -22,10 +24,6 @@ using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Sinks.OpenTelemetry;
 
-using HomeBudget.Core.Constants;
-using HomeBudget.Core.Options;
-using HomeBudget.Rates.Api.Constants;
-
 namespace HomeBudget.Rates.Api.Extensions.Logs
 {
     internal static class CustomLoggerExtensions
@@ -34,8 +32,11 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
             this IConfiguration configuration,
             IWebHostEnvironment environment,
             ILoggingBuilder loggingBuilder,
-            ConfigureHostBuilder configureHostBuilder)
+            ConfigureHostBuilder configureHostBuilder,
+            string hostServiceName)
         {
+            var serviceVersion = typeof(CustomLoggerExtensions).Assembly.GetName().Version?.ToString() ?? "unknown";
+
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .Enrich.FromLogContext()
@@ -59,6 +60,14 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
                 {
                     o.Endpoint = configuration.GetSection("ObservabilityOptions:LogsEndpoint")?.Value;
                     o.Protocol = OtlpProtocol.Grpc;
+                    o.ResourceAttributes = new Dictionary<string, object>
+                    {
+                        ["service.name"] = hostServiceName,
+                        ["service.version"] = serviceVersion,
+                        [LoggerTags.Environment] = environment.EnvironmentName,
+                        [LoggerTags.HostService] = hostServiceName,
+                        [LoggerTags.ApplicationName] = environment.ApplicationName,
+                    };
                 })
                 .TryAddSeqSupport(configuration)
                 .TryAddElasticSearchSupport(configuration, environment)

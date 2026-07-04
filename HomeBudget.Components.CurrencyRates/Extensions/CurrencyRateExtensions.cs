@@ -32,5 +32,13 @@ namespace HomeBudget.Components.CurrencyRates.Extensions
             rate.Scale = configInfo.Scale;
             rate.RatePerUnit = rate.OfficialRate / configInfo.Scale;
         }
+
+        public static void EnrichWithRateGroupInfo(this CurrencyRate rate, NationalBankCurrencyDefinition currencyInfo)
+        {
+            rate.Abbreviation = currencyInfo.Abbreviation;
+            rate.Name = currencyInfo.Name;
+            rate.Scale = currencyInfo.Scale;
+            rate.RatePerUnit = rate.OfficialRate / currencyInfo.Scale;
+        }
     }
 }

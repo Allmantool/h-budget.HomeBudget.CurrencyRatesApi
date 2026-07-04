@@ -4,15 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using AutoMapper;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
-using Moq;
-using NUnit.Framework;
-
 using HomeBudget.Components.CurrencyRates.Clients;
 using HomeBudget.Components.CurrencyRates.Extensions;
 using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
@@ -21,14 +14,20 @@ using HomeBudget.Components.CurrencyRates.Models.Api;
 using HomeBudget.Components.CurrencyRates.Providers;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.CurrencyRates.Services;
+using HomeBudget.Components.CurrencyRates.Services.Interfaces;
 using HomeBudget.Core.Constants;
 using HomeBudget.Core.Limiters;
 using HomeBudget.Core.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using Moq;
+using NUnit.Framework;
 
 namespace HomeBudget.Components.CurrencyRates.Tests.Services
 {
     [TestFixture]
-    public class CurrencyRatesServiceTests
+    internal class CurrencyRatesServiceTests
     {
         private readonly Mock<INationalBankApiClient> _nationalBankApiClientMock = new();
         private readonly Mock<ICurrencyRatesReadProvider> _currencyRatesReadProviderMock = new();
@@ -84,6 +83,36 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
                 .Setup(x => x.AcquireAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(lease);
 
+            var currencyResolverMock = new Mock<INationalBankCurrencyResolver>();
+
+            currencyResolverMock
+                .Setup(r => r.ResolveActiveCurrenciesAsync(testEndDate, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[]
+                {
+                    new NationalBankCurrencyDefinition(
+                        1,
+                        null,
+                        "001",
+                        "Abb-A",
+                        "Name-A",
+                        "Name-A",
+                        1,
+                        0,
+                        new DateOnly(2000, 1, 1),
+                        new DateOnly(2050, 1, 1)),
+                    new NationalBankCurrencyDefinition(
+                        2,
+                        null,
+                        "002",
+                        "Abb-B",
+                        "Name-B",
+                        "Name-B",
+                        1,
+                        0,
+                        new DateOnly(2000, 1, 1),
+                        new DateOnly(2050, 1, 1))
+                });
+
             _nationalBankApiClientMock
                 .Setup(i => i.GetRatesForPeriodAsync(
                     1,
@@ -129,24 +158,11 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
                 _currencyRatesReadProviderMock.Object,
                 _currencyRatesWriteProviderMock.Object,
                 new NationalBankRatesProvider(
-                    new ConfigSettings
-                    {
-                        ActiveNationalBankCurrencies = new List<ConfigCurrency>
-                        {
-                            new()
-                            {
-                                Abbreviation = "Abb-A"
-                            },
-                            new()
-                            {
-                                Abbreviation = "Abb-B"
-                            }
-                        }
-                    },
                     Mock.Of<ILogger<NationalBankRatesProvider>>(),
                     Options.Create(new HttpClientOptions()),
                     _nationalBankApiClientMock.Object,
-                    _httpClientRateLimiterMock.Object));
+                    _httpClientRateLimiterMock.Object,
+                    currencyResolverMock.Object));
 
             var rates = await _sut.GetRatesForPeriodAsync(testStartDate, testEndDate);
 
