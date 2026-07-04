@@ -1,14 +1,14 @@
 # Coding Standards
 
-These standards apply to production code, tests, scripts, and documentation in this repository unless a more specific nested `AGENTS.md` or domain-specific standard overrides them.
+These standards apply to production code, tests, scripts, and documentation in the HomeBudget Rates API repository unless a more specific nested `AGENTS.md` or domain-specific standard overrides them.
 
-They are intentionally project-agnostic. Domain-specific rules should live in separate addenda, for example:
+Rates API review and documentation guidance also lives in:
 
 ```text
-docs/standards/rates-api.md
-docs/standards/accounting-api.md
-docs/standards/angular-ui.md
-docs/standards/data-migration.md
+docs/code-review-checklist.md
+docs/pr-review-check.md
+docs/pull_request_template.md
+docs/rates-api-currency-catalog/
 ```
 
 ---
@@ -1037,17 +1037,16 @@ Do not claim success without evidence.
 
 ## 35. Project-Specific Addenda
 
-Keep this document general.
+Keep this document focused on shared HomeBudget Rates API engineering rules.
 
 When a project or feature needs stricter rules, create a focused addendum and link it from `AGENTS.md` or the nearest nested `AGENTS.md`.
 
-Examples:
+Useful addenda for this repository include:
 
 ```text
-docs/standards/rates-api.md
-docs/standards/accounting-api.md
-docs/standards/angular-ui.md
-docs/standards/firebird-migration.md
+docs/code-review-checklist.md
+docs/pr-review-check.md
+docs/rates-api-currency-catalog/
 ```
 
 Addenda should contain only domain-specific rules, not duplicate this whole document.

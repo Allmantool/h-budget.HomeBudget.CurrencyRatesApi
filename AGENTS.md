@@ -4,10 +4,19 @@
 
 This file is the primary entry point for AI coding agents working in this repository.
 
+This repository is the HomeBudget Rates API. The main areas are:
+
+* `HomeBudget.Rates.Api` for the ASP.NET Core host and API configuration;
+* `HomeBudget.Components.CurrencyRates` for NBRB rates integration and currency-rate workflows;
+* `HomeBudget.Components.Exchange` for exchange calculations;
+* `HomeBudget.DataAccess*` for persistence;
+* `HomeBudget.Components.*.Tests` and `HomeBudget.Rates.Api.Tests` for unit and integration coverage;
+* `docs` for repository standards, PR review guidance, and design notes.
+
 Detailed engineering standards live in:
 
 ```text
-docs/CODING_STANDARDS.md
+docs/coding-standards.md
 ```
 
 Read this file first, then read the nearest nested `AGENTS.md` for the area being changed, then read the detailed standards and local implementation patterns.
@@ -22,7 +31,7 @@ When instructions conflict, follow this order:
 2. User task instructions.
 3. Nearest `AGENTS.md`.
 4. Root `AGENTS.md`.
-5. `docs/CODING_STANDARDS.md`.
+5. `docs/coding-standards.md`.
 6. Existing local code patterns.
 7. General framework or language conventions.
 
@@ -105,7 +114,7 @@ This is mandatory for changes involving:
 
 ## 5. Architecture Expectations
 
-Follow `docs/CODING_STANDARDS.md`.
+Follow `docs/coding-standards.md`.
 
 Default architecture rules:
 

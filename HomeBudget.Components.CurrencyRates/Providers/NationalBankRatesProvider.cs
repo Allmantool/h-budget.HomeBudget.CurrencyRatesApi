@@ -70,7 +70,7 @@ namespace HomeBudget.Components.CurrencyRates.Providers
                 },
                 async (payload, loopCt) =>
                 {
-                    using var requestCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+                    using var requestCts = CancellationTokenSource.CreateLinkedTokenSource(loopCt);
 
                     requestCts.CancelAfter(TimeSpan.FromSeconds(httpClientOptions.TimeoutInSeconds));
                     using var lease = await nationalBankHttpRateLimiter.AcquireAsync(1, requestCts.Token);
@@ -107,7 +107,7 @@ namespace HomeBudget.Components.CurrencyRates.Providers
         {
             var requestedDate = DateOnly.FromDateTime(DateTime.Today);
             var activeCurrencies = await currencyResolver.ResolveActiveCurrenciesAsync(requestedDate, ct);
-            var activeRates = new ConcurrentBag<NationalBankCurrencyRate>();
+            var activeRates = new ConcurrentDictionary<int, NationalBankCurrencyRate>();
 
             await Parallel.ForEachAsync(
                 activeCurrencies,
@@ -124,11 +124,14 @@ namespace HomeBudget.Components.CurrencyRates.Providers
 
                     if (rate != null)
                     {
-                        activeRates.Add(rate);
+                        activeRates.TryAdd(currency.CurrencyId, rate);
                     }
                 });
 
-            return activeRates.ToList();
+            return activeCurrencies
+                .Select(currency => activeRates.TryGetValue(currency.CurrencyId, out var rate) ? rate : null)
+                .Where(rate => rate != null)
+                .ToList();
         }
 
         private static IReadOnlyCollection<YearRatesRequestPayload> GetYearPeriodRequests(
