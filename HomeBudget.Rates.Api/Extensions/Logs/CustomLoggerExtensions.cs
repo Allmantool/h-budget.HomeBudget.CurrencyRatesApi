@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Channels;
+
 using Elastic.Apm.SerilogEnricher;
 using Elastic.Channels;
 using Elastic.Ingest.Elasticsearch;
 using Elastic.Ingest.Elasticsearch.DataStreams;
 using Elastic.Serilog.Sinks;
-using HomeBudget.Core.Constants;
-using HomeBudget.Core.Options;
-using HomeBudget.Rates.Api.Constants;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +21,10 @@ using Serilog.Enrichers.Span;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Sinks.OpenTelemetry;
+
+using HomeBudget.Core.Constants;
+using HomeBudget.Core.Options;
+using HomeBudget.Rates.Api.Constants;
 
 namespace HomeBudget.Rates.Api.Extensions.Logs
 {

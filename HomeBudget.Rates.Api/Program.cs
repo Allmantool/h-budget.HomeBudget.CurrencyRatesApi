@@ -1,5 +1,13 @@
 ﻿using System;
+
 using FluentValidation;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+
 using HomeBudget.Components.CurrencyRates.MapperProfileConfigurations;
 using HomeBudget.Components.Exchange.MapperProfileConfigurations;
 using HomeBudget.Core.Constants;
@@ -9,12 +17,6 @@ using HomeBudget.Rates.Api.Exceptions.Handlers;
 using HomeBudget.Rates.Api.Extensions;
 using HomeBudget.Rates.Api.Extensions.Logs;
 using HomeBudget.Rates.Api.MapperProfileConfigurations;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Serilog;
 
 var webAppBuilder = WebApplication.CreateBuilder(args);
 
