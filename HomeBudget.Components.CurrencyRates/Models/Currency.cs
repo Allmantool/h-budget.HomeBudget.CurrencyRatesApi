@@ -8,9 +8,13 @@ namespace HomeBudget.Components.CurrencyRates.Models
 
         public string Code { get; set; }
 
+        public string Abbreviation { get; set; }
+
         public string Name { get; set; }
 
         public int Scale { get; set; }
+
+        public int Periodicity { get; set; }
 
         public DateOnly DateStart { get; set; }
 

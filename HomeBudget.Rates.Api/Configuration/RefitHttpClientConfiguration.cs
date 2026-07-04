@@ -34,7 +34,7 @@ namespace HomeBudget.Rates.Api.Configuration
                 .AddRefitClient<INationalBankApiClient>(_ => GetRefitSettings())
                 .ConfigureHttpClient(httpClient =>
                 {
-                    httpClient.BaseAddress = externalResourceUrls.NationalBankUrl;
+                    httpClient.BaseAddress = GetNationalBankApiBaseAddress(externalResourceUrls);
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     httpClient.Timeout = TimeSpan.FromSeconds(httpClientOptions.TimeoutInSeconds);
                 })
@@ -52,6 +52,18 @@ namespace HomeBudget.Rates.Api.Configuration
                 });
 
             return services;
+        }
+
+        private static Uri GetNationalBankApiBaseAddress(ExternalResourceUrls configuredUrl)
+        {
+            var legacyNationalBankHost = configuredUrl.NationalBankHost;
+
+            if (configuredUrl == null || !legacyNationalBankHost.Equals(configuredUrl.NationalBankUrl.Host, StringComparison.OrdinalIgnoreCase))
+            {
+                return configuredUrl.NationalBankUrl;
+            }
+
+            return new Uri(configuredUrl.NationalBankApi);
         }
 
         private static RefitSettings GetRefitSettings()
@@ -90,10 +102,11 @@ namespace HomeBudget.Rates.Api.Configuration
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                 PooledConnectionLifetime = TimeSpan.FromMinutes(options.HandlerLifetimeInMinutes),
                 PooledConnectionIdleTimeout = TimeSpan.FromMinutes(options.PooledConnectionIdleTimeoutInMinutes),
-                SslOptions =
-                {
-                    RemoteCertificateValidationCallback = (_, _, _, _) => true
-                }
+                /* SslOptions =
+                //{
+                //    RemoteCertificateValidationCallback = (_, _, _, _) => true
+                //}
+                */
             };
         }
 
@@ -103,7 +116,6 @@ namespace HomeBudget.Rates.Api.Configuration
 
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
-                .OrResult(msg => msg.StatusCode == HttpStatusCode.NotFound)
                 .WaitAndRetryAsync(
                     pollyRetryOptions.RetryCount,
                     retryAttempt => TimeSpan.FromSeconds(Math.Pow(pollyRetryOptions.SleepDurationInSeconds, retryAttempt)));

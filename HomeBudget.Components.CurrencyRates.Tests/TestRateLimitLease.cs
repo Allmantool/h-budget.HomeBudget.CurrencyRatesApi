@@ -25,7 +25,7 @@ namespace HomeBudget.Components.CurrencyRates.Tests
 
         protected override void Dispose(bool disposing)
         {
-            // nothing to dispose
+            base.Dispose(disposing);
         }
     }
 }

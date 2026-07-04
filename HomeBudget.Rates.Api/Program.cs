@@ -84,7 +84,11 @@ var isTracingEnabled = services.TryAddTracingSupport(environment, configuration)
 
 services
     .AddAllElasticApm()
-    .AddLogging(loggerBuilder => configuration.InitializeLogger(environment, loggerBuilder, webAppBuilder.Host));
+    .AddLogging(loggerBuilder => configuration.InitializeLogger(
+        environment,
+        loggerBuilder,
+        webAppBuilder.Host,
+        HostServiceOptions.Name));
 
 webHost.AddAndConfigureSentry();
 
@@ -136,7 +140,7 @@ catch (Exception ex)
 // To add visibility for integration tests
 namespace HomeBudget.Rates.Api
 {
-    public partial class Program
+    internal partial class Program
     {
         protected Program() { }
     }

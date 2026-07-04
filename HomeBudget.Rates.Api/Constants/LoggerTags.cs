@@ -6,7 +6,8 @@
         public const string Environment = "environment.name";
         public const string HostService = "host.name";
 
-        public const string TraceId = "TraceId";
-        public const string SpanId = "SpanId";
+        public const string ApplicationName = nameof(ApplicationName);
+        public const string TraceId = nameof(TraceId);
+        public const string SpanId = nameof(SpanId);
     }
 }

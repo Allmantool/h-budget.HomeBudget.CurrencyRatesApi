@@ -54,5 +54,38 @@ namespace HomeBudget.Core.Extensions
                 currentStart = currentEnd.AddDays(1);
             }
         }
+
+        public static IEnumerable<PeriodRange> SplitByMaxDays(this PeriodRange period, int maxDays)
+        {
+            if (maxDays < 1)
+            {
+                throw new ArgumentException("Max days must be greater than zero", nameof(maxDays));
+            }
+
+            if (period.StartDate > period.EndDate)
+            {
+                throw new ArgumentException("StartDate must be before EndDate");
+            }
+
+            var currentStart = period.StartDate;
+
+            while (currentStart <= period.EndDate)
+            {
+                var currentEnd = currentStart.AddDays(maxDays - 1);
+
+                if (currentEnd > period.EndDate)
+                {
+                    currentEnd = period.EndDate;
+                }
+
+                yield return new PeriodRange
+                {
+                    StartDate = currentStart,
+                    EndDate = currentEnd
+                };
+
+                currentStart = currentEnd.AddDays(1);
+            }
+        }
     }
 }

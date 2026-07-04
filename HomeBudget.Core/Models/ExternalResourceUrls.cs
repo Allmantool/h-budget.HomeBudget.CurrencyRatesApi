@@ -5,5 +5,7 @@ namespace HomeBudget.Core.Models
     public record ExternalResourceUrls
     {
         public Uri NationalBankUrl { get; set; }
+        public string NationalBankHost { get; set; }
+        public string NationalBankApi { get; set; }
     }
 }

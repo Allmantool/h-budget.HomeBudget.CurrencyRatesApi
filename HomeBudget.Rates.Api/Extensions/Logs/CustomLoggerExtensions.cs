@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-
 using System.Threading.Channels;
+
 using Elastic.Apm.SerilogEnricher;
 using Elastic.Channels;
 using Elastic.Ingest.Elasticsearch;
@@ -34,8 +34,11 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
             this IConfiguration configuration,
             IWebHostEnvironment environment,
             ILoggingBuilder loggingBuilder,
-            ConfigureHostBuilder configureHostBuilder)
+            ConfigureHostBuilder configureHostBuilder,
+            string hostServiceName)
         {
+            var serviceVersion = typeof(CustomLoggerExtensions).Assembly.GetName().Version?.ToString() ?? "unknown";
+
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .Enrich.FromLogContext()
@@ -59,6 +62,14 @@ namespace HomeBudget.Rates.Api.Extensions.Logs
                 {
                     o.Endpoint = configuration.GetSection("ObservabilityOptions:LogsEndpoint")?.Value;
                     o.Protocol = OtlpProtocol.Grpc;
+                    o.ResourceAttributes = new Dictionary<string, object>
+                    {
+                        ["service.name"] = hostServiceName,
+                        ["service.version"] = serviceVersion,
+                        [LoggerTags.Environment] = environment.EnvironmentName,
+                        [LoggerTags.HostService] = hostServiceName,
+                        [LoggerTags.ApplicationName] = environment.ApplicationName,
+                    };
                 })
                 .TryAddSeqSupport(configuration)
                 .TryAddElasticSearchSupport(configuration, environment)
