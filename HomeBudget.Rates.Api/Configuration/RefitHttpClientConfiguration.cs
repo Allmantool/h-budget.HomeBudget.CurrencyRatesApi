@@ -34,7 +34,7 @@ namespace HomeBudget.Rates.Api.Configuration
                 .AddRefitClient<INationalBankApiClient>(_ => GetRefitSettings())
                 .ConfigureHttpClient(httpClient =>
                 {
-                    httpClient.BaseAddress = GetNationalBankApiBaseAddress(externalResourceUrls.NationalBankUrl);
+                    httpClient.BaseAddress = GetNationalBankApiBaseAddress(externalResourceUrls);
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     httpClient.Timeout = TimeSpan.FromSeconds(httpClientOptions.TimeoutInSeconds);
                 })
@@ -54,16 +54,16 @@ namespace HomeBudget.Rates.Api.Configuration
             return services;
         }
 
-        private static Uri GetNationalBankApiBaseAddress(Uri configuredUrl)
+        private static Uri GetNationalBankApiBaseAddress(ExternalResourceUrls configuredUrl)
         {
-            const string LegacyNationalBankHost = "www.nbrb.by";
+            var legacyNationalBankHost = configuredUrl.NationalBankHost;
 
-            if (configuredUrl == null || !LegacyNationalBankHost.Equals(configuredUrl.Host, StringComparison.OrdinalIgnoreCase))
+            if (configuredUrl == null || !legacyNationalBankHost.Equals(configuredUrl.NationalBankUrl.Host, StringComparison.OrdinalIgnoreCase))
             {
-                return configuredUrl;
+                return configuredUrl.NationalBankUrl;
             }
 
-            return new Uri("https://api.nbrb.by");
+            return new Uri(configuredUrl.NationalBankApi);
         }
 
         private static RefitSettings GetRefitSettings()
