@@ -1,51 +1,45 @@
-﻿using System;
-
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace HomeBudget.Rates.Api.Extensions
 {
     internal static class SwaggerExtensions
     {
+        private const string DocumentName = "v1";
+        private const string ApiTitle = "HomeBudget_Rates_Api";
+        private const string BearerSchemeName = "Bearer";
+
         public static IServiceCollection SetupSwaggerGen(this IServiceCollection services)
         {
             return services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc(
-                    "v1",
+                    DocumentName,
                     new OpenApiInfo
                     {
-                        Title = "HomeBudget_Rates_Api",
-                        Version = "v1"
+                        Title = ApiTitle,
+                        Version = DocumentName
                     });
 
-                options.CustomSchemaIds(type => type.ToString());
+                options.CustomSchemaIds(type => type.FullName ?? type.Name);
 
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    In = ParameterLocation.Header,
-                    Description = "Please insert JWT token with the prefix Bearer into field",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT"
-                });
+                options.AddSecurityDefinition(
+                    BearerSchemeName,
+                    new OpenApiSecurityScheme
+                    {
+                        Name = "Authorization",
+                        Description = "JWT Authorization header using the Bearer scheme.",
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "bearer",
+                        BearerFormat = "JWT"
+                    });
 
                 options.AddSecurityRequirement(
-                    new OpenApiSecurityRequirement
+                    document => new OpenApiSecurityRequirement
                     {
-                        {
-                            new OpenApiSecurityScheme
-                            {
-                                Reference = new OpenApiReference
-                                {
-                                    Type = ReferenceType.SecurityScheme,
-                                    Id = "Bearer"
-                                }
-                            },
-                            Array.Empty<string>()
-                        }
+                        [new OpenApiSecuritySchemeReference(BearerSchemeName, document)] = []
                     });
             });
         }
@@ -55,13 +49,15 @@ namespace HomeBudget.Rates.Api.Extensions
             return app
                 .UseSwagger(options =>
                 {
-                    // Optional configuration
                     options.RouteTemplate = "swagger/{documentName}/swagger.json";
                 })
                 .UseSwaggerUI(options =>
                 {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "HomeBudget_Rates_Api v1");
-                    options.RoutePrefix = "swagger"; // Optional: set custom route
+                    options.SwaggerEndpoint(
+                        $"/swagger/{DocumentName}/swagger.json",
+                        $"{ApiTitle} {DocumentName}");
+
+                    options.RoutePrefix = "swagger";
                 });
         }
     }
