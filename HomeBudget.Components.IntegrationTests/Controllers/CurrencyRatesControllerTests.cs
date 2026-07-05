@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
-
 using FluentAssertions;
-using NUnit.Framework;
-using RestSharp;
-
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Components.IntegrationTests.Constants;
 using HomeBudget.Components.IntegrationTests.WebApps;
@@ -15,6 +11,9 @@ using HomeBudget.Core.Constants;
 using HomeBudget.Core.Models;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Models.Requests;
+using Microsoft.Data.SqlClient;
+using NUnit.Framework;
+using RestSharp;
 using CurrencyRate = HomeBudget.Rates.Api.Models.CurrencyRate;
 
 namespace HomeBudget.Components.IntegrationTests.Controllers
@@ -72,7 +71,60 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var payload = response.Data;
             var currencyGroupAmount = payload?.Payload.Count;
 
-            currencyGroupAmount.Should().Be(6);
+            currencyGroupAmount.Should().Be(8);
+        }
+
+        [Test]
+        public async Task RequestRatesForPeriodAsync_WhenExecutedTwice_PersistsMultipleDatesAndCurrenciesWithoutDuplicates()
+        {
+            var startDate = new DateOnly(2026, 1, 1);
+            var endDate = new DateOnly(2026, 1, 3);
+            var startDay = startDate.ToString(DateFormats.RatesApiRequestFormat, CultureInfo.InvariantCulture);
+            var endDay = endDate.ToString(DateFormats.RatesApiRequestFormat, CultureInfo.InvariantCulture);
+            var requestBody = new CurrencyForPeriodRequest
+            {
+                StartDate = startDate,
+                EndDate = endDate
+            };
+
+            var firstRequest = new RestRequest($"/{Endpoints.RatesApi}/period/{startDay}/{endDay}", Method.Post)
+                .AddJsonBody(requestBody);
+            var secondRequest = new RestRequest($"/{Endpoints.RatesApi}/period/{startDay}/{endDay}", Method.Post)
+                .AddJsonBody(requestBody);
+
+            var firstResponse = await _httpClient.ExecuteAsync(firstRequest);
+            var secondResponse = await _httpClient.ExecuteAsync(secondRequest);
+            var persistedRows = await CountPersistedRatesAsync(startDate, endDate);
+
+            firstResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            secondResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            persistedRows.Should().Be(24);
+        }
+
+        [Test]
+        public async Task GetRatesForPeriodAsync_WhenProviderNamesAreEnglish_ReturnsCurrencyAbbreviationNames()
+        {
+            var date = new DateOnly(2026, 2, 1);
+            var requestDate = date.ToString(DateFormats.RatesApiRequestFormat, CultureInfo.InvariantCulture);
+            var expectedNames = new Dictionary<string, string>
+            {
+                ["USD"] = "Доллар США",
+                ["RUB"] = "Российских рублей",
+                ["EUR"] = "Евро",
+                ["UAH"] = "Гривен",
+                ["PLN"] = "Злотых",
+                ["TRY"] = "Турецких лир",
+                ["CNY"] = "Китайский юань",
+                ["THB"] = "Таиландский бат"
+            };
+
+            var request = new RestRequest($"/{Endpoints.RatesApi}/period/{requestDate}/{requestDate}");
+
+            var response = await _httpClient.ExecuteAsync<Result<IReadOnlyCollection<CurrencyRateGrouped>>>(request);
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            response.Data?.Payload.Should().HaveCount(expectedNames.Count);
+            response.Data?.Payload.Should().OnlyContain(rate => rate.Name == expectedNames[rate.Abbreviation]);
         }
 
         [Test]
@@ -121,6 +173,25 @@ namespace HomeBudget.Components.IntegrationTests.Controllers
             var response = await _httpClient.ExecuteAsync<Result<int>>(currencySaveRatesRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        private async Task<int> CountPersistedRatesAsync(DateOnly startDate, DateOnly endDate)
+        {
+            const string query = @"
+                SELECT COUNT(*)
+                FROM [HomeBudget.CurrencyRates].[dbo].[CurrencyRates]
+                WHERE [UpdateDate] BETWEEN @StartDate AND @EndDate
+                  AND [Abbreviation] IN ('USD', 'RUB', 'EUR', 'UAH', 'PLN', 'TRY', 'CNY', 'THB');";
+
+            await using var connection = new SqlConnection(TestContainers.MsSqlDbContainer.GetConnectionString());
+            await using var command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@StartDate", startDate.ToDateTime(TimeOnly.MinValue));
+            command.Parameters.AddWithValue("@EndDate", endDate.ToDateTime(TimeOnly.MinValue));
+
+            await connection.OpenAsync();
+
+            return (int)await command.ExecuteScalarAsync();
         }
     }
 }

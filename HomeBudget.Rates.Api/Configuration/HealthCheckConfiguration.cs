@@ -1,18 +1,22 @@
 ﻿using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Extensions;
 using HomeBudget.Rates.Api.Middlewares;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace HomeBudget.Rates.Api.Configuration
 {
     internal static class HealthCheckConfiguration
     {
+        private static readonly string[] CustomTags = new[] { "custom" };
+        private static readonly string[] RedisTags = new[] { "redis" };
+        private static readonly string[] SqlServerTags = new[] { "sqlServer" };
+
         public static IServiceCollection SetUpHealthCheck(this IServiceCollection services, IConfiguration configuration, string hostUrls)
         {
             var msSqlConnectionString = configuration.GetRequiredSection("DatabaseOptions:ConnectionString").Value;
@@ -26,9 +30,9 @@ namespace HomeBudget.Rates.Api.Configuration
             services
                 .AddHealthChecks()
                 .AddCheck("heartbeat", () => HealthCheckResult.Healthy())
-                .AddCheck<CustomLogicHealthCheck>(nameof(CustomLogicHealthCheck), tags: ["custom"])
-                .AddSqlServer(msSqlConnectionString, tags: ["sqlServer"])
-                .AddRedis(redisConnectionString, tags: ["redis"]);
+                .AddCheck<CustomLogicHealthCheck>(nameof(CustomLogicHealthCheck), tags: CustomTags)
+                .AddSqlServer(msSqlConnectionString, tags: SqlServerTags)
+                .AddRedis(redisConnectionString, tags: RedisTags);
 
             services.AddHealthChecksUI(setupSettings: setup =>
                 {
@@ -39,22 +43,21 @@ namespace HomeBudget.Rates.Api.Configuration
             return services;
         }
 
-        public static IApplicationBuilder SetUpHealthCheckEndpoints(this IApplicationBuilder builder)
+        public static IEndpointRouteBuilder SetUpHealthCheckEndpoints(this IEndpointRouteBuilder builder)
         {
-            return builder.UseEndpoints(config =>
+            builder.MapHealthChecks(Endpoints.HealthCheckSource, new HealthCheckOptions
             {
-                config.MapHealthChecks(Endpoints.HealthCheckSource, new HealthCheckOptions
-                {
-                    Predicate = _ => true,
-                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
-                });
-
-                config.MapHealthChecksUI(options =>
-                {
-                    options.UIPath = "/show-health-ui";
-                    options.ApiPath = "/health-ui-api";
-                });
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
             });
+
+            builder.MapHealthChecksUI(options =>
+            {
+                options.UIPath = "/show-health-ui";
+                options.ApiPath = "/health-ui-api";
+            });
+
+            return builder;
         }
     }
 }

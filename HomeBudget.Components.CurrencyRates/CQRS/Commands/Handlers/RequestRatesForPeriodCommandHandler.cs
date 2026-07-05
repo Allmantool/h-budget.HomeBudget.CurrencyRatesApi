@@ -1,13 +1,9 @@
-﻿using System.Globalization;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-
-using MediatR;
-
 using HomeBudget.Components.CurrencyRates.CQRS.Commands.Models;
 using HomeBudget.Components.CurrencyRates.Services.Interfaces;
-using HomeBudget.Core.Constants;
 using HomeBudget.Core.Services.Interfaces;
+using MediatR;
 
 namespace HomeBudget.Components.CurrencyRates.CQRS.Commands.Handlers
 {
@@ -20,18 +16,15 @@ namespace HomeBudget.Components.CurrencyRates.CQRS.Commands.Handlers
             RequestRatesForPeriodCommand request,
             CancellationToken cancellationToken)
         {
-            var startDate = request.StartDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture);
-            var endDate = request.EndDate.ToString(DateFormats.NationalBankApiRequest, CultureInfo.InvariantCulture);
-
-            var cacheKey = $"{nameof(ICurrencyRatesService.GetRatesForPeriodAsync)}" +
-                           $"|{startDate}-{endDate}";
-
-            var operationResult = await cacheService.GetOrCreateAsync(
-                 cacheKey,
-                 () => currencyRatesService.GetRatesForPeriodAsync(request.StartDate, request.EndDate));
+            var operationResult = await currencyRatesService.GetRatesForPeriodAsync(
+                request.StartDate,
+                request.EndDate,
+                cancellationToken);
 
             if (operationResult.IsSucceeded)
             {
+                await cacheService.FlushAsync();
+
                 // TODO: SignalR
             }
         }

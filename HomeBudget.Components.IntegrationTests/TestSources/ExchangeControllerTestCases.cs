@@ -4,6 +4,8 @@ namespace HomeBudget.Components.IntegrationTests.TestSources
 {
     internal static class ExchangeControllerTestCases
     {
+        private const string UkrainianHryvniaAbbreviation = "UAH";
+
         public static object[] WithUsdCases =>
         [
             new object[] { CurrencyCodes.Blr, CurrencyCodes.Usd, 314.71m },
@@ -26,8 +28,8 @@ namespace HomeBudget.Components.IntegrationTests.TestSources
             new object[] { CurrencyCodes.Pln, CurrencyCodes.Blr, 814.63m },
             new object[] { CurrencyCodes.Blr, CurrencyCodes.Try, 9268.7m },
             new object[] { CurrencyCodes.Try, CurrencyCodes.Blr, 107.89m },
-            new object[] { CurrencyCodes.Blr, CurrencyCodes.Uan, 11826.2m },
-            new object[] { CurrencyCodes.Uan, CurrencyCodes.Blr, 84.56m },
+            new object[] { CurrencyCodes.Blr, UkrainianHryvniaAbbreviation, 11826.2m },
+            new object[] { UkrainianHryvniaAbbreviation, CurrencyCodes.Blr, 84.56m },
         ];
     }
 }

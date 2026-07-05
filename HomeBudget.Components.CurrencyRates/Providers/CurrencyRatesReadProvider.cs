@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,6 +17,27 @@ namespace HomeBudget.Components.CurrencyRates.Providers
     internal class CurrencyRatesReadProvider : ICurrencyRatesReadProvider
     {
         private const string DatabaseName = "HomeBudget.CurrencyRates";
+        private const string CurrencyRateSelect = @"
+            SELECT
+                rates.[CurrencyId],
+                COALESCE(localNames.[Name], rates.[Name]) AS [Name],
+                rates.[Abbreviation],
+                rates.[Scale],
+                rates.[OfficialRate],
+                rates.[RatePerUnit],
+                rates.[UpdateDate]
+            FROM dbo.[CurrencyRates] rates WITH (NOLOCK)
+            OUTER APPLY
+            (
+                SELECT TOP (1) abbreviations.[Name]
+                FROM dbo.[CurrencyAbbreviations] abbreviations WITH (NOLOCK)
+                WHERE abbreviations.[CurrencyId] = rates.[CurrencyId]
+                ORDER BY
+                    CASE
+                        WHEN abbreviations.[Abbreviation] = rates.[Abbreviation] THEN 0
+                        ELSE 1
+                    END
+            ) localNames";
 
         private readonly string _ratesAbbreviationPredicate;
         private readonly IMapper _mapper;
@@ -31,24 +53,25 @@ namespace HomeBudget.Components.CurrencyRates.Providers
 
             _mapper = mapper;
             _readRepository = readRepository;
-            _ratesAbbreviationPredicate = $"[Abbreviation] IN ({abbreviations})";
+            _ratesAbbreviationPredicate = $"rates.[Abbreviation] IN ({abbreviations})";
 
             _readRepository.Database = DatabaseName;
         }
 
         public async Task<IReadOnlyCollection<CurrencyRate>> GetRatesForPeriodAsync(DateOnly startDate, DateOnly endDate)
         {
-            var query = "SELECT * " +
-                          $"FROM dbo.[CurrencyRates] WITH (NOLOCK) " +
-                         "WHERE [UpdateDate] BETWEEN @StartDate AND @EndDate " +
-                          $"AND {_ratesAbbreviationPredicate};";
+            var startDateParameter = startDate.ToString(DateFormats.MsSqlDayOnlyFormat, CultureInfo.InvariantCulture);
+            var endDateParameter = endDate.ToString(DateFormats.MsSqlDayOnlyFormat, CultureInfo.InvariantCulture);
+            var query = CurrencyRateSelect +
+                         " WHERE rates.[UpdateDate] BETWEEN @StartDate AND @EndDate " +
+                         $"AND {_ratesAbbreviationPredicate};";
 
             var response = await _readRepository.GetAsync<CurrencyRateEntity>(
                 query,
                 new
                 {
-                    StartDate = startDate.ToString(DateFormats.MsSqlDayOnlyFormat),
-                    EndDate = endDate.ToString(DateFormats.MsSqlDayOnlyFormat)
+                    StartDate = startDateParameter,
+                    EndDate = endDateParameter
                 });
 
             return _mapper.Map<IReadOnlyCollection<CurrencyRate>>(response);
@@ -56,9 +79,8 @@ namespace HomeBudget.Components.CurrencyRates.Providers
 
         public async Task<IReadOnlyCollection<CurrencyRate>> GetRatesAsync()
         {
-            var query = "SELECT * " +
-                          $"FROM dbo.[CurrencyRates] WITH (NOLOCK) " +
-                        $"WHERE {_ratesAbbreviationPredicate};";
+            var query = CurrencyRateSelect +
+                        $" WHERE {_ratesAbbreviationPredicate};";
 
             var response = await _readRepository.GetAsync<CurrencyRateEntity>(query);
 
@@ -67,16 +89,18 @@ namespace HomeBudget.Components.CurrencyRates.Providers
 
         public async Task<IReadOnlyCollection<CurrencyRate>> GetTodayRatesAsync()
         {
-            var query = "SELECT * " +
-                          $"FROM dbo.[CurrencyRates] WITH (NOLOCK) " +
-                         "WHERE [UpdateDate] = @Today " +
-                          $"AND {_ratesAbbreviationPredicate};";
+            var todayParameter = DateOnly.FromDateTime(DateTime.Now).ToString(
+                DateFormats.MsSqlDayOnlyFormat,
+                CultureInfo.InvariantCulture);
+            var query = CurrencyRateSelect +
+                         " WHERE rates.[UpdateDate] = @Today " +
+                         $"AND {_ratesAbbreviationPredicate};";
 
             var response = await _readRepository.GetAsync<CurrencyRateEntity>(
                 query,
                 new
                 {
-                    Today = DateOnly.FromDateTime(DateTime.Now).ToString(DateFormats.MsSqlDayOnlyFormat)
+                    Today = todayParameter
                 });
 
             return _mapper.Map<IReadOnlyCollection<CurrencyRate>>(response);

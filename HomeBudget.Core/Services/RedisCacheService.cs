@@ -26,10 +26,7 @@ namespace HomeBudget.Core.Services
                 return Result<T>.Succeeded(await GetAsync<T>(key));
             }
 
-            if (callback is null)
-            {
-                throw new ArgumentNullException(nameof(callback));
-            }
+            ArgumentNullException.ThrowIfNull(callback);
 
             var cacheValue = await callback.Invoke();
             await AddAsync(key, cacheValue.Payload);

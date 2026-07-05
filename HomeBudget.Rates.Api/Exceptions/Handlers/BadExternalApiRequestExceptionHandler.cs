@@ -28,9 +28,8 @@ namespace HomeBudget.Rates.Api.Exceptions.Handlers
 
             var problemDetails = new ProblemDetails
             {
-                Status = StatusCodes.Status503ServiceUnavailable,
-                Title = "Service is unreachable",
-                Detail = badRequestException.Message,
+                Status = StatusCodes.Status408RequestTimeout,
+                Title = "External Api request failed due to big latency"
             };
 
             httpContext.Response.StatusCode = problemDetails.Status.Value;
