@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-
 using AutoMapper;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-
 using HomeBudget.Components.CurrencyRates.CQRS.Commands.Models;
 using HomeBudget.Components.CurrencyRates.CQRS.Queries.Models;
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Core.Models;
 using HomeBudget.Rates.Api.Constants;
 using HomeBudget.Rates.Api.Models.Requests;
-
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using CurrencyRate = HomeBudget.Components.CurrencyRates.Models.CurrencyRate;
 
 namespace HomeBudget.Rates.Api.Controllers
@@ -34,16 +31,16 @@ namespace HomeBudget.Rates.Api.Controllers
         }
 
         [HttpPost("period/{startDate}/{endDate}")]
-        public ActionResult RequestRatesForPeriod(
+        public async Task<ActionResult> RequestRatesForPeriodAsync(
             [FromBody] CurrencyForPeriodRequest request,
             CancellationToken token = default)
         {
-            var command = new RequestRatesForPeriodCommand (
+            var command = new RequestRatesForPeriodCommand(
                 request.StartDate,
                 request.EndDate
             );
 
-            mediator.Send(command, token);
+            await mediator.Send(command, token);
 
             return Accepted(command.Id);
         }

@@ -2,17 +2,19 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using HomeBudget.Core.Extensions;
+using HomeBudget.Rates.Api.Extensions;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-using HomeBudget.Core.Extensions;
-
 namespace HomeBudget.Rates.Api.Exceptions.Handlers
 {
-    internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
+    internal sealed class GlobalExceptionHandler(
+        ILogger<GlobalExceptionHandler> logger,
+        IWebHostEnvironment environment) : IExceptionHandler
     {
         public async ValueTask<bool> TryHandleAsync(
             HttpContext httpContext,
@@ -30,7 +32,9 @@ namespace HomeBudget.Rates.Api.Exceptions.Handlers
             var problemDetails = new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
-                Title = $"Global exception. Message: {exception.Message}"
+                Title = environment.IsUnderDevelopment()
+                    ? $"Global exception. Message: {exception.Message}"
+                    : "Server Error"
             };
 
             httpContext.Response.StatusCode = problemDetails.Status.Value;

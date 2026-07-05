@@ -11,7 +11,6 @@ using HomeBudget.Components.CurrencyRates.Extensions;
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.CurrencyRates.Services.Interfaces;
-using HomeBudget.Core.Extensions;
 using HomeBudget.Core.Models;
 
 namespace HomeBudget.Components.CurrencyRates.Services
@@ -63,11 +62,11 @@ namespace HomeBudget.Components.CurrencyRates.Services
                 rate.EnrichWithRateGroupInfo(currencyInfo);
             }
 
+            await SaveWithRewriteAsync(new SaveCurrencyRatesCommand(ratesFromApiCall));
+
             var ratesForPeriodFromDatabase = await currencyRatesReadProvider.GetRatesForPeriodAsync(startDate, endDate);
 
-            await SaveWithRewriteAsync(new SaveCurrencyRatesCommand(ratesFromApiCall, ratesForPeriodFromDatabase));
-
-            var currencyGroups = ratesFromApiCall.MapToCurrencyRateGrouped(mapper);
+            var currencyGroups = ratesForPeriodFromDatabase.MapToCurrencyRateGrouped(mapper);
 
             // TODO: SignalR or .net 10 SSE
             return Result<IReadOnlyCollection<CurrencyRateGrouped>>.Succeeded(currencyGroups);
@@ -79,21 +78,23 @@ namespace HomeBudget.Components.CurrencyRates.Services
 
             var ratesFromApiCall = mapper.Map<IReadOnlyCollection<CurrencyRate>>(activeCurrencyRates);
 
+            await SaveWithRewriteAsync(new SaveCurrencyRatesCommand(ratesFromApiCall));
+
             var todayRatesFromDatabase = await currencyRatesReadProvider.GetTodayRatesAsync();
 
-            await SaveWithRewriteAsync(new SaveCurrencyRatesCommand(ratesFromApiCall, todayRatesFromDatabase));
-
-            return Result<IReadOnlyCollection<CurrencyRateGrouped>>.Succeeded(ratesFromApiCall.MapToCurrencyRateGrouped(mapper));
+            return Result<IReadOnlyCollection<CurrencyRateGrouped>>.Succeeded(todayRatesFromDatabase.MapToCurrencyRateGrouped(mapper));
         }
 
         public async Task<Result<int>> SaveWithRewriteAsync(SaveCurrencyRatesCommand saveRatesCommand)
         {
             var ratesFromApiCall = saveRatesCommand.RatesFromApiCall ?? Enumerable.Empty<CurrencyRate>().ToList();
 
-            var amountOfAffectedRows = saveRatesCommand.RatesFromDatabase.IsNullOrEmpty()
-                                       || saveRatesCommand.RatesFromDatabase.Count != ratesFromApiCall.Count
-                ? await currencyRatesWriteProvider.UpsertRatesWithSaveAsync(ratesFromApiCall)
-                : default;
+            if (ratesFromApiCall.Count == 0)
+            {
+                return Result<int>.Succeeded(default);
+            }
+
+            var amountOfAffectedRows = await currencyRatesWriteProvider.UpsertRatesWithSaveAsync(ratesFromApiCall);
 
             return Result<int>.Succeeded(amountOfAffectedRows);
         }
