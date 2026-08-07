@@ -15,6 +15,7 @@
 		<PackageReference Include="Refit.Newtonsoft.Json" />
 		<PackageReference Include="Refit.HttpClientFactory" />
 		<PackageReference Include="Refit" />
+		<PackageReference Include="Refit.Reflection" />
 		<PackageReference Include="System.Text.Json" />
 	</ItemGroup>
 
