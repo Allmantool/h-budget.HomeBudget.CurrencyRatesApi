@@ -83,6 +83,20 @@ Do not start broad legacy cleanup unless explicitly requested.
 
 ---
 
+## 3.1 Mandatory Codex Self-Review
+
+After the first implementation pass and before the final response, Codex must review its own diff as a PR:
+
+1. Run `git status --short`, `git diff --stat`, and inspect the relevant `git diff`.
+2. Identify unrelated dirty files and avoid touching them.
+3. Review architecture boundaries, SOLID/GRASP/KISS/YAGNI alignment, naming, domain language, async/error/loading behavior, state-management consistency where applicable, API contract compatibility, test coverage, security/secrets/logging impact, performance, duplicate calls, and UI/UX regressions where applicable.
+4. Search the diff for `TODO`, `FIXME`, `HACK`, `any`, `ts-ignore`, `ts-expect-error`, broad `eslint-disable`, `force`, `legacy-peer-deps`, and temporary workarounds.
+5. Fix issues found in the self-review before final validation, staying within the original task scope.
+6. Do not hide issues by weakening tests, lint, compiler settings, analyzers, or repository standards.
+7. Report the self-review result, validation commands, and any remaining risks in the final response.
+
+---
+
 ## 4. Ambiguity and Stop Conditions
 
 Do not guess when the decision affects correctness, public behavior, persistence, security, financial calculations, external integrations, or operational safety.
