@@ -1,3 +1,8 @@
+---
+name: clean-code-review
+description: Review or refactor Rates API C# code for maintainability and testability while preserving currency and provider behavior.
+---
+
 # Clean Code Review
 
 Use this skill when reviewing or refactoring C#/.NET code for maintainability, readability, SOLID, GRASP, KISS, YAGNI, Law of Demeter, complexity, file size, method size, parameter count, dependency design, testability, and code-review readiness.
