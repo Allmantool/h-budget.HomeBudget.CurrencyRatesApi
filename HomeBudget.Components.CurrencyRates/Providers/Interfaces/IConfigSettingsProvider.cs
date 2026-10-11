@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-
+﻿using System.Threading;
+using System.Threading.Tasks;
 using HomeBudget.Components.CurrencyRates.Models;
 
 namespace HomeBudget.Components.CurrencyRates.Providers.Interfaces
@@ -7,6 +7,8 @@ namespace HomeBudget.Components.CurrencyRates.Providers.Interfaces
     public interface IConfigSettingsProvider
     {
         Task<ConfigSettings> GetDefaultSettingsAsync();
-        Task<int> SaveDefaultSettingsAsync(ConfigSettings settings);
+        Task<int> SaveDefaultSettingsAsync(
+            ConfigSettings settings,
+            CancellationToken cancellationToken = default);
     }
 }

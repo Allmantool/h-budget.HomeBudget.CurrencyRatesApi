@@ -65,7 +65,9 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
                 });
 
             _currencyRatesWriteProviderMock
-                .Setup(i => i.UpsertRatesWithSaveAsync(It.IsAny<IReadOnlyCollection<CurrencyRate>>()))
+                .Setup(i => i.UpsertRatesWithSaveAsync(
+                    It.IsAny<IReadOnlyCollection<CurrencyRate>>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(0);
 
             _sut = new CurrencyRatesService(
@@ -300,9 +302,28 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
                     new[] { existingDifferentRate }));
 
             _currencyRatesWriteProviderMock.Verify(
-                i => i.UpsertRatesWithSaveAsync(It.Is<IReadOnlyCollection<CurrencyRate>>(rates =>
-                    rates.Single().CurrencyId == fetchedRate.CurrencyId
-                    && rates.Single().UpdateDate == fetchedRate.UpdateDate)),
+                i => i.UpsertRatesWithSaveAsync(
+                    It.Is<IReadOnlyCollection<CurrencyRate>>(rates =>
+                        rates.Single().CurrencyId == fetchedRate.CurrencyId
+                        && rates.Single().UpdateDate == fetchedRate.UpdateDate),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task SaveWithRewriteAsync_WhenCancellationTokenProvided_ForwardsTokenToWriteProvider()
+        {
+            using var cancellation = new CancellationTokenSource();
+            var rate = CreateRate(431, "USD", "US Dollar", 1, 3.2m, new DateOnly(2032, 1, 1));
+
+            await _sut.SaveWithRewriteAsync(
+                new SaveCurrencyRatesCommand(new[] { rate }),
+                cancellation.Token);
+
+            _currencyRatesWriteProviderMock.Verify(
+                provider => provider.UpsertRatesWithSaveAsync(
+                    It.IsAny<IReadOnlyCollection<CurrencyRate>>(),
+                    cancellation.Token),
                 Times.Once);
         }
 
@@ -338,9 +359,11 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
             await _sut.GetRatesForPeriodAsync(startDate, endDate);
 
             _currencyRatesWriteProviderMock.Verify(
-                i => i.UpsertRatesWithSaveAsync(It.Is<IReadOnlyCollection<CurrencyRate>>(rates =>
-                    rates.Any(rate => rate.UpdateDate == startDate)
-                    && rates.Any(rate => rate.UpdateDate == endDate))),
+                i => i.UpsertRatesWithSaveAsync(
+                    It.Is<IReadOnlyCollection<CurrencyRate>>(rates =>
+                        rates.Any(rate => rate.UpdateDate == startDate)
+                        && rates.Any(rate => rate.UpdateDate == endDate)),
+                    It.IsAny<CancellationToken>()),
                 Times.Once);
         }
 
@@ -384,8 +407,10 @@ namespace HomeBudget.Components.CurrencyRates.Tests.Services
 
             result.Payload.Should().ContainSingle(rate => rate.Abbreviation == "USD");
             _currencyRatesWriteProviderMock.Verify(
-                i => i.UpsertRatesWithSaveAsync(It.Is<IReadOnlyCollection<CurrencyRate>>(rates =>
-                    rates.Count == 1 && rates.Single().CurrencyId == 431)),
+                i => i.UpsertRatesWithSaveAsync(
+                    It.Is<IReadOnlyCollection<CurrencyRate>>(rates =>
+                        rates.Count == 1 && rates.Single().CurrencyId == 431),
+                    It.IsAny<CancellationToken>()),
                 Times.Once);
         }
 

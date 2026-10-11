@@ -11,15 +11,17 @@ namespace HomeBudget.Components.CurrencyRates.Services.Interfaces
 {
     public interface ICurrencyRatesService
     {
-        public Task<Result<int>> SaveWithRewriteAsync(SaveCurrencyRatesCommand saveRatesCommand);
+        Task<Result<int>> SaveWithRewriteAsync(
+            SaveCurrencyRatesCommand saveRatesCommand,
+            CancellationToken cancellationToken = default);
 
-        public Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesAsync();
+        Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesAsync();
 
-        public Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesForPeriodAsync(
+        Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetRatesForPeriodAsync(
             DateOnly startDate,
             DateOnly endDate,
             CancellationToken ct = default);
 
-        public Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetTodayRatesAsync();
+        Task<Result<IReadOnlyCollection<CurrencyRateGrouped>>> GetTodayRatesAsync();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.RateLimiting;
 using HomeBudget.Components.CurrencyRates.Clients.Limiters;
+using HomeBudget.Components.CurrencyRates.DataProtection;
 using HomeBudget.Components.CurrencyRates.Providers;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
 using HomeBudget.Components.CurrencyRates.Services;
@@ -19,6 +20,7 @@ namespace HomeBudget.Components.CurrencyRates.Configuration
         {
             return services
                 .AddScoped<IConfigSettingsProvider, ConfigSettingsProvider>()
+                .AddScoped<IRatesCaptureFrontierProvider, RatesCaptureFrontierProvider>()
                 .AddScoped<IConfigSettingsServices, ConfigSettingsServices>()
                 .AddScoped<INationalBankCurrencyResolver, NationalBankCurrencyResolver>()
                 .AddScoped<ICurrencyRatesWriteProvider, CurrencyRatesWriteProvider>()

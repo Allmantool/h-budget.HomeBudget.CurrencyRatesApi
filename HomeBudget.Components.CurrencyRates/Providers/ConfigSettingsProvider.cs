@@ -1,6 +1,9 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
+using HomeBudget.Components.CurrencyRates.DataProtection;
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Components.CurrencyRates.Models.DbEntities;
 using HomeBudget.Components.CurrencyRates.Providers.Interfaces;
@@ -11,7 +14,35 @@ namespace HomeBudget.Components.CurrencyRates.Providers
     internal class ConfigSettingsProvider : IConfigSettingsProvider
     {
         private const string GeneralConfigSettingsKey = "General";
-        private const string DatabaseName = "HomeBudget.CurrencyRates";
+        private const string SaveSettingsSql = RatesCommitSql.BeginMutationTransaction + """
+                UPDATE dbo.ConfigSettings
+                   SET Settings = @Settings
+                 WHERE [Key] = @Key;
+
+                DECLARE @AffectedRows INT = @@ROWCOUNT;
+                DECLARE @Receipt TABLE
+                (
+                    ReceiptId UNIQUEIDENTIFIER,
+                    CommitSequence BIGINT,
+                    AffectedRows INT,
+                    CommittedUtc DATETIME2(7)
+                );
+
+                INSERT INTO dbo.RatesCommitReceipts
+                    (ReceiptId, MutationKind, AffectedRows, CommittedUtc)
+                OUTPUT inserted.ReceiptId,
+                       inserted.CommitSequence,
+                       inserted.AffectedRows,
+                       inserted.CommittedUtc
+                    INTO @Receipt
+                VALUES
+                    (@ReceiptId, N'settings', @AffectedRows, SYSUTCDATETIME());
+
+                COMMIT TRANSACTION;
+
+                SELECT ReceiptId, CommitSequence, AffectedRows, CommittedUtc
+                FROM @Receipt;
+            """ + RatesCommitSql.RollbackOnError;
 
         private readonly IBaseWriteRepository _writeRepository;
         private readonly IBaseReadRepository _readRepository;
@@ -23,8 +54,8 @@ namespace HomeBudget.Components.CurrencyRates.Providers
             _writeRepository = writeRepository;
             _readRepository = readRepository;
 
-            _readRepository.Database = DatabaseName;
-            _writeRepository.Database = DatabaseName;
+            _readRepository.Database = RatesCommitSql.DatabaseName;
+            _writeRepository.Database = RatesCommitSql.DatabaseName;
         }
 
         public async Task<ConfigSettings> GetDefaultSettingsAsync()
@@ -41,21 +72,25 @@ namespace HomeBudget.Components.CurrencyRates.Providers
             return JsonSerializer.Deserialize<ConfigSettings>(configAsJson);
         }
 
-        public async Task<int> SaveDefaultSettingsAsync(ConfigSettings settings)
+        public async Task<int> SaveDefaultSettingsAsync(
+            ConfigSettings settings,
+            CancellationToken cancellationToken = default)
         {
             var settingsAsJson = JsonSerializer.Serialize(settings);
-
-            const string query = $"UPDATE [dbo].[ConfigSettings] " +
-                                    "SET Settings = @Settings " +
-                                  "WHERE [Key] = @Key";
-
-            return await _writeRepository.ExecuteAsync(
-                query,
+            var receipt = await _writeRepository.QuerySingleAsync<RatesCommitWriteResult, SettingsForUpdatePayload>(
+                SaveSettingsSql,
                 new SettingsForUpdatePayload
                 {
                     Key = GeneralConfigSettingsKey,
-                    Settings = settingsAsJson
-                });
+                    Settings = settingsAsJson,
+                    ReceiptId = Guid.NewGuid(),
+                    LockResource = RatesCommitSql.LockResource,
+                    GlobalMaintenanceLockResource = RatesCommitSql.GlobalMaintenanceLockResource,
+                    LockTimeoutMilliseconds = RatesCommitSql.LockTimeoutMilliseconds
+                },
+                cancellationToken);
+
+            return receipt.AffectedRows;
         }
     }
 }

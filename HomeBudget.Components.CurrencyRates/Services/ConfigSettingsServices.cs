@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -27,9 +28,12 @@ namespace HomeBudget.Components.CurrencyRates.Services
             return Result<IReadOnlyCollection<Currency>>.Succeeded(mapper.Map<IReadOnlyCollection<Currency>>(upToDateCurrencies));
         }
 
-        public async Task<Result<int>> SaveSettingsAsync(ConfigSettings settings)
+        public async Task<Result<int>> SaveSettingsAsync(
+            ConfigSettings settings,
+            CancellationToken cancellationToken = default)
         {
-            return Result<int>.Succeeded(await configSettingsProvider.SaveDefaultSettingsAsync(settings));
+            return Result<int>.Succeeded(
+                await configSettingsProvider.SaveDefaultSettingsAsync(settings, cancellationToken));
         }
 
         public Task<Result<ConfigSettings>> GetSettingsAsync()

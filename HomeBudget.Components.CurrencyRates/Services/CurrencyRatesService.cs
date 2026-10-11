@@ -62,7 +62,7 @@ namespace HomeBudget.Components.CurrencyRates.Services
                 rate.EnrichWithRateGroupInfo(currencyInfo);
             }
 
-            await SaveWithRewriteAsync(new SaveCurrencyRatesCommand(ratesFromApiCall));
+            await SaveWithRewriteAsync(new SaveCurrencyRatesCommand(ratesFromApiCall), ct);
 
             var ratesForPeriodFromDatabase = await currencyRatesReadProvider.GetRatesForPeriodAsync(startDate, endDate);
 
@@ -85,7 +85,9 @@ namespace HomeBudget.Components.CurrencyRates.Services
             return Result<IReadOnlyCollection<CurrencyRateGrouped>>.Succeeded(todayRatesFromDatabase.MapToCurrencyRateGrouped(mapper));
         }
 
-        public async Task<Result<int>> SaveWithRewriteAsync(SaveCurrencyRatesCommand saveRatesCommand)
+        public async Task<Result<int>> SaveWithRewriteAsync(
+            SaveCurrencyRatesCommand saveRatesCommand,
+            CancellationToken cancellationToken = default)
         {
             var ratesFromApiCall = saveRatesCommand.RatesFromApiCall ?? Enumerable.Empty<CurrencyRate>().ToList();
 
@@ -94,7 +96,9 @@ namespace HomeBudget.Components.CurrencyRates.Services
                 return Result<int>.Succeeded(default);
             }
 
-            var amountOfAffectedRows = await currencyRatesWriteProvider.UpsertRatesWithSaveAsync(ratesFromApiCall);
+            var amountOfAffectedRows = await currencyRatesWriteProvider.UpsertRatesWithSaveAsync(
+                ratesFromApiCall,
+                cancellationToken);
 
             return Result<int>.Succeeded(amountOfAffectedRows);
         }

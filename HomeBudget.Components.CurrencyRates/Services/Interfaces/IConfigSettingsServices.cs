@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using HomeBudget.Components.CurrencyRates.Models;
@@ -8,10 +9,12 @@ namespace HomeBudget.Components.CurrencyRates.Services.Interfaces
 {
     public interface IConfigSettingsServices
     {
-        public Task<Result<IReadOnlyCollection<Currency>>> GetAvailableCurrenciesAsync();
+        Task<Result<IReadOnlyCollection<Currency>>> GetAvailableCurrenciesAsync();
 
-        public Task<Result<int>> SaveSettingsAsync(ConfigSettings settings);
+        Task<Result<int>> SaveSettingsAsync(
+            ConfigSettings settings,
+            CancellationToken cancellationToken = default);
 
-        public Task<Result<ConfigSettings>> GetSettingsAsync();
+        Task<Result<ConfigSettings>> GetSettingsAsync();
     }
 }

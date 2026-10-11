@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Mvc;
-
 using HomeBudget.Components.CurrencyRates.Models;
 using HomeBudget.Components.CurrencyRates.Services.Interfaces;
 using HomeBudget.Core.Models;
 using HomeBudget.Rates.Api.Constants;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HomeBudget.Rates.Api.Controllers
 {
@@ -27,9 +26,11 @@ namespace HomeBudget.Rates.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<int>> SaveSettingsAsync(ConfigSettings settings)
+        public async Task<Result<int>> SaveSettingsAsync(
+            ConfigSettings settings,
+            CancellationToken cancellationToken = default)
         {
-            return await configSettingsServices.SaveSettingsAsync(settings);
+            return await configSettingsServices.SaveSettingsAsync(settings, cancellationToken);
         }
     }
 }

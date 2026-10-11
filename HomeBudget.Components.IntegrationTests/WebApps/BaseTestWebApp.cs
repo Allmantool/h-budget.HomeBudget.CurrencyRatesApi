@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-
-using NUnit.Framework;
-using RestSharp;
-
 using HomeBudget.Components.IntegrationTests.Constants;
 using HomeBudget.Components.IntegrationTests.Models;
 using HomeBudget.Rates.Api.Constants;
+using NUnit.Framework;
+using RestSharp;
 
 namespace HomeBudget.Components.IntegrationTests.WebApps
 {
@@ -17,6 +15,8 @@ namespace HomeBudget.Components.IntegrationTests.WebApps
         internal TestContainersService TestContainersService { get; private set; } = GlobalTestContainerSetup.TestContainersService;
 
         internal RestClient RestHttpClient { get; set; }
+
+        internal IServiceProvider Services => WebFactory.Services;
 
         public async Task<bool> InitAsync()
         {

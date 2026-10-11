@@ -1,11 +1,11 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
-
 using Dapper;
-using Microsoft.Extensions.Options;
-
 using HomeBudget.Core.Options;
 using HomeBudget.DataAccess.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace HomeBudget.DataAccess.Dapper.SqlClients.MsSql
 {
@@ -33,11 +33,22 @@ namespace HomeBudget.DataAccess.Dapper.SqlClients.MsSql
                 : await db.ExecuteAsync(sqlQuery, parameters, dbTransaction, commandTimeout: sqlOptions.Value.SqlWriteCommandTimeoutSeconds);
         }
 
-        public async Task<int> ExecuteAsync(
+        public Task<int> ExecuteAsync(
             string sqlQuery,
             DataTable dt,
             string mapToDbType,
             IDbTransaction dbTransaction = null)
+        {
+            ArgumentNullException.ThrowIfNull(dt);
+
+            return ExecuteDataTableAsync(sqlQuery, dt, mapToDbType, dbTransaction);
+        }
+
+        private async Task<int> ExecuteDataTableAsync(
+            string sqlQuery,
+            DataTable dt,
+            string mapToDbType,
+            IDbTransaction dbTransaction)
         {
             using var db = sqlConnectionFactory.Create(Database);
 
@@ -47,6 +58,58 @@ namespace HomeBudget.DataAccess.Dapper.SqlClients.MsSql
             return dbTransaction == null
                 ? await db.ExecuteAsync(sqlQuery, parameters, commandTimeout: sqlOptions.Value.SqlWriteCommandTimeoutSeconds)
                 : await db.ExecuteAsync(sqlQuery, parameters, dbTransaction, commandTimeout: sqlOptions.Value.SqlWriteCommandTimeoutSeconds);
+        }
+
+        public async Task<TResult> QuerySingleAsync<TResult, T>(
+            string sqlQuery,
+            T parameters,
+            CancellationToken cancellationToken = default)
+            where T : IDbEntity
+        {
+            using var db = sqlConnectionFactory.Create(Database);
+            var command = new CommandDefinition(
+                sqlQuery,
+                parameters,
+                commandTimeout: sqlOptions.Value.SqlWriteCommandTimeoutSeconds,
+                cancellationToken: cancellationToken);
+
+            return await db.QuerySingleAsync<TResult>(command);
+        }
+
+        public Task<TResult> QuerySingleAsync<TResult>(
+            string sqlQuery,
+            DataTable dt,
+            string mapToDbType,
+            object parameters,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(dt);
+
+            return QuerySingleDataTableAsync<TResult>(
+                sqlQuery,
+                dt,
+                mapToDbType,
+                parameters,
+                cancellationToken);
+        }
+
+        private async Task<TResult> QuerySingleDataTableAsync<TResult>(
+            string sqlQuery,
+            DataTable dt,
+            string mapToDbType,
+            object parameters,
+            CancellationToken cancellationToken)
+        {
+            using var db = sqlConnectionFactory.Create(Database);
+            var dynamicParameters = new DynamicParameters(parameters);
+            dynamicParameters.Add($"@{dt.TableName}", dt.AsTableValuedParameter(mapToDbType));
+            var command = new CommandDefinition(
+                sqlQuery,
+                dynamicParameters,
+                commandTimeout: sqlOptions.Value.SqlWriteCommandTimeoutSeconds,
+                cancellationToken: cancellationToken);
+
+            return await db.QuerySingleAsync<TResult>(command);
         }
     }
 }
