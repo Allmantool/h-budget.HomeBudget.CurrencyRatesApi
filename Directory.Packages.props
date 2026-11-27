@@ -59,8 +59,8 @@
     <PackageVersion Include="Refit.Newtonsoft.Json" Version="17.0.0" />
     <PackageVersion Include="Refit.Reflection" Version="17.0.0" />
     <PackageVersion Include="RestSharp" Version="114.1.0" />
-    <PackageVersion Include="Sentry.AspNetCore" Version="7.0.1" />
-    <PackageVersion Include="Sentry.Serilog" Version="7.0.1" />
+    <PackageVersion Include="Sentry.AspNetCore" Version="7.1.0" />
+    <PackageVersion Include="Sentry.Serilog" Version="7.1.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="11.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Activity" Version="1.0.0.3" />
     <PackageVersion Include="Serilog.Enrichers.Context" Version="4.6.5" />
